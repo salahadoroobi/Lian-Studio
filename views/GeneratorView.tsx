@@ -67,17 +67,9 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t }) => {
                 <h2 className="text-3xl font-bold text-brand-primary dark:text-white">{t('generator_title')}</h2>
                 
                 <div>
-                    <label htmlFor="prompt" className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('prompt_label')}</label>
-                    <div className="relative w-full">
-                        <textarea
-                            id="prompt"
-                            rows={4}
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            placeholder={t('prompt_placeholder')}
-                            className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                        />
-                         <input
+                    <div className="flex justify-between items-center mb-2">
+                        <label htmlFor="prompt" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('prompt_label')}</label>
+                        <input
                             type="file"
                             ref={fileInputRef}
                             onChange={handleFileSelect}
@@ -89,11 +81,19 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t }) => {
                             onClick={() => fileInputRef.current?.click()}
                             title={t('upload_prompt_label')}
                             aria-label={t('upload_prompt_label')}
-                            className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors"
+                            className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
                         >
                             <UploadTextIcon />
                         </button>
                     </div>
+                    <textarea
+                        id="prompt"
+                        rows={4}
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder={t('prompt_placeholder')}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
                 </div>
                 
                 <div>
