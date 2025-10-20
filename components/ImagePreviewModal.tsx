@@ -32,7 +32,7 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ imageUrl, 
         
         <button
           onClick={onClose}
-          className="absolute -top-4 -right-4 bg-white text-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent z-10"
+          className="absolute -top-4 -right-4 bg-brand-accent text-brand-bg rounded-full p-2 shadow-lg hover:bg-brand-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent z-10 transition-colors"
           aria-label={t('close_preview')}
           title={t('close_preview')}
         >
