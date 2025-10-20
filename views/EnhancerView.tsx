@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
 import { enhanceImage } from '../services/geminiService';
 import type { ReferenceImage } from '../types';
 import { EnhancementSlider } from '../components/EnhancementSlider';
 import type { TFunction } from '../hooks/useLocalization';
+import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 
 interface EnhancerViewProps {
   t: TFunction;
@@ -18,6 +19,8 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t }) => {
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleEnhance = async () => {
         if (baseImage.length === 0) {
@@ -41,6 +44,22 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t }) => {
         }
     };
     
+     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target?.result as string;
+                setPrompt(text);
+            };
+            reader.onerror = (e) => {
+                console.error("Failed to read file", e);
+                setError("Failed to read the selected file.");
+            }
+            reader.readAsText(file);
+        }
+    };
+    
     const canEnhance = !isLoading && baseImage.length > 0 && prompt.trim().length > 0;
 
     return (
@@ -56,15 +75,33 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t }) => {
                 </div>
 
                 <div>
-                    <label htmlFor="prompt" className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('enhancement_label')}</label>
-                    <textarea
-                        id="prompt"
-                        rows={3}
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        placeholder={t('enhancement_placeholder')}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    />
+                    <label htmlFor="prompt-enhancer" className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('enhancement_label')}</label>
+                     <div className="relative w-full">
+                        <textarea
+                            id="prompt-enhancer"
+                            rows={3}
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            placeholder={t('enhancement_placeholder')}
+                            className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        />
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileSelect}
+                            accept=".txt"
+                            className="hidden"
+                            id="prompt-file-upload-enhancer"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            title={t('upload_prompt_label')}
+                            aria-label={t('upload_prompt_label')}
+                            className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors"
+                        >
+                            <UploadTextIcon />
+                        </button>
+                    </div>
                 </div>
 
                 <EnhancementSlider strength={enhancementStrength} setStrength={setEnhancementStrength} t={t} />
@@ -72,7 +109,7 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t }) => {
                 <button
                     onClick={handleEnhance}
                     disabled={!canEnhance}
-                    className="w-full bg-brand-accent text-white font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
+                    className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                 >
                     {isLoading ? '...' : t('enhance_button')}
                 </button>
