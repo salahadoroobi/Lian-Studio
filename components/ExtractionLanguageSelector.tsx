@@ -1,11 +1,10 @@
 import React from 'react';
 import type { TFunction } from '../hooks/useLocalization';
 import { EXTRACTION_LANGUAGES } from '../constants';
-import type { Language } from '../hooks/useLocalization';
 
 interface ExtractionLanguageSelectorProps {
-  selectedLanguage: Language;
-  setSelectedLanguage: (language: Language) => void;
+  selectedLanguage: string;
+  setSelectedLanguage: (language: string) => void;
   t: TFunction;
 }
 
@@ -13,14 +12,14 @@ export const ExtractionLanguageSelector: React.FC<ExtractionLanguageSelectorProp
   return (
     <div>
       <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('output_language_label')}</label>
-      <div className="grid grid-cols-2 gap-3">
-        {EXTRACTION_LANGUAGES.map(({ label, value }) => {
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {EXTRACTION_LANGUAGES.map(({ value }) => {
           const isSelected = selectedLanguage === value;
           return (
             <button
               key={value}
-              onClick={() => setSelectedLanguage(value as Language)}
-              className={`p-3 border rounded-lg text-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 h-full
+              onClick={() => setSelectedLanguage(value)}
+              className={`p-3 border rounded-lg text-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800
                 ${
                   isSelected
                     ? 'bg-brand-accent text-white border-brand-accent ring-brand-accent/50'

@@ -25,6 +25,10 @@ export const generateImage = async (
   
   let fullPrompt = prompt;
   if (aspectRatio !== 'Default') {
+    // Remove conflicting instructions from the prompt
+    fullPrompt = fullPrompt.replace(/vertical format|portrait aspect ratio|1080x1920|9:16/gi, '');
+    fullPrompt = fullPrompt.replace(/horizontal format|landscape aspect ratio|1920x1080|16:9/gi, '');
+    fullPrompt = fullPrompt.replace(/square format|square aspect ratio|1080x1080|1:1/gi, '');
     fullPrompt += `\n- Aspect ratio: ${aspectRatio}`;
   }
   if (quality === 'HD') {
@@ -33,7 +37,6 @@ export const generateImage = async (
 
   const imageParts = await Promise.all(referenceImages.map(img => fileToGenerativePart(img.file)));
   
-  // FIX: Conditionally construct `parts` array to ensure TypeScript correctly infers the union type for image and text parts.
   const parts = fullPrompt.trim()
     ? [...imageParts, { text: fullPrompt }]
     : imageParts;
@@ -89,13 +92,21 @@ export const enhanceImage = async (
     throw new Error('Image enhancement failed or the model did not return an image.');
 };
 
-export const extractPromptFromImage = async (image: ReferenceImage, language: 'en' | 'ar'): Promise<string> => {
+export const extractPromptFromImage = async (image: ReferenceImage, language: string): Promise<string> => {
     const model = 'gemini-2.5-flash';
     const imagePart = await fileToGenerativePart(image.file);
     
-    const langInstruction = language === 'ar'
-        ? 'The final output must be ONLY the generated prompt, in ARABIC, with no additional explanation or introductory text.'
-        : 'The final output must be ONLY the generated prompt, in ENGLISH, with no additional explanation or introductory text.';
+    const languageMap: { [key: string]: string } = {
+        en: 'ENGLISH',
+        ar: 'ARABIC',
+        es: 'SPANISH',
+        fr: 'FRENCH',
+        de: 'GERMAN',
+        ja: 'JAPANESE',
+    };
+    
+    const langName = languageMap[language] || 'ENGLISH';
+    const langInstruction = `The final output must be ONLY the generated prompt, in ${langName}, with no additional explanation or introductory text.`;
 
     const textPart = { text: `You are an expert prompt engineer for an advanced AI image generation model. Your task is to analyze the provided image and create a perfect, detailed prompt that could be used to generate a very similar image.
 

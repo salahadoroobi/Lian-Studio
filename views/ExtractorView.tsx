@@ -16,7 +16,7 @@ export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
     const [extractedText, setExtractedText] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [extractionLanguage, setExtractionLanguage] = useState<'en' | 'ar'>('en');
+    const [extractionLanguage, setExtractionLanguage] = useState<string>('en');
 
     const handleExtract = async () => {
         if (baseImage.length === 0) {

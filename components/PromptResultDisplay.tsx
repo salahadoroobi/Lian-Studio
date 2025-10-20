@@ -7,7 +7,7 @@ import { ClipboardCheckIcon } from './icons/ClipboardCheckIcon';
 interface PromptResultDisplayProps {
   text: string | null;
   t: TFunction;
-  extractionLanguage: 'en' | 'ar';
+  extractionLanguage: string;
 }
 
 export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, t, extractionLanguage }) => {
@@ -38,13 +38,13 @@ export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, 
           onClick={handleCopy}
           title={copied ? t('copy_success') : t('copy_button')}
           aria-label={copied ? t('copy_success') : t('copy_button')}
-          className="absolute top-2 right-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-brand-primary dark:text-brand-accent"
+          className="absolute top-3 right-3 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-brand-primary dark:text-brand-accent"
         >
           {copied ? <ClipboardCheckIcon /> : <ClipboardIcon />}
         </button>
         <p
           dir={extractionLanguage === 'ar' ? 'rtl' : 'ltr'}
-          className="text-brand-primary dark:text-brand-accent whitespace-pre-wrap select-text pr-10"
+          className="text-brand-primary dark:text-brand-accent whitespace-pre-wrap select-text pr-12"
         >
           {text}
         </p>

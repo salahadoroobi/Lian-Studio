@@ -63,6 +63,10 @@ const translations: Record<Language, Record<string, string>> = {
     output_language_label: 'Output Language',
     output_language_en: 'English',
     output_language_ar: 'Arabic',
+    output_language_es: 'Spanish',
+    output_language_fr: 'French',
+    output_language_de: 'German',
+    output_language_ja: 'Japanese',
     
     aspect_ratio_label: 'Aspect Ratio',
     aspect_ratio_Default: 'Default',
@@ -97,6 +101,9 @@ const translations: Record<Language, Record<string, string>> = {
     
     copy_button: 'Copy Prompt',
     copy_success: 'Copied!',
+
+    image_preview_title: 'Image Preview',
+    close_preview: 'Close Preview',
 
     toggle_theme_dark: 'Switch to dark mode',
     toggle_theme_light: 'Switch to light mode',
@@ -162,6 +169,10 @@ const translations: Record<Language, Record<string, string>> = {
     output_language_label: 'لغة الإخراج',
     output_language_en: 'الإنجليزية',
     output_language_ar: 'العربية',
+    output_language_es: 'الإسبانية',
+    output_language_fr: 'الفرنسية',
+    output_language_de: 'الألمانية',
+    output_language_ja: 'اليابانية',
     
     aspect_ratio_label: 'نسبة العرض إلى الارتفاع',
     aspect_ratio_Default: 'افتراضي',
@@ -196,6 +207,9 @@ const translations: Record<Language, Record<string, string>> = {
     
     copy_button: 'نسخ الوصف',
     copy_success: 'تم النسخ!',
+
+    image_preview_title: 'معاينة الصورة',
+    close_preview: 'إغلاق المعاينة',
 
     toggle_theme_dark: 'التبديل إلى الوضع الداكن',
     toggle_theme_light: 'التبديل إلى الوضع الفاتح',

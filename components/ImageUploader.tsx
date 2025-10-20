@@ -5,6 +5,7 @@ import { XIcon } from './icons/XIcon';
 import { MAX_IMAGES, MAX_FILE_SIZE_MB } from '../constants';
 import type { ReferenceImage } from '../types';
 import type { TFunction } from '../hooks/useLocalization';
+import { ImagePreviewModal } from './ImagePreviewModal';
 
 interface ImageUploaderProps {
   images: ReferenceImage[];
@@ -15,6 +16,7 @@ interface ImageUploaderProps {
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages, maxFiles = MAX_IMAGES, t }) => {
   const [error, setError] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setError(null);
@@ -87,11 +89,17 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
     <div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
         {images.map(image => (
-          <div key={image.id} className="relative aspect-square">
-            <img src={image.dataUrl} alt="preview" className="w-full h-full object-cover rounded-lg" />
+          <div key={image.id} className="relative aspect-square group">
+            <button
+              onClick={() => setPreviewImage(image.dataUrl)}
+              className="w-full h-full rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent dark:focus:ring-offset-gray-800"
+              aria-label={t('image_preview_title')}
+            >
+              <img src={image.dataUrl} alt="preview" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+            </button>
             <button
               onClick={() => removeImage(image.id)}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 z-10"
             >
               <XIcon />
             </button>
@@ -114,6 +122,14 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
       </div>
        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t('uploader_desc')}</p>
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+
+      {previewImage && (
+        <ImagePreviewModal
+          imageUrl={previewImage}
+          onClose={() => setPreviewImage(null)}
+          t={t}
+        />
+      )}
     </div>
   );
 };

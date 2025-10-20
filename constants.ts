@@ -16,4 +16,8 @@ export const QUALITY_OPTIONS = [
 export const EXTRACTION_LANGUAGES = [
     { label: 'English', value: 'en' },
     { label: 'Arabic', value: 'ar' },
+    { label: 'Spanish', value: 'es' },
+    { label: 'French', value: 'fr' },
+    { label: 'German', value: 'de' },
+    { label: 'Japanese', value: 'ja' },
 ];
