@@ -1,0 +1,217 @@
+import { useState, useCallback, useMemo } from 'react';
+
+export type Language = 'en' | 'ar';
+export type TFunction = (key: string) => string;
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    app_title: 'Lian Studio',
+    nav_generator: 'Generator',
+    nav_enhancer: 'Enhancer',
+    nav_extractor: 'Extractor',
+    back_to_home: 'Back to Home',
+    
+    landing_title: 'Welcome to Lian AI Studio',
+    landing_subtitle: 'Your creative partner for stunning visuals. Generate, enhance, and extract information from images with the power of Gemini.',
+    generator_card_title: 'Image Generator',
+    generator_card_desc: 'Turn your imagination into reality. Create unique images from text prompts and reference photos.',
+    enhancer_card_title: 'Image Enhancer',
+    enhancer_card_desc: 'Breathe new life into your images. Refine details, adjust styles, and perfect your visuals with a simple prompt.',
+    extractor_card_title: 'Prompt Extractor',
+    extractor_card_desc: 'Analyze any image and generate a descriptive prompt that you can use to recreate similar visuals.',
+    start_generating: 'Start Generating',
+    start_enhancing: 'Start Enhancing',
+    start_extracting: 'Start Extracting',
+    beta_tag: 'Beta',
+
+    landing_about_title: "About Lian Studio",
+    landing_about_desc: "Lian Studio is an advanced creative suite powered by Google's Gemini AI. It's designed for artists, designers, and creators of all levels to bring their ideas to life, refine their work, and explore the limitless possibilities of AI-driven visual creation.",
+    landing_importance_title: "The Importance of Visuals",
+    landing_importance_desc: "In today's visually-driven world, high-quality, unique images are essential for capturing attention, telling stories, and building brands. Lian Studio provides the tools to create professional-grade visuals effortlessly, giving you a competitive edge.",
+    landing_goals_title: "Our Goal",
+    landing_goals_desc: "Our primary goal is to democratize creativity. We aim to provide powerful, intuitive, and accessible AI tools that empower users to overcome technical barriers and focus purely on their creative vision, regardless of their technical skill.",
+    landing_features_title: "Key Features",
+    landing_feature_1_title: "AI-Powered Generation",
+    landing_feature_1_desc: "Create stunning, original images from simple text prompts. Guide the AI with reference images to match your desired style.",
+    landing_feature_2_title: "Intelligent Enhancement",
+    landing_feature_2_desc: "Improve resolution, refine details, and make artistic modifications to your existing photos with precise control.",
+    landing_feature_3_title: "Insightful Prompt Extraction",
+    landing_feature_3_desc: "Deconstruct any image to understand its core elements. The AI generates a descriptive prompt, teaching you the art of prompt engineering.",
+    landing_feature_4_title: "Intuitive User Experience",
+    landing_feature_4_desc: "A clean, responsive interface with multi-language support and theme options, designed for a seamless creative workflow.",
+    
+    generator_title: 'AI Image Generator',
+    prompt_label: 'Prompt',
+    prompt_placeholder: 'e.g., A futuristic cityscape at sunset, with flying cars and neon lights, hyper-realistic.',
+    reference_images_label: 'Reference Images (Optional)',
+    reference_images_desc: 'Add up to 5 images to guide the AI. The more you add, the more style it will influence the result.',
+    generate_button: 'Generate',
+    
+    enhancer_title: 'AI Image Enhancer',
+    base_image_label: 'Base Image',
+    base_image_desc: 'Upload a single image you want to modify or improve.',
+    enhancement_label: 'Enhancement Prompt',
+    enhancement_placeholder: 'e.g., Change the background to a magical forest, add a cinematic feel.',
+    enhance_button: 'Enhance',
+
+    extractor_title: 'AI Prompt Extractor',
+    base_image_label_extractor: 'Image to Extract Prompt From',
+    base_image_desc_extractor: 'Upload an image to have the AI generate a descriptive prompt from it.',
+    extract_button: 'Extract Prompt',
+    extracting_title: 'Extracting Prompt...',
+    extracting_desc: 'The AI is analyzing your image. Please wait a moment.',
+    output_language_label: 'Output Language',
+    output_language_en: 'English',
+    output_language_ar: 'Arabic',
+    
+    aspect_ratio_label: 'Aspect Ratio',
+    aspect_ratio_Default: 'Default',
+    aspect_ratio_Square: 'Square',
+    aspect_ratio_Portrait: 'Portrait',
+    aspect_ratio_Landscape: 'Landscape',
+    
+    quality_label: 'Quality',
+    quality_Standard: 'Standard',
+    quality_HD: 'HD',
+    
+    enhancement_strength: 'Enhancement Strength',
+    
+    uploader_cta: 'Drop files here or click to upload',
+    uploader_desc: 'PNG, JPG, or WEBP. Max 10MB each.',
+    uploader_cta_add_more: 'Add more',
+    uploader_error_size: 'File is too large. Max size is 10MB.',
+    uploader_error_type: 'Invalid file type. Please use PNG, JPG, or WEBP.',
+    uploader_error_single_count: 'You can only upload one file.',
+    uploader_error_count: 'You cannot upload more than 5 files.',
+    
+    generating_title: 'Generating Your Image...',
+    generating_desc: 'The AI is working its magic. This may take a moment.',
+    enhancing_title: 'Enhancing Your Image...',
+    enhancing_desc: 'Applying your enhancements. Please be patient.',
+    error_title: 'Oops! Something went wrong.',
+    generated_image_alt: 'Generated by AI',
+    download_image_label: 'Download Image',
+    initial_title: 'Your masterpiece awaits',
+    initial_desc: 'The generated image will appear here once ready.',
+    initial_desc_extractor: 'The extracted prompt will appear here.',
+    
+    copy_button: 'Copy Prompt',
+    copy_success: 'Copied!',
+
+    toggle_theme_dark: 'Switch to dark mode',
+    toggle_theme_light: 'Switch to light mode',
+    switch_language_to_ar: 'Switch to Arabic',
+    switch_language_to_en: 'Switch to English',
+  },
+  ar: {
+    app_title: 'استوديو ليان',
+    nav_generator: 'مولد الصور',
+    nav_enhancer: 'محسن الصور',
+    nav_extractor: 'مستخرج النصوص',
+    back_to_home: 'العودة للرئيسية',
+    
+    landing_title: 'أهلاً بك في استوديو ليان للذكاء الاصطناعي',
+    landing_subtitle: 'شريكك الإبداعي لصور مذهلة. قم بتوليد الصور وتحسينها واستخراج المعلومات منها بقوة Gemini.',
+    generator_card_title: 'مولد الصور',
+    generator_card_desc: 'حوّل خيالك إلى حقيقة. أنشئ صورًا فريدة من النصوص والصور المرجعية.',
+    enhancer_card_title: 'محسن الصور',
+    enhancer_card_desc: 'أضف حياة جديدة لصورك. صقل التفاصيل، عدّل الأنماط، وأتقن صورك بوصف بسيط.',
+    extractor_card_title: 'مستخرج الوصف',
+    extractor_card_desc: 'حلل أي صورة وقم بإنشاء وصف تفصيلي يمكنك استخدامه لإعادة إنشاء صور مرئية مشابهة.',
+    start_generating: 'ابدأ التوليد',
+    start_enhancing: 'ابدأ التحسين',
+    start_extracting: 'ابدأ الاستخراج',
+    beta_tag: 'تجريبي',
+
+    landing_about_title: "عن استوديو ليان",
+    landing_about_desc: "استوديو ليان هو مجموعة إبداعية متقدمة مدعومة بالذكاء الاصطناعي Gemini من Google. تم تصميمه للفنانين والمصممين والمبدعين من جميع المستويات لتحويل أفكارهم إلى حقيقة، وصقل أعمالهم، واستكشاف الإمكانيات اللامحدودة للإبداع البصري المدعوم بالذكاء الاصطناعي.",
+    landing_importance_title: "أهمية المحتوى البصري",
+    landing_importance_desc: "في عالم اليوم الذي يعتمد على المحتوى البصري، تعد الصور الفريدة وعالية الجودة ضرورية لجذب الانتباه ورواية القصص وبناء العلامات التجارية. يوفر استوديو ليان الأدوات اللازمة لإنشاء صور احترافية بسهولة، مما يمنحك ميزة تنافسية.",
+    landing_goals_title: "هدفنا",
+    landing_goals_desc: "هدفنا الأساسي هو جعل الإبداع في متناول الجميع. نسعى لتوفير أدوات ذكاء اصطناعي قوية وبديهية تمكّن المستخدمين من التغلب على الحواجز التقنية والتركيز بشكل كامل على رؤيتهم الإبداعية، بغض النظر عن مهارتهم التقنية.",
+    landing_features_title: "الميزات الرئيسية",
+    landing_feature_1_title: "توليد بالذكاء الاصطناعي",
+    landing_feature_1_desc: "أنشئ صورًا مذهلة ومبتكرة من أوامر نصية بسيطة. قم بتوجيه الذكاء الاصطناعي بصور مرجعية لمطابقة أسلوبك المطلوب.",
+    landing_feature_2_title: "تحسين ذكي",
+    landing_feature_2_desc: "حسّن الدقة، وصقل التفاصيل، وقم بإجراء تعديلات فنية على صورك الحالية بتحكم دقيق.",
+    landing_feature_3_title: "استخراج الوصف الذكي",
+    landing_feature_3_desc: "حلل أي صورة لفهم عناصرها الأساسية. يقوم الذكاء الاصطناعي بإنشاء وصف تفصيلي، مما يعلمك فن هندسة الأوصاف.",
+    landing_feature_4_title: "تجربة مستخدم بديهية",
+    landing_feature_4_desc: "واجهة نظيفة وسريعة الاستجابة مع دعم متعدد اللغات وخيارات المظهر، مصممة لسير عمل إبداعي سلس.",
+
+    generator_title: 'مولد الصور بالذكاء الاصطناعي',
+    prompt_label: 'الوصف النصي',
+    prompt_placeholder: 'مثال: منظر مدينة مستقبلية عند الغروب، مع سيارات طائرة وأضواء نيون، واقعية جداً.',
+    reference_images_label: 'صور مرجعية (اختياري)',
+    reference_images_desc: 'أضف ما يصل إلى 5 صور لتوجيه الذكاء الاصطناعي. كلما أضفت المزيد، زاد تأثيرها على النتيجة.',
+    generate_button: 'توليد',
+    
+    enhancer_title: 'محسن الصور بالذكاء الاصطناعي',
+    base_image_label: 'الصورة الأساسية',
+    base_image_desc: 'قم بتحميل صورة واحدة ترغب في تعديلها أو تحسينها.',
+    enhancement_label: 'وصف التحسين',
+    enhancement_placeholder: 'مثال: غير الخلفية إلى غابة سحرية، أضف طابعًا سينمائيًا.',
+    enhance_button: 'تحسين',
+
+    extractor_title: 'مستخرج الوصف بالذكاء الاصطناعي',
+    base_image_label_extractor: 'صورة لاستخراج الوصف منها',
+    base_image_desc_extractor: 'قم بتحميل صورة ليقوم الذكاء الاصطناعي بإنشاء وصف تفصيلي لها.',
+    extract_button: 'استخراج الوصف',
+    extracting_title: 'جاري استخراج الوصف...',
+    extracting_desc: 'الذكاء الاصطناعي يحلل صورتك. يرجى الانتظار لحظة.',
+    output_language_label: 'لغة الإخراج',
+    output_language_en: 'الإنجليزية',
+    output_language_ar: 'العربية',
+    
+    aspect_ratio_label: 'نسبة العرض إلى الارتفاع',
+    aspect_ratio_Default: 'افتراضي',
+    aspect_ratio_Square: 'مربع',
+    aspect_ratio_Portrait: 'طولي',
+    aspect_ratio_Landscape: 'عرضي',
+    
+    quality_label: 'الجودة',
+    quality_Standard: 'عادي',
+    quality_HD: 'عالي الدقة',
+    
+    enhancement_strength: 'قوة التحسين',
+    
+    uploader_cta: 'اسحب الملفات هنا أو انقر للتحميل',
+    uploader_desc: 'PNG, JPG, or WEBP. الحجم الأقصى 10 ميجابايت لكل ملف.',
+    uploader_cta_add_more: 'أضف المزيد',
+    uploader_error_size: 'الملف كبير جدًا. الحجم الأقصى هو 10 ميجابايت.',
+    uploader_error_type: 'نوع ملف غير صالح. يرجى استخدام PNG, JPG, or WEBP.',
+    uploader_error_single_count: 'يمكنك تحميل ملف واحد فقط.',
+    uploader_error_count: 'لا يمكنك تحميل أكثر من 5 ملفات.',
+    
+    generating_title: 'جاري توليد صورتك...',
+    generating_desc: 'الذكاء الاصطناعي يعمل بسحره. قد يستغرق هذا بعض الوقت.',
+    enhancing_title: 'جاري تحسين صورتك...',
+    enhancing_desc: 'تطبيق تحسيناتك. يرجى التحلي بالصبر.',
+    error_title: 'عفوًا! حدث خطأ ما.',
+    generated_image_alt: 'صورة مولدة بواسطة الذكاء الاصطناعي',
+    download_image_label: 'تنزيل الصورة',
+    initial_title: 'تحفتك الفنية في انتظارك',
+    initial_desc: 'ستظهر الصورة المولدة هنا بمجرد أن تصبح جاهزة.',
+    initial_desc_extractor: 'سيظهر الوصف المستخرج هنا.',
+    
+    copy_button: 'نسخ الوصف',
+    copy_success: 'تم النسخ!',
+
+    toggle_theme_dark: 'التبديل إلى الوضع الداكن',
+    toggle_theme_light: 'التبديل إلى الوضع الفاتح',
+    switch_language_to_ar: 'التبديل إلى اللغة العربية',
+    switch_language_to_en: 'التبديل إلى اللغة الإنجليزية',
+  },
+};
+
+export const useLocalization = () => {
+  const [language, setLanguage] = useState<Language>('en');
+
+  const t = useCallback<TFunction>((key: string) => {
+    return translations[language][key] || translations['en'][key] || key;
+  }, [language]);
+  
+  const dir = useMemo(() => (language === 'ar' ? 'rtl' : 'ltr'), [language]);
+
+  return { t, setLanguage, language, dir };
+};

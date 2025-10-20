@@ -1,0 +1,119 @@
+import React, { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { PlusIcon } from './icons/PlusIcon';
+import { XIcon } from './icons/XIcon';
+import { MAX_IMAGES, MAX_FILE_SIZE_MB } from '../constants';
+import type { ReferenceImage } from '../types';
+import type { TFunction } from '../hooks/useLocalization';
+
+interface ImageUploaderProps {
+  images: ReferenceImage[];
+  setImages: React.Dispatch<React.SetStateAction<ReferenceImage[]>>;
+  maxFiles?: number;
+  t: TFunction;
+}
+
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages, maxFiles = MAX_IMAGES, t }) => {
+  const [error, setError] = useState<string | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
+    setError(null);
+    if (rejectedFiles && rejectedFiles.length > 0) {
+        const firstError = rejectedFiles[0].errors[0].code;
+        if (firstError === 'file-too-large') {
+            setError(t('uploader_error_size'));
+        } else if (firstError === 'file-invalid-type') {
+            setError(t('uploader_error_type'));
+        } else {
+            setError('An unknown error occurred during upload.');
+        }
+        return;
+    }
+
+    if (images.length + acceptedFiles.length > maxFiles) {
+      if (maxFiles === 1) {
+        setError(t('uploader_error_single_count'));
+      } else {
+        setError(t(`uploader_error_count`));
+      }
+      return;
+    }
+
+    const newImages = acceptedFiles.map(file => ({
+      id: `${file.name}-${Date.now()}`,
+      file,
+      dataUrl: URL.createObjectURL(file),
+    }));
+
+    if (maxFiles === 1) {
+        setImages(newImages);
+    } else {
+        setImages(prev => [...prev, ...newImages]);
+    }
+  }, [images, setImages, maxFiles, t]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/png': ['.png'], 'image/jpeg': ['.jpg', '.jpeg'], 'image/webp': ['.webp'] },
+    maxSize: MAX_FILE_SIZE_MB * 1024 * 1024,
+  });
+
+  const removeImage = (id: string) => {
+    setImages(images.filter(image => image.id !== id));
+  };
+
+  if (images.length === 0) {
+    return (
+      <div>
+        <div
+          {...getRootProps()}
+          className={`flex flex-col items-center justify-center w-full min-h-[160px] p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors
+            ${isDragActive ? 'border-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20' : 'border-gray-300 dark:border-gray-600 hover:border-brand-primary/70 hover:bg-gray-50 dark:hover:bg-gray-800/50'}
+          `}
+        >
+          <input {...getInputProps()} />
+          <PlusIcon />
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-2">
+            {t('uploader_cta')}
+          </p>
+        </div>
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t('uploader_desc')}</p>
+        {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+        {images.map(image => (
+          <div key={image.id} className="relative aspect-square">
+            <img src={image.dataUrl} alt="preview" className="w-full h-full object-cover rounded-lg" />
+            <button
+              onClick={() => removeImage(image.id)}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              <XIcon />
+            </button>
+          </div>
+        ))}
+        {images.length < maxFiles && (
+          <div
+            {...getRootProps()}
+            className={`flex flex-col items-center justify-center aspect-square p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors
+              ${isDragActive ? 'border-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20' : 'border-gray-300 dark:border-gray-600 hover:border-brand-primary/70 hover:bg-gray-50 dark:hover:bg-gray-800/50'}
+            `}
+          >
+            <input {...getInputProps()} />
+            <PlusIcon />
+            <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+               {t('uploader_cta_add_more')}
+            </p>
+          </div>
+        )}
+      </div>
+       <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t('uploader_desc')}</p>
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+    </div>
+  );
+};
