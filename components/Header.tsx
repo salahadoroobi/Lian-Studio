@@ -4,6 +4,7 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { ArrowLeftIcon } from './icons/ArrowLeftIcon';
+import { KeyIcon } from './icons/KeyIcon';
 
 type Theme = 'light' | 'dark';
 
@@ -15,9 +16,10 @@ interface HeaderProps {
     language: Language;
     setLanguage: (lang: Language) => void;
     t: TFunction;
+    setIsApiKeyModalOpen: (isOpen: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, setTheme, language, setLanguage, t }) => {
+export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, setTheme, language, setLanguage, t, setIsApiKeyModalOpen }) => {
     
     return (
         <header className="bg-brand-bg/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
@@ -37,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, set
                          <h1 className="text-2xl font-bold text-brand-primary dark:text-white flex items-center gap-2">
                             {t('app_title')}
                             <span className="bg-brand-accent text-brand-bg dark:bg-gray-700 dark:text-brand-accent text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                v3.0.3
+                                v3.0.4
                             </span>
                         </h1>
                     )}
@@ -55,6 +57,14 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, set
                 {/* Right section */}
                 <div className="w-1/3 flex justify-end">
                     <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsApiKeyModalOpen(true)}
+                            className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-brand-accent/20 text-brand-accent dark:text-brand-accent transition-colors"
+                            aria-label={t('api_key_tooltip')}
+                            title={t('api_key_tooltip')}
+                        >
+                            <KeyIcon />
+                        </button>
                         <LanguageSwitcher language={language} setLanguage={setLanguage} t={t} />
                         <ThemeSwitcher theme={theme} setTheme={setTheme} t={t} />
                     </div>

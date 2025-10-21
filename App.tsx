@@ -6,6 +6,7 @@ import { ExtractorView } from './views/ExtractorView';
 import { LandingPage } from './views/LandingPage';
 import { useLocalization } from './hooks/useLocalization';
 import { MergerView } from './views/MergerView';
+import { ApiKeyModal } from './components/ApiKeyModal';
 
 export type View = 'landing' | 'generator' | 'enhancer' | 'extractor' | 'merger';
 type Theme = 'light' | 'dark';
@@ -14,6 +15,7 @@ const App: React.FC = () => {
     const [view, setView] = useState<View>('landing');
     const { t, setLanguage, language, dir } = useLocalization();
     const [theme, setTheme] = useState<Theme>('light');
+    const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -76,10 +78,16 @@ const App: React.FC = () => {
                 language={language}
                 setLanguage={handleSetLanguage}
                 t={t}
+                setIsApiKeyModalOpen={setIsApiKeyModalOpen}
             />
             <main className={`transition-opacity duration-300 ease-in-out ${mainContentClasses}`}>
                 {renderView()}
             </main>
+            <ApiKeyModal
+                isOpen={isApiKeyModalOpen}
+                onClose={() => setIsApiKeyModalOpen(false)}
+                t={t}
+            />
         </div>
     );
 };

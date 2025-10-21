@@ -1,9 +1,14 @@
-
 import { GoogleGenAI, Modality } from '@google/genai';
 import type { ReferenceImage } from '../types';
 
-// Per guidelines, API key is available in process.env.API_KEY
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const getGenAIClient = () => {
+    const userApiKey = localStorage.getItem('user_api_key');
+    const apiKey = userApiKey || process.env.API_KEY as string;
+    if (!apiKey) {
+        throw new Error("API key is not available. Please set it in your environment or provide one in the app.");
+    }
+    return new GoogleGenAI({ apiKey });
+}
 
 const fileToGenerativePart = async (file: File) => {
   const base64EncodedDataPromise = new Promise<string>((resolve) => {
@@ -22,6 +27,7 @@ export const generateImage = async (
   aspectRatio: string,
   quality: string
 ): Promise<string> => {
+  const ai = getGenAIClient();
   const model = 'gemini-2.5-flash-image';
   
   let fullPrompt = prompt;
@@ -65,6 +71,7 @@ export const enhanceImage = async (
   baseImage: ReferenceImage,
   strength: number
 ): Promise<string> => {
+    const ai = getGenAIClient();
     const model = 'gemini-2.5-flash-image';
     const imagePart = await fileToGenerativePart(baseImage.file);
     
@@ -97,6 +104,7 @@ export const mergeImages = async (
   prompt: string,
   sourceImages: ReferenceImage[]
 ): Promise<string> => {
+  const ai = getGenAIClient();
   const model = 'gemini-2.5-flash-image';
 
   const imageParts = await Promise.all(sourceImages.map(img => fileToGenerativePart(img.file)));
@@ -127,6 +135,7 @@ ${prompt ? `User Guidance: Pay special attention to the following instruction: "
 
 
 export const extractPromptFromImage = async (image: ReferenceImage, language: string): Promise<string> => {
+    const ai = getGenAIClient();
     const model = 'gemini-2.5-flash';
     const imagePart = await fileToGenerativePart(image.file);
     

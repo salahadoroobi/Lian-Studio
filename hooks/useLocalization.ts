@@ -124,6 +124,13 @@ const translations: Record<Language, Record<string, string>> = {
     toggle_theme_light: 'Switch to light mode',
     switch_language_to_ar: 'Switch to Arabic',
     switch_language_to_en: 'Switch to English',
+    
+    api_key_tooltip: 'Manage API Key',
+    api_key_modal_title: 'Your Gemini API Key',
+    api_key_modal_desc: 'Your key is stored securely in your browser\'s local storage and is never sent to our servers. This allows you to use your own models and quotas.',
+    api_key_modal_placeholder: 'Enter your API key here',
+    api_key_modal_save: 'Save Key',
+    api_key_modal_close: 'Close',
   },
   ar: {
     app_title: 'استوديو ليان',
@@ -245,6 +252,13 @@ const translations: Record<Language, Record<string, string>> = {
     toggle_theme_light: 'التبديل إلى الوضع الفاتح',
     switch_language_to_ar: 'التبديل إلى اللغة العربية',
     switch_language_to_en: 'التبديل إلى اللغة الإنجليزية',
+
+    api_key_tooltip: 'إدارة مفتاح API',
+    api_key_modal_title: 'مفتاح Gemini API الخاص بك',
+    api_key_modal_desc: 'يتم تخزين مفتاحك بأمان في التخزين المحلي للمتصفح ولا يتم إرساله إلى خوادمنا أبدًا. يتيح لك هذا استخدام النماذج والحصص الخاصة بك.',
+    api_key_modal_placeholder: 'أدخل مفتاح API الخاص بك هنا',
+    api_key_modal_save: 'حفظ المفتاح',
+    api_key_modal_close: 'إغلاق',
   },
 };
 
