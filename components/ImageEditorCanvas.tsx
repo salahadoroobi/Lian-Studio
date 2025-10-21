@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import type { TFunction } from '../hooks/useLocalization';
+import { UndoIcon } from './icons/UndoIcon';
+import { TrashIcon } from './icons/TrashIcon';
 
 interface ImageEditorCanvasProps {
   imageSrc: string | null;
@@ -23,6 +25,32 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPosition, setLastPosition] = useState<{ x: number, y: number } | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
+
+  const generateAndPropagateMask = (sourceCanvas: HTMLCanvasElement) => {
+    const image = imageRef.current;
+    if (sourceCanvas && image && image.naturalWidth > 0) {
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = image.naturalWidth;
+      maskCanvas.height = image.naturalHeight;
+      const maskCtx = maskCanvas.getContext('2d');
+      if (maskCtx) {
+        maskCtx.drawImage(sourceCanvas, 0, 0, image.naturalWidth, image.naturalHeight);
+        const imageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 0) { // If pixel has any opacity
+            data[i] = 255;     // R
+            data[i + 1] = 255; // G
+            data[i + 2] = 255; // B
+            data[i + 3] = 255; // A
+          }
+        }
+        maskCtx.putImageData(imageData, 0, 0);
+        onMaskChange(maskCanvas.toDataURL('image/png'));
+      }
+    }
+  };
 
   const resizeCanvas = () => {
     const image = imageRef.current;
@@ -35,11 +63,13 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
   };
 
   useEffect(() => {
-    // Resize when image source changes
     if (imageSrc) {
         const image = new Image();
         image.src = imageSrc;
-        image.onload = resizeCanvas;
+        image.onload = () => {
+            resizeCanvas();
+            handleClear(); // Clear canvas and history for new image
+        };
     }
     window.addEventListener('resize', resizeCanvas);
     return () => {
@@ -53,9 +83,13 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
     if ('touches' in e) {
-        e.preventDefault();
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
+        if (e.touches.length > 0) {
+            e.preventDefault();
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            return null; // No touches to process
+        }
     } else {
         clientX = e.clientX;
         clientY = e.clientY;
@@ -95,33 +129,10 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
     setIsDrawing(false);
     setLastPosition(null);
 
-    // Generate B&W mask and send it up
     const canvas = canvasRef.current;
-    const image = imageRef.current;
-    if (canvas && image && image.naturalWidth > 0) {
-      const maskCanvas = document.createElement('canvas');
-      // Use naturalWidth/Height for full resolution mask
-      maskCanvas.width = image.naturalWidth;
-      maskCanvas.height = image.naturalHeight;
-      const maskCtx = maskCanvas.getContext('2d');
-      if (maskCtx) {
-        // Draw the user's drawing onto the mask canvas, scaled up
-        maskCtx.drawImage(canvas, 0, 0, image.naturalWidth, image.naturalHeight);
-        // Get image data to make it B&W
-        const imageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          // If pixel has any opacity, make it white. Otherwise, it stays black (default).
-          if (data[i + 3] > 0) {
-            data[i] = 255;     // R
-            data[i + 1] = 255; // G
-            data[i + 2] = 255; // B
-            data[i + 3] = 255; // A
-          }
-        }
-        maskCtx.putImageData(imageData, 0, 0);
-        onMaskChange(maskCanvas.toDataURL('image/png'));
-      }
+    if (canvas) {
+        setHistory(prev => [...prev, canvas.toDataURL()]);
+        generateAndPropagateMask(canvas);
     }
   };
   
@@ -130,7 +141,34 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
     const context = canvas?.getContext('2d');
     if (canvas && context) {
       context.clearRect(0, 0, canvas.width, canvas.height);
+      setHistory([]);
       onClear();
+    }
+  };
+  
+  const handleUndo = () => {
+    if (history.length === 0) return;
+
+    const newHistory = history.slice(0, -1);
+    setHistory(newHistory);
+
+    const prevStateUrl = newHistory[newHistory.length - 1] || null;
+    
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (prevStateUrl) {
+        const img = new Image();
+        img.onload = () => {
+            context.drawImage(img, 0, 0);
+            generateAndPropagateMask(canvas);
+        };
+        img.src = prevStateUrl;
+    } else {
+        onClear(); // We've undone back to a blank state
     }
   };
 
@@ -157,11 +195,23 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
       />
-      <button 
-        onClick={handleClear}
-        className="absolute top-2 right-2 bg-gray-800/70 text-white px-3 py-1 rounded-md text-sm hover:bg-black z-10"
+      <button
+          onClick={handleUndo}
+          disabled={history.length === 0}
+          className="absolute top-3 left-3 z-10 p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
+          aria-label={t('undo_mask')}
+          title={t('undo_mask')}
       >
-        {t('clear_mask')}
+          <UndoIcon />
+      </button>
+      <button
+          onClick={handleClear}
+          disabled={history.length === 0}
+          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
+          aria-label={t('clear_mask')}
+          title={t('clear_mask')}
+      >
+          <TrashIcon />
       </button>
     </div>
   );
