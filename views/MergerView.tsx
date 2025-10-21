@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
 import { mergeImages } from '../services/geminiService';
@@ -21,6 +21,15 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
     const [error, setError] = useState<string | null>(null);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useLayoutEffect(() => {
+        const textarea = promptTextareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    }, [prompt]);
 
     const handleMerge = async () => {
         if (sourceImages.length < 2) {
@@ -90,12 +99,13 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
                         />
                     </div>
                     <textarea
+                        ref={promptTextareaRef}
                         id="prompt-merger"
                         rows={3}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder={t('merger_prompt_placeholder')}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                     />
                 </div>
 

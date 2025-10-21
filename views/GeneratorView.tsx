@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { AspectRatioSelector } from '../components/AspectRatioSelector';
 import { ImageUploader } from '../components/ImageUploader';
 import { QualitySelector } from '../components/QualitySelector';
@@ -24,6 +24,15 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => 
     const [error, setError] = useState<string | null>(null);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useLayoutEffect(() => {
+        const textarea = promptTextareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    }, [prompt]);
 
     const handleGenerate = async () => {
         if (!prompt.trim() && referenceImages.length === 0) {
@@ -61,8 +70,6 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => 
     
     const canGenerate = !isLoading && (prompt.trim().length > 0 || referenceImages.length > 0);
 
-    const buttonPositionClass = language === 'ar' ? 'left-2' : 'right-2';
-
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 md:p-8">
             {/* Left Panel: Controls */}
@@ -90,12 +97,13 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => 
                         />
                     </div>
                     <textarea
+                        ref={promptTextareaRef}
                         id="prompt"
                         rows={4}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder={t('prompt_placeholder')}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                     />
                 </div>
                 
