@@ -5,8 +5,9 @@ import { EnhancerView } from './views/EnhancerView';
 import { ExtractorView } from './views/ExtractorView';
 import { LandingPage } from './views/LandingPage';
 import { useLocalization } from './hooks/useLocalization';
+import { MergerView } from './views/MergerView';
 
-export type View = 'landing' | 'generator' | 'enhancer' | 'extractor';
+export type View = 'landing' | 'generator' | 'enhancer' | 'extractor' | 'merger';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -50,9 +51,11 @@ const App: React.FC = () => {
     const renderView = () => {
         switch (view) {
             case 'generator':
-                return <GeneratorView t={t} />;
+                return <GeneratorView t={t} language={language} />;
             case 'enhancer':
-                return <EnhancerView t={t} />;
+                return <EnhancerView t={t} language={language} />;
+            case 'merger':
+                return <MergerView t={t} language={language} />;
             case 'extractor':
                 return <ExtractorView t={t} />;
             case 'landing':

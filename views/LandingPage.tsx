@@ -4,6 +4,7 @@ import { SparklesIcon } from '../components/icons/SparklesIcon';
 import { WandIcon } from '../components/icons/WandIcon';
 import { DocumentTextIcon } from '../components/icons/DocumentTextIcon';
 import type { Language, TFunction } from '../hooks/useLocalization';
+import { CombineIcon } from '../components/icons/CombineIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -17,8 +18,8 @@ const FeatureCard: React.FC<{
     description: string;
     language: Language;
   }> = ({ icon, title, description, language }) => (
-    <div className={`flex flex-col items-center p-6 text-center bg-white dark:bg-gray-800 rounded-lg shadow-sm md:items-start gap-4 ${language === 'ar' ? 'md:flex-row-reverse md:text-right' : 'md:flex-row md:text-left'}`}>
-        <div className="flex-shrink-0 w-12 h-12">{icon}</div>
+    <div className={`flex items-start p-6 text-left bg-white dark:bg-gray-800 rounded-lg shadow-sm gap-4 ${language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'}`}>
+        <div className="flex-shrink-0 w-12 h-12 text-brand-primary">{icon}</div>
         <div>
             <h4 className="text-xl font-bold text-brand-primary dark:text-white">{title}</h4>
             <p className="text-brand-primary dark:text-gray-400">{description}</p>
@@ -73,7 +74,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-12">{t('landing_subtitle')}</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 md:mb-32">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20 md:mb-32">
         <Card
           icon={<SparklesIcon />}
           title={t('generator_card_title')}
@@ -87,6 +88,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
           description={t('enhancer_card_desc')}
           buttonText={t('start_enhancing')}
           onClick={() => setView('enhancer')}
+        />
+        <Card
+          icon={<CombineIcon />}
+          title={t('merger_card_title')}
+          description={t('merger_card_desc')}
+          buttonText={t('start_merging')}
+          onClick={() => setView('merger')}
+          isBeta={true}
         />
         <Card
           icon={<DocumentTextIcon />}
@@ -116,8 +125,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FeatureCard language={language} title={t('landing_feature_1_title')} description={t('landing_feature_1_desc')} icon={<SparklesIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_2_title')} description={t('landing_feature_2_desc')} icon={<WandIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<DocumentTextIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<div className="w-12 h-12 text-brand-primary"><svg xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" /></svg></div>} />
+                <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
+                <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
             </div>
         </section>
 

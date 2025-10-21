@@ -1,42 +1,37 @@
 import React, { useState, useRef } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
-import { enhanceImage } from '../services/geminiService';
+import { mergeImages } from '../services/geminiService';
 import type { ReferenceImage } from '../types';
-import { EnhancementSlider } from '../components/EnhancementSlider';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
+import { MAX_MERGE_IMAGES } from '../constants';
 
-interface EnhancerViewProps {
+interface MergerViewProps {
   t: TFunction;
   language: Language;
 }
 
-export const EnhancerView: React.FC<EnhancerViewProps> = ({ t, language }) => {
+export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
     const [prompt, setPrompt] = useState('');
-    const [baseImage, setBaseImage] = useState<ReferenceImage[]>([]);
-    const [enhancementStrength, setEnhancementStrength] = useState(50);
-    
+    const [sourceImages, setSourceImages] = useState<ReferenceImage[]>([]);
+
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleEnhance = async () => {
-        if (baseImage.length === 0) {
-            setError('Please upload an image to enhance.');
-            return;
-        }
-        if (!prompt.trim()) {
-            setError('Please provide an enhancement prompt.');
+    const handleMerge = async () => {
+        if (sourceImages.length < 2) {
+            setError('Please provide at least two images to merge.');
             return;
         }
         setIsLoading(true);
         setError(null);
         setGeneratedImage(null);
         try {
-            const result = await enhanceImage(prompt, baseImage[0], enhancementStrength);
+            const result = await mergeImages(prompt, sourceImages);
             setGeneratedImage(result);
         } catch (e: any) {
             setError(e.message || 'An unexpected error occurred.');
@@ -45,7 +40,7 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t, language }) => {
         }
     };
     
-     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -61,22 +56,22 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t, language }) => {
         }
     };
     
-    const canEnhance = !isLoading && baseImage.length > 0 && prompt.trim().length > 0;
+    const canMerge = !isLoading && sourceImages.length >= 2;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 md:p-8">
             {/* Left Panel: Controls */}
             <div className="flex flex-col gap-6 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                <h2 className="text-3xl font-bold text-brand-primary dark:text-white">{t('enhancer_title')}</h2>
+                <h2 className="text-3xl font-bold text-brand-primary dark:text-white">{t('merger_title')}</h2>
                 
                 <div>
-                    <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('base_image_label')}</label>
-                    <ImageUploader images={baseImage} setImages={setBaseImage} maxFiles={1} t={t} descriptionKey="base_image_desc" />
+                    <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('source_images_label')}</label>
+                    <ImageUploader images={sourceImages} setImages={setSourceImages} maxFiles={MAX_MERGE_IMAGES} t={t} descriptionKey="source_images_desc" />
                 </div>
 
                 <div className="relative">
                     <div className="flex justify-between items-center mb-2">
-                        <label htmlFor="prompt-enhancer" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('enhancement_label')}</label>
+                        <label htmlFor="prompt-merger" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('merger_prompt_label')}</label>
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             title={t('upload_prompt_label')}
@@ -91,32 +86,32 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t, language }) => {
                             onChange={handleFileSelect}
                             accept=".txt"
                             className="hidden"
-                            id="prompt-file-upload-enhancer"
+                            id="prompt-file-upload-merger"
                         />
                     </div>
                     <textarea
-                        id="prompt-enhancer"
+                        id="prompt-merger"
                         rows={3}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        placeholder={t('enhancement_placeholder')}
+                        placeholder={t('merger_prompt_placeholder')}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     />
                 </div>
 
-                <EnhancementSlider strength={enhancementStrength} setStrength={setEnhancementStrength} t={t} />
+                {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
                 <button
-                    onClick={handleEnhance}
-                    disabled={!canEnhance}
+                    onClick={handleMerge}
+                    disabled={!canMerge}
                     className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                 >
-                    {isLoading ? '...' : t('enhance_button')}
+                    {isLoading ? '...' : t('merge_button')}
                 </button>
             </div>
 
             {/* Right Panel: Result */}
-            <ResultPanel generatedImage={generatedImage} isLoading={isLoading} error={error} t={t} view="enhancer" />
+            <ResultPanel generatedImage={generatedImage} isLoading={isLoading} error={error} t={t} view="merger" />
         </div>
     );
 };

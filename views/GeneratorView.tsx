@@ -5,14 +5,15 @@ import { QualitySelector } from '../components/QualitySelector';
 import { ResultPanel } from '../components/ResultPanel';
 import { generateImage } from '../services/geminiService';
 import type { ReferenceImage } from '../types';
-import type { TFunction } from '../hooks/useLocalization';
+import type { Language, TFunction } from '../hooks/useLocalization';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 
 interface GeneratorViewProps {
   t: TFunction;
+  language: Language;
 }
 
-export const GeneratorView: React.FC<GeneratorViewProps> = ({ t }) => {
+export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => {
     const [prompt, setPrompt] = useState('');
     const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
     const [aspectRatio, setAspectRatio] = useState('Default');
@@ -60,23 +61,17 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t }) => {
     
     const canGenerate = !isLoading && (prompt.trim().length > 0 || referenceImages.length > 0);
 
+    const buttonPositionClass = language === 'ar' ? 'left-2' : 'right-2';
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 md:p-8">
             {/* Left Panel: Controls */}
             <div className="flex flex-col gap-6 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
                 <h2 className="text-3xl font-bold text-brand-primary dark:text-white">{t('generator_title')}</h2>
                 
-                <div>
+                <div className="relative">
                     <div className="flex justify-between items-center mb-2">
                         <label htmlFor="prompt" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('prompt_label')}</label>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileSelect}
-                            accept=".txt"
-                            className="hidden"
-                            id="prompt-file-upload-generator"
-                        />
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             title={t('upload_prompt_label')}
@@ -85,6 +80,14 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t }) => {
                         >
                             <UploadTextIcon />
                         </button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileSelect}
+                            accept=".txt"
+                            className="hidden"
+                            id="prompt-file-upload-generator"
+                        />
                     </div>
                     <textarea
                         id="prompt"
@@ -98,8 +101,7 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t }) => {
                 
                 <div>
                     <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('reference_images_label')}</label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{t('reference_images_desc')}</p>
-                    <ImageUploader images={referenceImages} setImages={setReferenceImages} t={t} />
+                    <ImageUploader images={referenceImages} setImages={setReferenceImages} t={t} descriptionKey="reference_images_desc" />
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

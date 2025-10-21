@@ -1,4 +1,5 @@
 export const MAX_IMAGES = 5;
+export const MAX_MERGE_IMAGES = 15;
 export const MAX_FILE_SIZE_MB = 10;
 
 export const ASPECT_RATIOS = [

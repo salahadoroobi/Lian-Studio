@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { PlusIcon } from './icons/PlusIcon';
 import { XIcon } from './icons/XIcon';
-import { MAX_IMAGES, MAX_FILE_SIZE_MB } from '../constants';
+import { MAX_IMAGES, MAX_FILE_SIZE_MB, MAX_MERGE_IMAGES } from '../constants';
 import type { ReferenceImage } from '../types';
 import type { TFunction } from '../hooks/useLocalization';
 import { ImagePreviewModal } from './ImagePreviewModal';
@@ -11,10 +11,11 @@ interface ImageUploaderProps {
   images: ReferenceImage[];
   setImages: React.Dispatch<React.SetStateAction<ReferenceImage[]>>;
   maxFiles?: number;
+  descriptionKey: string;
   t: TFunction;
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages, maxFiles = MAX_IMAGES, t }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages, maxFiles = MAX_IMAGES, descriptionKey, t }) => {
   const [error, setError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -35,7 +36,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
     if (images.length + acceptedFiles.length > maxFiles) {
       if (maxFiles === 1) {
         setError(t('uploader_error_single_count'));
-      } else {
+      } else if (maxFiles === MAX_MERGE_IMAGES) {
+        setError(t('uploader_error_merge_count'));
+      }
+       else {
         setError(t(`uploader_error_count`));
       }
       return;
@@ -79,7 +83,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
             {t('uploader_cta')}
           </p>
         </div>
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t('uploader_desc')}</p>
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t(descriptionKey)}</p>
         {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
       </div>
     );
@@ -120,7 +124,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
           </div>
         )}
       </div>
-       <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t('uploader_desc')}</p>
+       <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t(descriptionKey)}</p>
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 
       {previewImage && (

@@ -9,7 +9,7 @@ interface ResultPanelProps {
   isLoading: boolean;
   error: string | null;
   t: TFunction;
-  view: 'generator' | 'enhancer';
+  view: 'generator' | 'enhancer' | 'merger';
 }
 
 export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoading, error, t, view }) => {
@@ -26,8 +26,16 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
 
   const renderContent = () => {
     if (isLoading) {
-      const titleKey = view === 'enhancer' ? 'enhancing_title' : 'generating_title';
-      const descKey = view === 'enhancer' ? 'enhancing_desc' : 'generating_desc';
+      let titleKey = 'generating_title';
+      let descKey = 'generating_desc';
+      if (view === 'enhancer') {
+          titleKey = 'enhancing_title';
+          descKey = 'enhancing_desc';
+      } else if (view === 'merger') {
+          titleKey = 'merging_title';
+          descKey = 'merging_desc';
+      }
+
       return (
         <div className="text-center text-gray-500 dark:text-gray-400">
           <SpinnerIcon />

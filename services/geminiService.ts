@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality } from '@google/genai';
 import type { ReferenceImage } from '../types';
 
@@ -92,6 +93,39 @@ export const enhanceImage = async (
     throw new Error('Image enhancement failed or the model did not return an image.');
 };
 
+export const mergeImages = async (
+  prompt: string,
+  sourceImages: ReferenceImage[]
+): Promise<string> => {
+  const model = 'gemini-2.5-flash-image';
+
+  const imageParts = await Promise.all(sourceImages.map(img => fileToGenerativePart(img.file)));
+
+  const textInstruction = `Task: Blend Multiple Images.
+Instructions: Analyze all the provided images. Create a single, new, cohesive image that intelligently blends the key subjects, artistic styles, and color palettes from all of them.
+${prompt ? `User Guidance: Pay special attention to the following instruction: "${prompt}"` : ''}`;
+
+  const textPart = { text: textInstruction };
+  
+  const response = await ai.models.generateContent({
+    model,
+    contents: { parts: [...imageParts, textPart] },
+    config: {
+      responseModalities: [Modality.IMAGE],
+    },
+  });
+
+  for (const part of response.candidates[0].content.parts) {
+    if (part.inlineData) {
+      const base64ImageBytes: string = part.inlineData.data;
+      return `data:image/png;base64,${base64ImageBytes}`;
+    }
+  }
+
+  throw new Error('Image merging failed or the model did not return an image.');
+};
+
+
 export const extractPromptFromImage = async (image: ReferenceImage, language: string): Promise<string> => {
     const model = 'gemini-2.5-flash';
     const imagePart = await fileToGenerativePart(image.file);
@@ -125,5 +159,10 @@ Combine all these elements into a single, cohesive paragraph. ${langInstruction}
         contents: { parts: [imagePart, textPart] },
     });
     
-    return response.text;
+    const text = response.text;
+    if (typeof text === 'string') {
+        return text;
+    }
+    
+    throw new Error('Prompt extraction failed or the model did not return text.');
 };

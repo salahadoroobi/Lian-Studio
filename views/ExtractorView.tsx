@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { PromptResultDisplay } from '../components/PromptResultDisplay';
@@ -46,8 +47,7 @@ export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
                 
                 <div>
                     <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('base_image_label_extractor')}</label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{t('base_image_desc_extractor')}</p>
-                    <ImageUploader images={baseImage} setImages={setBaseImage} maxFiles={1} t={t} />
+                    <ImageUploader images={baseImage} setImages={setBaseImage} maxFiles={1} t={t} descriptionKey="base_image_desc_extractor" />
                 </div>
                 
                 <ExtractionLanguageSelector
