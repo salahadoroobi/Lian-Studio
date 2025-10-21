@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import type { TFunction } from '../hooks/useLocalization';
 import { UndoIcon } from './icons/UndoIcon';
 import { TrashIcon } from './icons/TrashIcon';
@@ -7,50 +7,60 @@ interface ImageEditorCanvasProps {
   imageSrc: string | null;
   brushColor: string;
   brushSize: number;
-  onMaskChange: (maskDataUrl: string) => void;
+  onStrokeComplete: (color: string) => void;
   onClear: () => void;
   t: TFunction;
 }
 
-export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
+export const ImageEditorCanvas = forwardRef<
+    { getCanvasDataUrl: () => string | undefined; clearCanvas: () => void; },
+    ImageEditorCanvasProps
+>(({
   imageSrc,
   brushColor,
   brushSize,
-  onMaskChange,
+  onStrokeComplete,
   onClear,
   t
-}) => {
+}, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPosition, setLastPosition] = useState<{ x: number, y: number } | null>(null);
   const [history, setHistory] = useState<string[]>([]);
-
-  const generateAndPropagateMask = (sourceCanvas: HTMLCanvasElement) => {
-    const image = imageRef.current;
-    if (sourceCanvas && image && image.naturalWidth > 0) {
-      const maskCanvas = document.createElement('canvas');
-      maskCanvas.width = image.naturalWidth;
-      maskCanvas.height = image.naturalHeight;
-      const maskCtx = maskCanvas.getContext('2d');
-      if (maskCtx) {
-        maskCtx.drawImage(sourceCanvas, 0, 0, image.naturalWidth, image.naturalHeight);
-        const imageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i + 3] > 0) { // If pixel has any opacity
-            data[i] = 255;     // R
-            data[i + 1] = 255; // G
-            data[i + 2] = 255; // B
-            data[i + 3] = 255; // A
-          }
-        }
-        maskCtx.putImageData(imageData, 0, 0);
-        onMaskChange(maskCanvas.toDataURL('image/png'));
-      }
+  
+  const handleInternalClear = () => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (canvas && context) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      setHistory([]);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    getCanvasDataUrl: () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return undefined;
+
+        // To handle transparency properly, draw the colored mask onto a white background
+        // before sending it to the model.
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        if (tempCtx) {
+            tempCtx.fillStyle = '#FFFFFF';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tempCtx.drawImage(canvas, 0, 0);
+            return tempCanvas.toDataURL('image/png');
+        }
+        
+        return canvas.toDataURL('image/png');
+    },
+    clearCanvas: handleInternalClear,
+  }));
 
   const resizeCanvas = () => {
     const image = imageRef.current;
@@ -68,7 +78,7 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
         image.src = imageSrc;
         image.onload = () => {
             resizeCanvas();
-            handleClear(); // Clear canvas and history for new image
+            handleInternalClear();
         };
     }
     window.addEventListener('resize', resizeCanvas);
@@ -132,17 +142,7 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
     const canvas = canvasRef.current;
     if (canvas) {
         setHistory(prev => [...prev, canvas.toDataURL()]);
-        generateAndPropagateMask(canvas);
-    }
-  };
-  
-  const handleClear = () => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext('2d');
-    if (canvas && context) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      setHistory([]);
-      onClear();
+        onStrokeComplete(brushColor);
     }
   };
   
@@ -164,11 +164,11 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
         const img = new Image();
         img.onload = () => {
             context.drawImage(img, 0, 0);
-            generateAndPropagateMask(canvas);
         };
         img.src = prevStateUrl;
     } else {
-        onClear(); // We've undone back to a blank state
+        // We've undone back to a blank state, let the parent know.
+        onClear();
     }
   };
 
@@ -205,7 +205,10 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
           <UndoIcon />
       </button>
       <button
-          onClick={handleClear}
+          onClick={() => {
+              handleInternalClear();
+              onClear();
+          }}
           disabled={history.length === 0}
           className="absolute top-3 right-3 z-10 p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
           aria-label={t('clear_mask')}
@@ -215,4 +218,4 @@ export const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
       </button>
     </div>
   );
-};
+});

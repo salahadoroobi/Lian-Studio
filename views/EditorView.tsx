@@ -6,6 +6,11 @@ import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
 
+type CanvasHandle = {
+  getCanvasDataUrl: () => string | undefined;
+  clearCanvas: () => void;
+};
+
 interface EditorViewProps {
   t: TFunction;
   language: Language;
@@ -14,8 +19,10 @@ interface EditorViewProps {
 export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
   const [prompt, setPrompt] = useState('');
   const [baseImage, setBaseImage] = useState<ReferenceImage[]>([]);
-  const [maskDataUrl, setMaskDataUrl] = useState<string>('');
   
+  const [activeColors, setActiveColors] = useState<string[]>([]);
+  const [colorPrompts, setColorPrompts] = useState<Record<string, string>>({});
+
   const [brushColor, setBrushColor] = useState('#ef4444'); // Red
   const [brushSize, setBrushSize] = useState(30);
 
@@ -24,6 +31,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
   const [error, setError] = useState<string | null>(null);
 
   const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const canvasRef = useRef<CanvasHandle>(null);
 
   useLayoutEffect(() => {
     const textarea = promptTextareaRef.current;
@@ -38,19 +46,40 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
       setError('Please upload an image to edit.');
       return;
     }
-    if (!maskDataUrl) {
+    const coloredMaskDataUrl = canvasRef.current?.getCanvasDataUrl();
+    if (!coloredMaskDataUrl || activeColors.length === 0) {
       setError('Please draw a mask on the image to specify the edit area.');
       return;
     }
-    if (!prompt.trim()) {
-      setError('Please provide edit instructions.');
-      return;
+
+    const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
+    if (!prompt.trim() && !hasColorPrompts) {
+        setError('Please provide general edit instructions or instructions for at least one color.');
+        return;
     }
+
     setIsLoading(true);
     setError(null);
     setGeneratedImage(null);
+
     try {
-      const result = await editImage(prompt, baseImage[0], maskDataUrl);
+      let finalPrompt = `Using the second image as a colored mask, edit the first image.`;
+      if (prompt.trim()) {
+        finalPrompt += `\nGeneral instructions: ${prompt.trim()}.`;
+      }
+      const colorInstructions = activeColors
+        .map(color => {
+          const instruction = colorPrompts[color]?.trim();
+          return instruction ? `For the area masked in ${color}, apply this change: "${instruction}"` : '';
+        })
+        .filter(Boolean)
+        .join('\n');
+      
+      if (colorInstructions) {
+        finalPrompt += `\n\nSpecific instructions for colored areas:\n${colorInstructions}`;
+      }
+      
+      const result = await editImage(finalPrompt, baseImage[0], coloredMaskDataUrl);
       setGeneratedImage(result);
     } catch (e: any) {
       setError(e.message || 'An unexpected error occurred.');
@@ -61,10 +90,23 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
 
   const handleImageUpload = (images: ReferenceImage[]) => {
     setBaseImage(images);
-    setMaskDataUrl(''); // Clear mask when new image is uploaded
+    handleClearMask();
   };
 
-  const canEdit = !isLoading && baseImage.length > 0 && prompt.trim().length > 0 && !!maskDataUrl;
+  const handleStrokeComplete = (color: string) => {
+    if (!activeColors.includes(color)) {
+        setActiveColors(prev => [...prev, color]);
+    }
+  };
+
+  const handleClearMask = () => {
+    canvasRef.current?.clearCanvas();
+    setActiveColors([]);
+    setColorPrompts({});
+  };
+
+  const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
+  const canEdit = !isLoading && baseImage.length > 0 && activeColors.length > 0 && (prompt.trim().length > 0 || hasColorPrompts);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 md:p-8">
@@ -82,11 +124,12 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('mask_area_label')}</label>
             <p className="text-sm text-gray-500 dark:text-gray-400 -mt-3 mb-2">{t('mask_area_desc')}</p>
             <ImageEditorCanvas 
+              ref={canvasRef}
               imageSrc={baseImage[0]?.dataUrl}
               brushColor={brushColor}
               brushSize={brushSize}
-              onMaskChange={setMaskDataUrl}
-              onClear={() => setMaskDataUrl('')}
+              onStrokeComplete={handleStrokeComplete}
+              onClear={handleClearMask}
               t={t}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
@@ -118,10 +161,32 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
           />
         </div>
 
+        {activeColors.length > 0 && (
+            <div className="flex flex-col gap-3 -mt-2 animate-fade-in">
+                {activeColors.map(color => (
+                    <div key={color} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">
+                        <div 
+                            className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-600 shadow-sm flex-shrink-0"
+                            style={{ backgroundColor: color }}
+                            aria-hidden="true"
+                        />
+                        <input
+                            type="text"
+                            value={colorPrompts[color] || ''}
+                            onChange={(e) => setColorPrompts(p => ({...p, [color]: e.target.value}))}
+                            placeholder={t('color_prompt_placeholder')}
+                            aria-label={`Instructions for color ${color}`}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        />
+                    </div>
+                ))}
+            </div>
+        )}
+
         <button
           onClick={handleEdit}
           disabled={!canEdit}
-          className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
+          className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg mt-auto"
         >
           {isLoading ? '...' : t('edit_button')}
         </button>

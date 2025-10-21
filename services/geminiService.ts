@@ -112,16 +112,16 @@ export const generateImage = async (
 export const editImage = async (
     prompt: string,
     baseImage: ReferenceImage,
-    maskDataUrl: string
+    coloredMaskDataUrl: string
 ): Promise<string> => {
     const ai = getAi();
 
-    const maskFile = dataURLtoFile(maskDataUrl, 'mask.png');
+    const maskFile = dataURLtoFile(coloredMaskDataUrl, 'mask.png');
     
     const baseImagePart = await fileToGenerativePart(baseImage.file);
     const maskImagePart = await fileToGenerativePart(maskFile);
 
-    const textPart = { text: `Using the second image as a black and white mask (white is the area to edit), edit the first image. Change the masked area according to the following instructions: ${prompt}` };
+    const textPart = { text: prompt };
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
