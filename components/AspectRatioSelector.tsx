@@ -14,7 +14,7 @@ export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ select
     <div>
       <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('aspect_ratio_label')}</label>
       <div className="grid grid-cols-2 gap-3">
-        {ASPECT_RATIOS.map(({ label, value }) => {
+        {ASPECT_RATIOS.map(({ tKey, value }) => {
           const isSelected = selectedRatio === value;
           return (
             <button
@@ -28,7 +28,8 @@ export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ select
                 }
               `}
             >
-              <p>{t(`aspect_ratio_${label}`)}</p>
+              {/* Fix: Use the type-safe tKey for translations. */}
+              <p>{t(tKey)}</p>
               {value !== 'Default' && <p className="text-xs font-normal opacity-80">{value}</p>}
             </button>
           );

@@ -13,7 +13,7 @@ export const ExtractionLanguageSelector: React.FC<ExtractionLanguageSelectorProp
     <div>
       <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('output_language_label')}</label>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {EXTRACTION_LANGUAGES.map(({ value }) => {
+        {EXTRACTION_LANGUAGES.map(({ tKey, value }) => {
           const isSelected = selectedLanguage === value;
           return (
             <button
@@ -27,7 +27,8 @@ export const ExtractionLanguageSelector: React.FC<ExtractionLanguageSelectorProp
                 }
               `}
             >
-              <p>{t(`output_language_${value}`)}</p>
+              {/* Fix: Use the type-safe tKey for translations. */}
+              <p>{t(tKey)}</p>
             </button>
           );
         })}

@@ -26,8 +26,9 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
 
   const renderContent = () => {
     if (isLoading) {
-      let titleKey = 'generating_title';
-      let descKey = 'generating_desc';
+      // Fix: Use a specific translation key type instead of a generic string.
+      let titleKey: Parameters<TFunction>[0] = 'generating_title';
+      let descKey: Parameters<TFunction>[0] = 'generating_desc';
       if (view === 'enhancer') {
           titleKey = 'enhancing_title';
           descKey = 'enhancing_desc';

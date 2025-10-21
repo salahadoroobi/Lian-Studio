@@ -87,6 +87,7 @@ const App: React.FC = () => {
                 isOpen={isApiKeyModalOpen}
                 onClose={() => setIsApiKeyModalOpen(false)}
                 t={t}
+                language={language}
             />
         </div>
     );

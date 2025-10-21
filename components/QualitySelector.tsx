@@ -14,7 +14,7 @@ export const QualitySelector: React.FC<QualitySelectorProps> = ({ selectedQualit
     <div>
       <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('quality_label')}</label>
       <div className="grid grid-cols-2 gap-3">
-        {QUALITY_OPTIONS.map(({ label, value }) => {
+        {QUALITY_OPTIONS.map(({ tKey, value }) => {
           const isSelected = selectedQuality === value;
           return (
             <button
@@ -28,7 +28,8 @@ export const QualitySelector: React.FC<QualitySelectorProps> = ({ selectedQualit
                 }
               `}
             >
-              <p>{t(`quality_${label}`)}</p>
+              {/* Fix: Use the type-safe tKey for translations. */}
+              <p>{t(tKey)}</p>
             </button>
           );
         })}

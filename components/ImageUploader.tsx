@@ -11,7 +11,8 @@ interface ImageUploaderProps {
   images: ReferenceImage[];
   setImages: React.Dispatch<React.SetStateAction<ReferenceImage[]>>;
   maxFiles?: number;
-  descriptionKey: string;
+  // Fix: Use a specific translation key type instead of a generic string.
+  descriptionKey: Parameters<TFunction>[0];
   t: TFunction;
 }
 
