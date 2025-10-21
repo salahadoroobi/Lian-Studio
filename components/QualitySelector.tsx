@@ -12,7 +12,12 @@ interface QualitySelectorProps {
 export const QualitySelector: React.FC<QualitySelectorProps> = ({ selectedQuality, setSelectedQuality, t }) => {
   return (
     <div>
-      <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('quality_label')}</label>
+      <div className="flex items-center gap-2 mb-2">
+        <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('quality_label')}</label>
+        <span className="bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2 py-0.5 rounded-full">
+            {t('beta_tag')}
+        </span>
+      </div>
       <div className="grid grid-cols-2 gap-3">
         {QUALITY_OPTIONS.map(({ tKey, value }) => {
           const isSelected = selectedQuality === value;
