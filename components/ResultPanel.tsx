@@ -9,7 +9,7 @@ interface ResultPanelProps {
   isLoading: boolean;
   error: string | null;
   t: TFunction;
-  view: 'generator' | 'enhancer' | 'merger';
+  view: 'generator' | 'enhancer' | 'merger' | 'editor';
 }
 
 export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoading, error, t, view }) => {
@@ -35,6 +35,9 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
       } else if (view === 'merger') {
           titleKey = 'merging_title';
           descKey = 'merging_desc';
+      } else if (view === 'editor') {
+          titleKey = 'editing_title';
+          descKey = 'editing_desc';
       }
 
       return (

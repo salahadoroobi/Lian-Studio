@@ -20,6 +20,19 @@ const fileToGenerativePart = async (file: File) => {
   };
 };
 
+const dataURLtoFile = (dataurl: string, filename: string): File => {
+    const arr = dataurl.split(',');
+    // The type assertion is safe because a valid data URL will have this part.
+    const mime = (arr[0].match(/:(.*?);/) as RegExpMatchArray)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+};
+
 const getAi = () => {
     const userApiKey = localStorage.getItem('gemini_api_key');
     const apiKey = userApiKey || process.env.API_KEY;
@@ -94,6 +107,38 @@ export const generateImage = async (
     }
     
     throw new Error('Image generation failed. No image data received.');
+};
+
+export const editImage = async (
+    prompt: string,
+    baseImage: ReferenceImage,
+    maskDataUrl: string
+): Promise<string> => {
+    const ai = getAi();
+
+    const maskFile = dataURLtoFile(maskDataUrl, 'mask.png');
+    
+    const baseImagePart = await fileToGenerativePart(baseImage.file);
+    const maskImagePart = await fileToGenerativePart(maskFile);
+
+    const textPart = { text: `Using the second image as a black and white mask (white is the area to edit), edit the first image. Change the masked area according to the following instructions: ${prompt}` };
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: { parts: [baseImagePart, maskImagePart, textPart] },
+        config: {
+            responseModalities: [Modality.IMAGE],
+        },
+    });
+    
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            const base64ImageBytes: string = part.inlineData.data;
+            return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
+        }
+    }
+    
+    throw new Error('Image editing failed. No image data received.');
 };
 
 export const enhanceImage = async (
