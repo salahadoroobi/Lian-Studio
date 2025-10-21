@@ -26,21 +26,30 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, t, la
     if (isOpen) {
       const storedKey = localStorage.getItem('gemini_api_key') || '';
       setApiKey(storedKey);
-      setValidationStatus(storedKey ? 'valid' : 'idle'); // Assume stored key is valid
+      if (storedKey) {
+        // Re-validate the stored key silently
+        validateApiKey(storedKey).then(isValid => {
+            setValidationStatus(isValid ? 'valid' : 'invalid');
+        });
+      } else {
+        setValidationStatus('idle');
+      }
     }
   }, [isOpen]);
 
   // Debounced validation effect
   useEffect(() => {
-    // Don't validate if it's the initial stored key
-    if (apiKey === (localStorage.getItem('gemini_api_key') || '')) {
-      if(apiKey) setValidationStatus('valid');
-      return;
-    }
+    // This effect is for user input, not the initial load.
+    if (!isOpen) return;
 
     if (!apiKey.trim()) {
       setValidationStatus('idle');
       return;
+    }
+
+    // Only re-validate if the key has changed from what's stored
+    if (apiKey === localStorage.getItem('gemini_api_key')) {
+        return;
     }
 
     setValidationStatus('validating');
@@ -52,7 +61,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, t, la
     return () => {
       clearTimeout(handler);
     };
-  }, [apiKey]);
+  }, [apiKey, isOpen]);
 
   const handleSave = () => {
     if (validationStatus === 'valid') {
@@ -68,7 +77,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, t, la
     const marginClass = language === 'ar' ? 'mr-2' : 'ml-2';
     switch (validationStatus) {
       case 'validating':
-        return <div className="flex items-center text-sm text-gray-500 dark:text-gray-400"><SpinnerIcon className="animate-spin h-5 w-5 text-brand-accent" /> <span className={marginClass}>{t('api_key_validating')}</span></div>;
+        return <div className="flex items-center text-sm text-gray-500 dark:text-gray-400"><SpinnerIcon className="animate-spin h-5 w-5 text-brand-primary dark:text-brand-accent" /> <span className={marginClass}>{t('api_key_validating')}</span></div>;
       case 'valid':
         return <div className="text-sm text-green-600 dark:text-green-400">{t('api_key_valid')}</div>;
       case 'invalid':
@@ -125,7 +134,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, t, la
             </div>
             
             <div className="w-full flex justify-between items-center mt-4">
-                <div className="min-h-[20px]">
+                <div className="min-h-[20px] flex-1 text-start">
                      {renderValidationStatus()}
                 </div>
                 <div className="flex justify-end gap-3">
