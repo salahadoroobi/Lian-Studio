@@ -8,6 +8,7 @@ import { CombineIcon } from '../components/icons/CombineIcon';
 import { PaintBrushIcon } from '../components/icons/PaintBrushIcon';
 import { ShimmerWrapper } from '../components/ShimmerWrapper';
 import { ActionButton } from '../components/ActionButton';
+import { PencilRulerIcon } from '../components/icons/PencilRulerIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -47,7 +48,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
         <h3 className="text-2xl font-bold text-brand-primary dark:text-white">{title}</h3>
         {isBeta && (
           <ShimmerWrapper className="rounded-full">
-            <span className="inline-flex items-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span className="inline-flex items-center justify-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full min-w-[50px]">
               {t('beta_tag')}
             </span>
           </ShimmerWrapper>
@@ -79,7 +80,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-12">{t('landing_subtitle')}</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-20 md:mb-32">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 md:mb-32">
         <Card
           icon={<PaintBrushIcon />}
           title={t('editor_card_title')}
@@ -118,6 +119,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
           onClick={() => setView('extractor')}
           isBeta={true}
         />
+        <Card
+          icon={<PencilRulerIcon />}
+          title={t('corrector_card_title')}
+          description={t('corrector_card_desc')}
+          buttonText={t('start_correcting')}
+          onClick={() => setView('corrector')}
+          isBeta={true}
+        />
       </div>
 
       <div className="space-y-16">
@@ -135,14 +144,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
 
         <section className="max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-brand-primary dark:text-white mb-8">{t('landing_features_title')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <FeatureCard language={language} title={t('landing_feature_1_title')} description={t('landing_feature_1_desc')} icon={<SparklesIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_5_title')} description={t('landing_feature_5_desc')} icon={<PaintBrushIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_2_title')} description={t('landing_feature_2_desc')} icon={<WandIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
-                <div className="md:col-span-2">
-                    <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
-                </div>
+                <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
+                <FeatureCard language={language} title={t('landing_feature_6_title')} description={t('landing_feature_6_desc')} icon={<PencilRulerIcon />} />
             </div>
         </section>
 

@@ -8,10 +8,11 @@ import { DownloadIcon } from './icons/DownloadIcon';
 interface PromptResultDisplayProps {
   text: string | null;
   t: TFunction;
-  extractionLanguage: string;
+  outputLanguage: string;
+  initialDescKey?: Parameters<TFunction>[0];
 }
 
-export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, t, extractionLanguage }) => {
+export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, t, outputLanguage, initialDescKey }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -41,7 +42,7 @@ export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, 
       <div className="text-center text-gray-400">
         <DocumentTextIcon />
         <p className="mt-4 text-lg font-semibold text-brand-primary dark:text-brand-accent">{t('initial_title')}</p>
-        <p className="text-sm dark:text-gray-500">{t('initial_desc_extractor')}</p>
+        <p className="text-sm dark:text-gray-500">{t(initialDescKey || 'initial_desc_extractor')}</p>
       </div>
     );
   }
@@ -68,7 +69,7 @@ export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, 
             </button>
         </div>
         <p
-          dir={extractionLanguage === 'ar' ? 'rtl' : 'ltr'}
+          dir={outputLanguage === 'ar' ? 'rtl' : 'ltr'}
           className="text-brand-primary dark:text-brand-accent whitespace-pre-wrap select-text pr-12"
         >
           {text}

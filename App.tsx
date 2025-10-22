@@ -8,8 +8,9 @@ import { useLocalization } from './hooks/useLocalization';
 import { MergerView } from './views/MergerView';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { EditorView } from './views/EditorView';
+import { CorrectorView } from './views/CorrectorView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -63,6 +64,8 @@ const App: React.FC = () => {
                 return <MergerView t={t} language={language} />;
             case 'extractor':
                 return <ExtractorView t={t} />;
+            case 'corrector':
+                return <CorrectorView t={t} />;
             case 'landing':
             default:
                 return <LandingPage setView={changeView} t={t} language={language} />;

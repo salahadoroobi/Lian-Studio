@@ -234,3 +234,33 @@ export const extractPromptFromImage = async (
     }
     return response.text;
 };
+
+export const correctPrompt = async (
+    idea: string,
+    outputLanguage: string
+): Promise<string> => {
+    const ai = getAi();
+    const instruction = `You are a professional prompt engineer for advanced AI image generation models. Your task is to take a user's simple idea and transform it into a detailed, well-structured, and creative prompt. The final prompt must be in ${outputLanguage}.
+
+User's idea: "${idea}"
+
+Generate a high-quality prompt based on this idea. The prompt should include details about:
+- Subject and its appearance
+- Setting and environment
+- Artistic style (e.g., photorealistic, oil painting, anime, futuristic)
+- Composition and camera angle
+- Lighting and mood
+- Relevant keywords for quality (e.g., 4k, masterpiece, highly detailed)
+
+Respond only with the final, polished prompt.`;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: instruction,
+    });
+    
+    if (!response.text) {
+        throw new Error("Failed to correct the prompt.");
+    }
+    return response.text;
+};

@@ -105,7 +105,7 @@ export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
                         <p className="text-sm">{t('extracting_desc')}</p>
                      </div>
                 ) : (
-                    <PromptResultDisplay text={extractedText} t={t} extractionLanguage={extractionLanguage} />
+                    <PromptResultDisplay text={extractedText} t={t} outputLanguage={extractionLanguage} initialDescKey="initial_desc_extractor" />
                 )}
             </div>
         </div>
