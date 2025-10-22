@@ -5,6 +5,7 @@ import { editImage } from '../services/geminiService';
 import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
+import { ActionButton } from '../components/ActionButton';
 
 type CanvasHandle = {
   getCanvasDataUrl: () => string | undefined;
@@ -206,13 +207,13 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             </div>
         )}
 
-        <button
+        <ActionButton
           onClick={handleEdit}
           disabled={!canEdit}
           className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg mt-auto"
         >
           {isLoading ? '...' : t('edit_button')}
-        </button>
+        </ActionButton>
       </div>
 
       {/* Right Panel: Result */}

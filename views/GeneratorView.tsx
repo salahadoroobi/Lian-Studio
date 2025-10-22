@@ -7,6 +7,7 @@ import { generateImage } from '../services/geminiService';
 import type { ReferenceImage } from '../types';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
+import { ActionButton } from '../components/ActionButton';
 
 interface GeneratorViewProps {
   t: TFunction;
@@ -117,13 +118,13 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => 
                     <QualitySelector selectedQuality={quality} setSelectedQuality={setQuality} t={t} />
                 </div>
 
-                <button
+                <ActionButton
                     onClick={handleGenerate}
                     disabled={!canGenerate}
                     className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                 >
                     {isLoading ? '...' : t('generate_button')}
-                </button>
+                </ActionButton>
             </div>
 
             {/* Right Panel: Result */}

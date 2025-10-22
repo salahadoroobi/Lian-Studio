@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { PromptResultDisplay } from '../components/PromptResultDisplay';
@@ -7,6 +8,7 @@ import type { ReferenceImage } from '../types';
 import type { TFunction } from '../hooks/useLocalization';
 import { SpinnerIcon } from '../components/icons/SpinnerIcon';
 import { ExtractionLanguageSelector } from '../components/ExtractionLanguageSelector';
+import { ActionButton } from '../components/ActionButton';
 
 interface ExtractorViewProps {
   t: TFunction;
@@ -85,13 +87,13 @@ export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
 
                 {error && <p className="text-sm text-red-500">{error}</p>}
 
-                <button
+                <ActionButton
                     onClick={handleExtract}
                     disabled={!canExtract}
                     className="w-full bg-brand-accent text-white font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                 >
                     {isLoading ? '...' : t('extract_button')}
-                </button>
+                </ActionButton>
             </div>
 
             {/* Right Panel: Result */}

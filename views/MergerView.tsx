@@ -6,6 +6,7 @@ import type { ReferenceImage } from '../types';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 import { MAX_MERGE_IMAGES } from '../constants';
+import { ActionButton } from '../components/ActionButton';
 
 interface MergerViewProps {
   t: TFunction;
@@ -111,13 +112,13 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
 
                 {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
-                <button
+                <ActionButton
                     onClick={handleMerge}
                     disabled={!canMerge}
                     className="w-full bg-brand-accent text-brand-bg font-bold py-4 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                 >
                     {isLoading ? '...' : t('merge_button')}
-                </button>
+                </ActionButton>
             </div>
 
             {/* Right Panel: Result */}

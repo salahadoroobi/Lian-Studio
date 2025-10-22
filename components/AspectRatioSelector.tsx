@@ -16,7 +16,7 @@ export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ select
       <div className="flex items-center gap-2 mb-2">
         <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('aspect_ratio_label')}</label>
         <ShimmerWrapper className="rounded-full">
-            <span className="block bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2 py-0.5 rounded-full">
+            <span className="inline-flex items-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full">
                 {t('beta_tag')}
             </span>
         </ShimmerWrapper>

@@ -7,6 +7,7 @@ import type { Language, TFunction } from '../hooks/useLocalization';
 import { CombineIcon } from '../components/icons/CombineIcon';
 import { PaintBrushIcon } from '../components/icons/PaintBrushIcon';
 import { ShimmerWrapper } from '../components/ShimmerWrapper';
+import { ActionButton } from '../components/ActionButton';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -46,19 +47,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
         <h3 className="text-2xl font-bold text-brand-primary dark:text-white">{title}</h3>
         {isBeta && (
           <ShimmerWrapper className="rounded-full">
-            <span className="block bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2.5 py-0.5 rounded-full">
+            <span className="inline-flex items-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full">
               {t('beta_tag')}
             </span>
           </ShimmerWrapper>
         )}
       </div>
       <p className="text-brand-primary dark:text-gray-400 mb-6 flex-grow">{description}</p>
-      <button
+      <ActionButton
         onClick={onClick}
-        className="w-full bg-brand-accent text-white font-bold py-3 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300"
+        className="w-full bg-brand-accent text-white font-bold py-3 px-4 rounded-lg hover:bg-brand-accent-dark transition duration-300 transform hover:-translate-y-1 hover:shadow-2xl"
       >
         {buttonText}
-      </button>
+      </ActionButton>
     </div>
   );
   
