@@ -5,6 +5,7 @@ import type { TFunction } from '../hooks/useLocalization';
 import { SpinnerIcon } from '../components/icons/SpinnerIcon';
 import { ExtractionLanguageSelector } from '../components/ExtractionLanguageSelector';
 import { ActionButton } from '../components/ActionButton';
+import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 
 interface CorrectorViewProps {
   t: TFunction;
@@ -18,6 +19,7 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
     const [outputLanguage, setOutputLanguage] = useState<string>('en');
 
     const ideaTextareaRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useLayoutEffect(() => {
         const textarea = ideaTextareaRef.current;
@@ -45,6 +47,22 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
         }
     };
 
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target?.result as string;
+                setIdea(text);
+            };
+            reader.onerror = (e) => {
+                console.error("Failed to read file", e);
+                setError("Failed to read the selected file.");
+            }
+            reader.readAsText(file);
+        }
+    };
+
     const canCorrect = !isLoading && idea.trim().length > 0;
 
     return (
@@ -53,8 +71,26 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
             <div className="flex flex-col gap-6 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
                 <h2 className="text-3xl font-bold text-brand-primary dark:text-white">{t('corrector_title')}</h2>
                 
-                <div>
-                    <label htmlFor="idea-input" className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('corrector_idea_label')}</label>
+                <div className="relative">
+                    <div className="flex justify-between items-center mb-2">
+                        <label htmlFor="idea-input" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('corrector_idea_label')}</label>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            title={t('upload_prompt_label')}
+                            aria-label={t('upload_prompt_label')}
+                            className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+                        >
+                            <UploadTextIcon />
+                        </button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileSelect}
+                            accept=".txt"
+                            className="hidden"
+                            id="prompt-file-upload-corrector"
+                        />
+                    </div>
                     <textarea
                         ref={ideaTextareaRef}
                         id="idea-input"

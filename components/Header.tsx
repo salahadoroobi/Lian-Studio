@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, set
                             {t('app_title')}
                             <ShimmerWrapper className="rounded-full">
                                 <span className="inline-flex items-center justify-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full min-w-[50px]">
-                                    v3.2.0
+                                    v3.2.1
                                 </span>
                             </ShimmerWrapper>
                         </h1>
