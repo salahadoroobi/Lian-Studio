@@ -6,6 +6,7 @@ import { DocumentTextIcon } from '../components/icons/DocumentTextIcon';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { CombineIcon } from '../components/icons/CombineIcon';
 import { PaintBrushIcon } from '../components/icons/PaintBrushIcon';
+import { ShimmerWrapper } from '../components/ShimmerWrapper';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -44,9 +45,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
       <div className="flex items-center justify-center gap-2 mb-2">
         <h3 className="text-2xl font-bold text-brand-primary dark:text-white">{title}</h3>
         {isBeta && (
-          <span className="bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2.5 py-0.5 rounded-full">
-            {t('beta_tag')}
-          </span>
+          <ShimmerWrapper className="rounded-full">
+            <span className="block bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              {t('beta_tag')}
+            </span>
+          </ShimmerWrapper>
         )}
       </div>
       <p className="text-brand-primary dark:text-gray-400 mb-6 flex-grow">{description}</p>

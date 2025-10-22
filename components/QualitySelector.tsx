@@ -2,6 +2,7 @@ import React from 'react';
 // Fix: Correctly import TFunction from the implemented useLocalization hook.
 import type { TFunction } from '../hooks/useLocalization';
 import { QUALITY_OPTIONS } from '../constants';
+import { ShimmerWrapper } from './ShimmerWrapper';
 
 interface QualitySelectorProps {
   selectedQuality: string;
@@ -14,9 +15,11 @@ export const QualitySelector: React.FC<QualitySelectorProps> = ({ selectedQualit
     <div>
       <div className="flex items-center gap-2 mb-2">
         <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('quality_label')}</label>
-        <span className="bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2 py-0.5 rounded-full">
-            {t('beta_tag')}
-        </span>
+        <ShimmerWrapper className="rounded-full">
+            <span className="block bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2 py-0.5 rounded-full">
+                {t('beta_tag')}
+            </span>
+        </ShimmerWrapper>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {QUALITY_OPTIONS.map(({ tKey, value }) => {

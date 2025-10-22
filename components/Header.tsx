@@ -5,6 +5,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { ArrowLeftIcon } from './icons/ArrowLeftIcon';
 import { KeyIcon } from './icons/KeyIcon';
+import { ShimmerWrapper } from './ShimmerWrapper';
 
 type Theme = 'light' | 'dark';
 
@@ -38,9 +39,11 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, set
                     ) : (
                          <h1 className="text-2xl font-bold text-brand-primary dark:text-white flex items-center gap-2">
                             {t('app_title')}
-                            <span className="bg-brand-accent text-brand-bg dark:bg-gray-700 dark:text-brand-accent text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                v3.1.0
-                            </span>
+                            <ShimmerWrapper className="rounded-full">
+                                <span className="block bg-brand-accent text-brand-bg dark:bg-gray-700 dark:text-brand-accent text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                    v3.1.1
+                                </span>
+                            </ShimmerWrapper>
                         </h1>
                     )}
                 </div>

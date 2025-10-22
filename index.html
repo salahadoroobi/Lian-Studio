@@ -37,11 +37,19 @@
               scaleIn: {
                 '0%': { opacity: '0', transform: 'scale(0.95)' },
                 '100%': { opacity: '1', transform: 'scale(1)' },
-              }
+              },
+              shimmerLR: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
+              shimmerRL: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+              shimmerTB: { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(100%)' } },
+              shimmerBT: { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(-100%)' } },
             },
             animation: {
               'fade-in': 'fadeIn 0.2s ease-out forwards',
               'scale-in': 'scaleIn 0.2s ease-out forwards',
+              'shimmer-lr': 'shimmerLR 3s ease-in-out infinite',
+              'shimmer-rl': 'shimmerRL 3s ease-in-out infinite',
+              'shimmer-tb': 'shimmerTB 3s ease-in-out infinite',
+              'shimmer-bt': 'shimmerBT 3s ease-in-out infinite',
             }
           }
         }

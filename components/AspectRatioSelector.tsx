@@ -2,6 +2,7 @@ import React from 'react';
 // Fix: Correctly import TFunction from the implemented useLocalization hook.
 import type { TFunction } from '../hooks/useLocalization';
 import { ASPECT_RATIOS } from '../constants';
+import { ShimmerWrapper } from './ShimmerWrapper';
 
 interface AspectRatioSelectorProps {
   selectedRatio: string;
@@ -14,9 +15,11 @@ export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ select
     <div>
       <div className="flex items-center gap-2 mb-2">
         <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('aspect_ratio_label')}</label>
-        <span className="bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2 py-0.5 rounded-full">
-            {t('beta_tag')}
-        </span>
+        <ShimmerWrapper className="rounded-full">
+            <span className="block bg-gray-200 dark:bg-gray-700 text-brand-primary dark:text-brand-accent text-xs font-semibold px-2 py-0.5 rounded-full">
+                {t('beta_tag')}
+            </span>
+        </ShimmerWrapper>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {ASPECT_RATIOS.map(({ tKey, value }) => {
