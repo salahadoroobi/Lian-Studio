@@ -12,12 +12,15 @@ interface ExtractorViewProps {
   t: TFunction;
 }
 
+type ExtractionMode = 'descriptive' | 'concise';
+
 export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
     const [baseImage, setBaseImage] = useState<ReferenceImage[]>([]);
     const [extractedText, setExtractedText] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [extractionLanguage, setExtractionLanguage] = useState<string>('en');
+    const [extractionMode, setExtractionMode] = useState<ExtractionMode>('descriptive');
 
     const handleExtract = async () => {
         if (baseImage.length === 0) {
@@ -28,7 +31,7 @@ export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
         setError(null);
         setExtractedText(null);
         try {
-            const result = await extractPromptFromImage(baseImage[0], extractionLanguage);
+            const result = await extractPromptFromImage(baseImage[0], extractionLanguage, extractionMode);
             setExtractedText(result);
         } catch (e: any) {
             setError(e.message || 'An unexpected error occurred.');
@@ -50,6 +53,30 @@ export const ExtractorView: React.FC<ExtractorViewProps> = ({ t }) => {
                     <ImageUploader images={baseImage} setImages={setBaseImage} maxFiles={1} t={t} descriptionKey="base_image_desc_extractor" />
                 </div>
                 
+                <div>
+                    <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('extraction_mode_label')}</label>
+                    <div className="grid grid-cols-2 gap-3">
+                        {(['descriptive', 'concise'] as ExtractionMode[]).map((mode) => {
+                            const isSelected = extractionMode === mode;
+                            return (
+                                <button
+                                    key={mode}
+                                    onClick={() => setExtractionMode(mode)}
+                                    className={`p-3 border rounded-lg text-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800
+                                        ${
+                                        isSelected
+                                            ? 'bg-brand-accent text-white border-brand-accent ring-brand-accent/50'
+                                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                                        }
+                                    `}
+                                >
+                                    <p>{t(`extraction_mode_${mode}`)}</p>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
                 <ExtractionLanguageSelector
                     selectedLanguage={extractionLanguage}
                     setSelectedLanguage={setExtractionLanguage}

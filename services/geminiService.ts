@@ -209,11 +209,20 @@ export const mergeImages = async (
 
 export const extractPromptFromImage = async (
     image: ReferenceImage,
-    language: string
+    language: string,
+    extractionMode: 'descriptive' | 'concise'
 ): Promise<string> => {
     const ai = getAi();
     const imagePart = await fileToGenerativePart(image.file);
-    const textPart = { text: `You are an expert prompt engineer. Analyze this image and generate a detailed, descriptive prompt that could be used to recreate it. Describe the subject, environment, artistic style, composition, lighting, and mood. Respond only in ${language}.` };
+    
+    let instruction = '';
+    if (extractionMode === 'concise') {
+        instruction = `Analyze this image and provide a concise, factual description of its main subject and key elements. The description should be brief and suitable as a base for further editing prompts. Respond only in ${language}.`;
+    } else { // default to descriptive
+        instruction = `You are an expert prompt engineer. Analyze this image and generate a detailed, descriptive prompt that could be used to recreate it. Describe the subject, environment, artistic style, composition, lighting, and mood. Respond only in ${language}.`;
+    }
+    
+    const textPart = { text: instruction };
     
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
