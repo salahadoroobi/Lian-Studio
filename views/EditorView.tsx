@@ -128,6 +128,36 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
           <div className="flex flex-col gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
             <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('mask_area_label')}</label>
             <p className="text-sm text-gray-500 dark:text-gray-400 -mt-3 mb-2">{t('mask_area_desc')}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mb-4">
+              <div>
+                <label htmlFor="brush-size" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('brush_size')}</label>
+                <div className="flex items-center gap-2">
+                    <input
+                      id="brush-size"
+                      type="range"
+                      min="5"
+                      max="100"
+                      value={brushSize}
+                      onChange={(e) => setBrushSize(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700
+                       [&::-webkit-slider-thumb]:appearance-none
+                       [&::-webkit-slider-thumb]:h-5
+                       [&::-webkit-slider-thumb]:w-5
+                       [&::-webkit-slider-thumb]:rounded-full
+                       [&::-webkit-slider-thumb]:bg-brand-accent
+                       [&::-moz-range-thumb]:h-5
+                       [&::-moz-range-thumb]:w-5
+                       [&::-moz-range-thumb]:rounded-full
+                       [&::-moz-range-thumb]:bg-brand-accent"
+                    />
+                    <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 justify-self-start sm:justify-self-center">
+                <label htmlFor="brush-color" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('mask_color')}</label>
+                <input id="brush-color" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-10 h-10 rounded-md border-gray-300 dark:border-gray-600 cursor-pointer bg-transparent" />
+              </div>
+            </div>
             <ImageEditorCanvas 
               ref={canvasRef}
               imageSrc={baseImage[0]?.dataUrl}
@@ -138,19 +168,6 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
               onUndoToEmpty={handleUndoToEmpty}
               t={t}
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-              <div>
-                <label htmlFor="brush-size" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('brush_size')}</label>
-                <div className="flex items-center gap-2">
-                    <input id="brush-size" type="range" min="5" max="100" value={brushSize} onChange={(e) => setBrushSize(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" />
-                    <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 justify-self-start sm:justify-self-center">
-                <label htmlFor="brush-color" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('mask_color')}</label>
-                <input id="brush-color" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-10 h-10 rounded-md border-gray-300 dark:border-gray-600 cursor-pointer bg-transparent" />
-              </div>
-            </div>
           </div>
         )}
 
