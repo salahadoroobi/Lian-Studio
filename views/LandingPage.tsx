@@ -19,7 +19,7 @@ const FeatureCard: React.FC<{
     description: string;
     language: Language;
   }> = ({ icon, title, description, language }) => (
-    <div className={`flex items-start p-6 text-left bg-white dark:bg-gray-800 rounded-lg shadow-sm gap-4 ${language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'}`}>
+    <div className={`flex items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm gap-4 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
         <div className="flex-shrink-0 w-12 h-12">{icon}</div>
         <div>
             <h4 className="text-xl font-bold text-brand-primary dark:text-white">{title}</h4>
@@ -132,10 +132,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
         <section className="max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-brand-primary dark:text-white mb-8">{t('landing_features_title')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FeatureCard language={language} title={t('landing_feature_5_title')} description={t('landing_feature_5_desc')} icon={<PaintBrushIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_1_title')} description={t('landing_feature_1_desc')} icon={<SparklesIcon />} />
+                <FeatureCard language={language} title={t('landing_feature_5_title')} description={t('landing_feature_5_desc')} icon={<PaintBrushIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_2_title')} description={t('landing_feature_2_desc')} icon={<WandIcon />} />
                 <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
+                <div className="md:col-span-2">
+                    <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
+                </div>
             </div>
         </section>
 
