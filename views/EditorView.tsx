@@ -23,7 +23,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
   const [activeColors, setActiveColors] = useState<string[]>([]);
   const [colorPrompts, setColorPrompts] = useState<Record<string, string>>({});
 
-  const [brushColor, setBrushColor] = useState('#ef4444'); // Red
+  const [brushColor, setBrushColor] = useState('#f0522e'); // Brand Accent Orange
   const [brushSize, setBrushSize] = useState(30);
 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -105,6 +105,11 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
     setColorPrompts({});
   };
 
+  const handleUndoToEmpty = () => {
+    setActiveColors([]);
+    setColorPrompts({});
+  };
+
   const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
   const canEdit = !isLoading && baseImage.length > 0 && activeColors.length > 0 && (prompt.trim().length > 0 || hasColorPrompts);
 
@@ -130,6 +135,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
               brushSize={brushSize}
               onStrokeComplete={handleStrokeComplete}
               onClear={handleClearMask}
+              onUndoToEmpty={handleUndoToEmpty}
               t={t}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">

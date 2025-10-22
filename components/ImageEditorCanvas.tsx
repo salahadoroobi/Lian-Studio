@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } f
 import type { TFunction } from '../hooks/useLocalization';
 import { UndoIcon } from './icons/UndoIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import { RedoIcon } from './icons/RedoIcon';
 
 interface ImageEditorCanvasProps {
   imageSrc: string | null;
@@ -9,6 +10,7 @@ interface ImageEditorCanvasProps {
   brushSize: number;
   onStrokeComplete: (color: string) => void;
   onClear: () => void;
+  onUndoToEmpty: () => void;
   t: TFunction;
 }
 
@@ -21,6 +23,7 @@ export const ImageEditorCanvas = forwardRef<
   brushSize,
   onStrokeComplete,
   onClear,
+  onUndoToEmpty,
   t
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,6 +32,7 @@ export const ImageEditorCanvas = forwardRef<
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPosition, setLastPosition] = useState<{ x: number, y: number } | null>(null);
   const [history, setHistory] = useState<string[]>([]);
+  const [redoHistory, setRedoHistory] = useState<string[]>([]);
   
   const handleInternalClear = () => {
     const canvas = canvasRef.current;
@@ -36,6 +40,7 @@ export const ImageEditorCanvas = forwardRef<
     if (canvas && context) {
       context.clearRect(0, 0, canvas.width, canvas.height);
       setHistory([]);
+      setRedoHistory([]);
     }
   };
 
@@ -142,12 +147,16 @@ export const ImageEditorCanvas = forwardRef<
     const canvas = canvasRef.current;
     if (canvas) {
         setHistory(prev => [...prev, canvas.toDataURL()]);
+        setRedoHistory([]); // Clear redo history on new action
         onStrokeComplete(brushColor);
     }
   };
   
   const handleUndo = () => {
     if (history.length === 0) return;
+
+    const lastState = history[history.length - 1];
+    setRedoHistory(prev => [lastState, ...prev]);
 
     const newHistory = history.slice(0, -1);
     setHistory(newHistory);
@@ -168,8 +177,29 @@ export const ImageEditorCanvas = forwardRef<
         img.src = prevStateUrl;
     } else {
         // We've undone back to a blank state, let the parent know.
-        onClear();
+        onUndoToEmpty();
     }
+  };
+  
+  const handleRedo = () => {
+      if (redoHistory.length === 0) return;
+
+      const nextState = redoHistory[0];
+      const newRedoHistory = redoHistory.slice(1);
+
+      setRedoHistory(newRedoHistory);
+      setHistory(prev => [...prev, nextState]);
+
+      const canvas = canvasRef.current;
+      const context = canvas?.getContext('2d');
+      if (!canvas || !context) return;
+      
+      const img = new Image();
+      img.onload = () => {
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(img, 0, 0);
+      };
+      img.src = nextState;
   };
 
   if (!imageSrc) return null;
@@ -195,15 +225,26 @@ export const ImageEditorCanvas = forwardRef<
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
       />
-      <button
-          onClick={handleUndo}
-          disabled={history.length === 0}
-          className="absolute top-3 left-3 z-10 p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
-          aria-label={t('undo_mask')}
-          title={t('undo_mask')}
-      >
-          <UndoIcon />
-      </button>
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
+          <button
+              onClick={handleUndo}
+              disabled={history.length === 0}
+              className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
+              aria-label={t('undo_mask')}
+              title={t('undo_mask')}
+          >
+              <UndoIcon />
+          </button>
+          <button
+              onClick={handleRedo}
+              disabled={redoHistory.length === 0}
+              className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
+              aria-label={t('redo_mask')}
+              title={t('redo_mask')}
+          >
+              <RedoIcon />
+          </button>
+      </div>
       <button
           onClick={() => {
               handleInternalClear();
