@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { PlusIcon } from './icons/PlusIcon';
 import { XIcon } from './icons/XIcon';
 import { MAX_IMAGES, MAX_FILE_SIZE_MB, MAX_MERGE_IMAGES } from '../constants';
 import type { ReferenceImage } from '../types';
 import type { TFunction } from '../hooks/useLocalization';
 import { ImagePreviewModal } from './ImagePreviewModal';
+import { UploadIcon } from './icons/UploadIcon';
 
 interface ImageUploaderProps {
   images: ReferenceImage[];
@@ -79,9 +79,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
           `}
         >
           <input {...getInputProps()} />
-          <PlusIcon />
-          <p className="text-center text-gray-500 dark:text-gray-400 mt-2">
-            {t('uploader_cta')}
+          <UploadIcon />
+          <p className="font-semibold text-gray-700 dark:text-gray-300">
+            {t('uploader_cta_title')}
+          </p>
+          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-1">
+            {t('uploader_cta_desc')}
           </p>
         </div>
         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{t(descriptionKey)}</p>
@@ -93,7 +96,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
   return (
     <div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-        {images.map(image => (
+        {images.map((image, index) => (
           <div key={image.id} className="relative aspect-square group">
             <button
               onClick={() => setPreviewImage(image.dataUrl)}
@@ -108,6 +111,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
             >
               <XIcon />
             </button>
+            <div className="absolute -top-2 -left-2 bg-brand-primary dark:bg-brand-primary-dark text-brand-bg rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold shadow-md z-10 pointer-events-none">
+                {index + 1}
+            </div>
           </div>
         ))}
         {images.length < maxFiles && (
@@ -118,7 +124,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages,
             `}
           >
             <input {...getInputProps()} />
-            <PlusIcon />
+            <UploadIcon className="w-8 h-8 mb-2 text-brand-accent" />
             <p className="text-sm text-center text-gray-500 dark:text-gray-400">
                {t('uploader_cta_add_more')}
             </p>
