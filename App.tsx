@@ -9,6 +9,8 @@ import { MergerView } from './views/MergerView';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { EditorView } from './views/EditorView';
 import { CorrectorView } from './views/CorrectorView';
+import { Footer } from './components/Footer';
+import { DeveloperModal } from './components/DeveloperModal';
 
 export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector';
 type Theme = 'light' | 'dark';
@@ -18,6 +20,7 @@ const App: React.FC = () => {
     const { t, setLanguage, language, dir } = useLocalization();
     const [theme, setTheme] = useState<Theme>('light');
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+    const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -75,7 +78,7 @@ const App: React.FC = () => {
     const mainContentClasses = isLangTransitioning || isViewTransitioning ? 'opacity-0' : 'opacity-100';
 
     return (
-        <div className={`min-h-screen bg-brand-bg dark:bg-gray-900 transition-colors duration-300 ${language === 'ar' ? 'font-cairo' : 'font-poppins'}`}>
+        <div className={`min-h-screen bg-brand-bg dark:bg-gray-900 transition-colors duration-300 ${language === 'ar' ? 'font-cairo' : 'font-poppins'} flex flex-col`}>
             <Header
                 currentView={view}
                 setView={changeView}
@@ -86,14 +89,20 @@ const App: React.FC = () => {
                 t={t}
                 setIsApiKeyModalOpen={setIsApiKeyModalOpen}
             />
-            <main className={`transition-opacity duration-300 ease-in-out ${mainContentClasses}`}>
+            <main className={`flex-grow transition-opacity duration-300 ease-in-out ${mainContentClasses}`}>
                 {renderView()}
             </main>
+            <Footer t={t} onHeartClick={() => setIsDeveloperModalOpen(true)} />
             <ApiKeyModal
                 isOpen={isApiKeyModalOpen}
                 onClose={() => setIsApiKeyModalOpen(false)}
                 t={t}
                 language={language}
+            />
+            <DeveloperModal
+                isOpen={isDeveloperModalOpen}
+                onClose={() => setIsDeveloperModalOpen(false)}
+                t={t}
             />
         </div>
     );
