@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { XIcon } from './icons/XIcon';
 import type { TFunction } from '../hooks/useLocalization';
 
@@ -24,7 +24,7 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ imageUrl, 
     setIsDragging(false);
   }, [imageUrl]);
 
-  const handleWheel = (e: React.WheelEvent) => {
+  const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
     if (!containerRef.current || !imageRef.current) return;
 
@@ -55,23 +55,42 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ imageUrl, 
     if (mouseX < 0 || mouseX > imgRenderedWidth || mouseY < 0 || mouseY > imgRenderedHeight) {
         return; // Not over the image
     }
-
-    const scaleAmount = -e.deltaY * 0.005;
-    const newScale = Math.max(1, Math.min(5, scale + scaleAmount));
     
-    if (Math.abs(newScale - scale) < 0.01) return;
+    // Use functional updates to get the latest state
+    setScale(prevScale => {
+        const scaleAmount = -e.deltaY * 0.005;
+        const newScale = Math.max(1, Math.min(5, prevScale + scaleAmount));
+        
+        if (Math.abs(newScale - prevScale) < 0.01) return prevScale;
 
-    const newX = mouseX - (mouseX - position.x) * (newScale / scale);
-    const newY = mouseY - (mouseY - position.y) * (newScale / scale);
-    
-    if (Math.abs(newScale - 1) < 0.05) {
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
-    } else {
-      setScale(newScale);
-      setPosition({ x: newX, y: newY });
+        setPosition(prevPos => {
+            const newX = mouseX - (mouseX - prevPos.x) * (newScale / prevScale);
+            const newY = mouseY - (mouseY - prevPos.y) * (newScale / prevScale);
+            
+            if (Math.abs(newScale - 1) < 0.05) {
+                // If we're snapping back to 1, reset position too
+                setScale(1);
+                return { x: 0, y: 0 };
+            }
+            return { x: newX, y: newY };
+        });
+
+        if (Math.abs(newScale - 1) < 0.05) {
+            return 1;
+        }
+        return newScale;
+      });
+  }, []);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (node) {
+        node.addEventListener('wheel', handleWheel, { passive: false });
+        return () => {
+            node.removeEventListener('wheel', handleWheel);
+        };
     }
-  };
+  }, [handleWheel]);
   
   const handleMouseDown = (e: React.MouseEvent) => {
     if (scale > 1) {
@@ -144,7 +163,6 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ imageUrl, 
         <div
           ref={containerRef}
           className="w-full h-full max-h-[calc(90vh-2rem)] flex items-center justify-center overflow-hidden"
-          onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUpOrLeave}

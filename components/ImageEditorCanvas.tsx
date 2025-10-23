@@ -4,6 +4,7 @@ import { UndoIcon } from './icons/UndoIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { RedoIcon } from './icons/RedoIcon';
 import type { EditorTool } from '../views/EditorView';
+import { ResetViewIcon } from './icons/ResetViewIcon';
 
 interface ImageEditorCanvasProps {
   imageSrc: string | null;
@@ -332,18 +333,28 @@ export const ImageEditorCanvas = forwardRef<
               <RedoIcon />
           </button>
       </div>
-      <button
-          onClick={() => {
-              handleInternalClear();
-              onClear();
-          }}
-          disabled={history.length === 0}
-          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
-          aria-label={t('clear_mask')}
-          title={t('clear_mask')}
-      >
-          <TrashIcon />
-      </button>
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+        <button
+            onClick={() => setTransform({ scale: 1, x: 0, y: 0 })}
+            className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+            aria-label={t('reset_view')}
+            title={t('reset_view')}
+        >
+            <ResetViewIcon />
+        </button>
+        <button
+            onClick={() => {
+                handleInternalClear();
+                onClear();
+            }}
+            disabled={history.length === 0}
+            className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
+            aria-label={t('clear_mask')}
+            title={t('clear_mask')}
+        >
+            <TrashIcon />
+        </button>
+      </div>
     </div>
   );
 });

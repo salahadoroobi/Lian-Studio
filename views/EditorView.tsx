@@ -156,7 +156,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
                     min="5" max="100"
                     value={brushSize}
                     onChange={(e) => setBrushSize(Number(e.target.value))}
-                    className="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent"
+                    className="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
                   />
                   <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
               </div>
@@ -166,7 +166,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
               </div>
                <button onClick={() => setIsMaskVisible(!isMaskVisible)} title={t('toggle_mask_visibility')} className="p-2 rounded-md transition-colors text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700">
                   {isMaskVisible ? <EyeIcon className="w-5 h-5"/> : <EyeSlashIcon className="w-5 h-5"/>}
-              </button>
+               </button>
             </div>
             
             <ImageEditorCanvas 
