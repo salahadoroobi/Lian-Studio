@@ -6,11 +6,17 @@ import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
 import { ActionButton } from '../components/ActionButton';
+import { BrushIcon } from '../components/icons/BrushIcon';
+import { EraserIcon } from '../components/icons/EraserIcon';
+import { EyeIcon } from '../components/icons/EyeIcon';
+import { EyeSlashIcon } from '../components/icons/EyeSlashIcon';
 
 type CanvasHandle = {
   getCanvasDataUrl: () => string | undefined;
   clearCanvas: () => void;
 };
+
+export type EditorTool = 'brush' | 'eraser';
 
 interface EditorViewProps {
   t: TFunction;
@@ -24,8 +30,10 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
   const [activeColors, setActiveColors] = useState<string[]>([]);
   const [colorPrompts, setColorPrompts] = useState<Record<string, string>>({});
 
+  const [tool, setTool] = useState<EditorTool>('brush');
   const [brushColor, setBrushColor] = useState('#f0522e'); // Brand Accent Orange
   const [brushSize, setBrushSize] = useState(30);
+  const [isMaskVisible, setIsMaskVisible] = useState(true);
 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +103,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
   };
 
   const handleStrokeComplete = (color: string) => {
-    if (!activeColors.includes(color)) {
+    if (tool === 'brush' && !activeColors.includes(color)) {
         setActiveColors(prev => [...prev, color]);
     }
   };
@@ -129,46 +137,51 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
           <div className="flex flex-col gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
             <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('mask_area_label')}</label>
             <p className="text-sm text-gray-500 dark:text-gray-400 -mt-3 mb-2">{t('mask_area_desc')}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center mb-4">
-              <div>
-                <label htmlFor="brush-size" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('brush_size')}</label>
-                <div className="flex items-center gap-2">
-                    <input
-                      id="brush-size"
-                      type="range"
-                      min="5"
-                      max="100"
-                      value={brushSize}
-                      onChange={(e) => setBrushSize(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700
-                       [&::-webkit-slider-thumb]:appearance-none
-                       [&::-webkit-slider-thumb]:h-5
-                       [&::-webkit-slider-thumb]:w-5
-                       [&::-webkit-slider-thumb]:rounded-full
-                       [&::-webkit-slider-thumb]:bg-brand-accent
-                       [&::-moz-range-thumb]:h-5
-                       [&::-moz-range-thumb]:w-5
-                       [&::-moz-range-thumb]:rounded-full
-                       [&::-moz-range-thumb]:bg-brand-accent"
-                    />
-                    <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
-                </div>
+            
+            {/* Toolbar */}
+            <div className="bg-gray-100 dark:bg-gray-900/50 p-2 rounded-lg flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-1 rounded-lg bg-gray-200 dark:bg-gray-700 p-1">
+                  <button onClick={() => setTool('brush')} title={t('tool_brush')} className={`p-1.5 rounded-md transition-colors ${tool === 'brush' ? 'bg-white dark:bg-gray-800 text-brand-accent' : 'text-gray-500 hover:bg-gray-300/50 dark:hover:bg-gray-600/50'}`}>
+                      <BrushIcon className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => setTool('eraser')} title={t('tool_eraser')} className={`p-1.5 rounded-md transition-colors ${tool === 'eraser' ? 'bg-white dark:bg-gray-800 text-brand-accent' : 'text-gray-500 hover:bg-gray-300/50 dark:hover:bg-gray-600/50'}`}>
+                      <EraserIcon className="w-5 h-5" />
+                  </button>
               </div>
-              <div className="flex items-center gap-2 justify-self-start sm:justify-self-center">
-                <label htmlFor="brush-color" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('mask_color')}</label>
-                <input id="brush-color" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-10 h-10 rounded-md border-gray-300 dark:border-gray-600 cursor-pointer bg-transparent" />
+              <div className="flex items-center gap-2">
+                  <label htmlFor="brush-size" className="sr-only">{t('brush_size')}</label>
+                  <input
+                    id="brush-size"
+                    type="range"
+                    min="5" max="100"
+                    value={brushSize}
+                    onChange={(e) => setBrushSize(Number(e.target.value))}
+                    className="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent"
+                  />
+                  <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
               </div>
+               <div className="flex items-center gap-2">
+                <label htmlFor="brush-color" className="sr-only">{t('mask_color')}</label>
+                <input id="brush-color" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-8 h-8 rounded-md border-gray-300 dark:border-gray-600 cursor-pointer bg-transparent" />
+              </div>
+               <button onClick={() => setIsMaskVisible(!isMaskVisible)} title={t('toggle_mask_visibility')} className="p-2 rounded-md transition-colors text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700">
+                  {isMaskVisible ? <EyeIcon className="w-5 h-5"/> : <EyeSlashIcon className="w-5 h-5"/>}
+              </button>
             </div>
+            
             <ImageEditorCanvas 
               ref={canvasRef}
               imageSrc={baseImage[0]?.dataUrl}
+              tool={tool}
               brushColor={brushColor}
               brushSize={brushSize}
+              isMaskVisible={isMaskVisible}
               onStrokeComplete={handleStrokeComplete}
               onClear={handleClearMask}
               onUndoToEmpty={handleUndoToEmpty}
               t={t}
             />
+            <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">{t('editor_pan_instruction')}</p>
           </div>
         )}
 
