@@ -16,6 +16,9 @@ import type { EditorTool } from '../views/EditorView';
 import { HandIcon } from './icons/HandIcon';
 import { BrushIcon } from './icons/BrushIcon';
 import { EraserIcon } from './icons/EraserIcon';
+import { EyeIcon } from './icons/EyeIcon';
+import { EyeSlashIcon } from './icons/EyeSlashIcon';
+import { ZoomIcon } from './icons/ZoomIcon';
 
 interface Point {
   x: number;
@@ -34,8 +37,11 @@ interface ImageEditorCanvasProps {
   tool: EditorTool;
   setTool: (tool: EditorTool) => void;
   brushColor: string;
+  setBrushColor: (color: string) => void;
   brushSize: number;
+  setBrushSize: (size: number) => void;
   isMaskVisible: boolean;
+  setIsMaskVisible: (isVisible: boolean | ((prevState: boolean) => boolean)) => void;
   onStrokeComplete: (color: string) => void;
   onClear: () => void;
   onUndoToEmpty: () => void;
@@ -54,8 +60,11 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       tool,
       setTool,
       brushColor,
+      setBrushColor,
       brushSize,
+      setBrushSize,
       isMaskVisible,
+      setIsMaskVisible,
       onStrokeComplete,
       onClear,
       onUndoToEmpty,
@@ -67,12 +76,18 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
     const imageContainerRef = useRef<HTMLDivElement>(null);
-    const initialOffsetRef = useRef({ x: 0, y: 0 });
+    const brushSettingsRef = useRef<HTMLDivElement>(null);
+    const brushSettingsButtonRef = useRef<HTMLButtonElement>(null);
+    const zoomControlRef = useRef<HTMLDivElement>(null);
+    const zoomControlButtonRef = useRef<HTMLButtonElement>(null);
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [paths, setPaths] = useState<Path[]>([]);
     const [history, setHistory] = useState<Path[][]>([[]]);
     const [historyIndex, setHistoryIndex] = useState(0);
+    const [isBrushSettingsOpen, setIsBrushSettingsOpen] = useState(false);
+    const [isZoomControlOpen, setIsZoomControlOpen] = useState(false);
+    const [allowZoomOut, setAllowZoomOut] = useState(false);
 
     const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
     const [isPanning, setIsPanning] = useState(false);
@@ -133,19 +148,6 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
         return () => window.removeEventListener('resize', resizeCanvas);
     }, [resizeCanvas]);
     
-    useLayoutEffect(() => {
-        const container = containerRef.current;
-        const imageContainer = imageContainerRef.current;
-        if (imageSrc && container && imageContainer && transform.scale === 1) {
-            const containerRect = container.getBoundingClientRect();
-            const imageContainerRect = imageContainer.getBoundingClientRect();
-            initialOffsetRef.current = {
-                x: imageContainerRect.left - containerRect.left,
-                y: imageContainerRect.top - containerRect.top,
-            };
-        }
-    }, [imageSrc, transform.scale]);
-
     const getPoint = (e: React.MouseEvent | React.TouchEvent): Point | null => {
       const canvas = canvasRef.current;
       if (!canvas) return null;
@@ -201,37 +203,37 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       setHistoryIndex(newHistory.length);
     };
 
-    useEffect(() => {
-      const container = containerRef.current;
+    const resetView = () => setTransform({ x: 0, y: 0, scale: 1 });
 
-      const handleWheel = (e: WheelEvent) => {
+    const handleWheel = useCallback((e: WheelEvent) => {
         e.preventDefault();
+        const container = containerRef.current;
         if (!container) return;
     
-        const rect = container.getBoundingClientRect();
-        const mouseX_container = e.clientX - rect.left;
-        const mouseY_container = e.clientY - rect.top;
-        
-        const point = {
-            x: mouseX_container - initialOffsetRef.current.x,
-            y: mouseY_container - initialOffsetRef.current.y,
-        };
-    
         const scaleAmount = -e.deltaY * 0.005;
-    
+        const rect = container.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
         setTransform(prev => {
-          const newScale = Math.max(0.5, Math.min(5, prev.scale + scaleAmount));
-    
-          if (Math.abs(newScale - 1) < 0.05) {
-            return { x: 0, y: 0, scale: 1 };
-          }
-          
-          const newX = point.x - (point.x - prev.x) * (newScale / prev.scale);
-          const newY = point.y - (point.y - prev.y) * (newScale / prev.scale);
-    
-          return { x: newX, y: newY, scale: newScale };
+            const minScale = allowZoomOut ? 0.1 : 1;
+            const newScale = Math.max(minScale, Math.min(5, prev.scale + scaleAmount));
+
+            if (Math.abs(newScale - prev.scale) < 0.001) return prev;
+            
+            if (!allowZoomOut && Math.abs(newScale - 1) < 0.05) {
+                return { x: 0, y: 0, scale: 1 };
+            }
+
+            const newX = mouseX - (mouseX - prev.x) * (newScale / prev.scale);
+            const newY = mouseY - (mouseY - prev.y) * (newScale / prev.scale);
+            
+            return { x: newX, y: newY, scale: newScale };
         });
-      };
+      }, [allowZoomOut]);
+    
+    useEffect(() => {
+      const container = containerRef.current;
       
       if (container) {
           container.addEventListener('wheel', handleWheel, { passive: false });
@@ -249,17 +251,46 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
           setIsGrabbing(false);
         }
       };
+
+      const handleClickOutside = (event: MouseEvent) => {
+          if (
+              brushSettingsRef.current &&
+              !brushSettingsRef.current.contains(event.target as Node) &&
+              brushSettingsButtonRef.current &&
+              !brushSettingsButtonRef.current.contains(event.target as Node)
+          ) {
+              setIsBrushSettingsOpen(false);
+          }
+          if (
+              zoomControlRef.current &&
+              !zoomControlRef.current.contains(event.target as Node) &&
+              zoomControlButtonRef.current &&
+              !zoomControlButtonRef.current.contains(event.target as Node)
+          ) {
+              setIsZoomControlOpen(false);
+          }
+      };
+      
       window.addEventListener('keydown', handleKeyDown);
       window.addEventListener('keyup', handleKeyUp);
+      document.addEventListener('mousedown', handleClickOutside);
+      
       return () => {
         if (container) {
             container.removeEventListener('wheel', handleWheel);
         }
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keyup', handleKeyUp);
+        document.removeEventListener('mousedown', handleClickOutside);
       };
-    }, [isPanning]);
+    }, [isPanning, handleWheel]);
     
+    // Close popovers if tool changes
+    useEffect(() => {
+        setIsBrushSettingsOpen(false);
+        setIsZoomControlOpen(false);
+    }, [tool]);
+
     const localUndo = useCallback(() => {
       if (historyIndex > 0) {
         const newIndex = historyIndex - 1;
@@ -285,8 +316,6 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       setHistoryIndex(0);
       onClear();
     }, [onClear]);
-
-    const resetView = () => setTransform({ x: 0, y: 0, scale: 1 });
 
     const handleImageLoad = useCallback(() => {
         const image = imageRef.current;
@@ -404,6 +433,9 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
           <button onClick={() => setTool('eraser')} title={t('tool_eraser')} className={`p-2 rounded-md transition-colors ${tool === 'eraser' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
               <EraserIcon className="w-5 h-5" />
           </button>
+
+          <div className="h-px bg-white/20 mx-1.5 my-1"></div>
+          
           <button onClick={localUndo} disabled={historyIndex === 0} title={t('undo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
             <UndoIcon />
           </button>
@@ -413,12 +445,109 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
            <button onClick={localClearCanvas} disabled={paths.length === 0} title={t('clear_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
             <TrashIcon />
           </button>
-          <button onClick={() => setTool('pan')} title={t('tool_pan')} className={`p-2 rounded-md transition-colors ${tool === 'pan' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+
+          <div className="h-px bg-white/20 mx-1.5 my-1"></div>
+
+          <button onClick={() => setIsMaskVisible(prev => !prev)} title={t('toggle_mask_visibility')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
+              {isMaskVisible ? <EyeIcon className="w-5 h-5"/> : <EyeSlashIcon className="w-5 h-5"/>}
+          </button>
+           <button onClick={() => setTool('pan')} title={t('tool_pan')} className={`p-2 rounded-md transition-colors ${tool === 'pan' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
             <HandIcon />
           </button>
            <button onClick={resetView} title={t('reset_view')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
             <ResetViewIcon />
           </button>
+          <div className="relative">
+              <button
+                ref={zoomControlButtonRef}
+                onClick={() => setIsZoomControlOpen(prev => !prev)}
+                title={t('zoom_tool')}
+                className={`p-2 rounded-md transition-colors w-full flex justify-center items-center ${isZoomControlOpen ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}
+              >
+                  <ZoomIcon className="w-5 h-5" />
+              </button>
+              {isZoomControlOpen && (
+                  <div
+                      ref={zoomControlRef}
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col items-center gap-4 animate-fade-in"
+                  >
+                      <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('zoom_tool')}</span>
+                          <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-12 text-center">{(transform.scale * 100).toFixed(0)}%</span>
+                      </div>
+                      <input
+                          type="range"
+                          min={allowZoomOut ? 0.1 : 1}
+                          max="5"
+                          step="0.05"
+                          value={transform.scale}
+                          onChange={(e) => setTransform(prev => ({ ...prev, scale: Number(e.target.value) }))}
+                          className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
+                      />
+                      <div className="flex items-center gap-2 self-start">
+                          <input
+                              type="checkbox"
+                              id="allow-shrink-checkbox"
+                              checked={allowZoomOut}
+                              onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setAllowZoomOut(checked);
+                                  if (!checked && transform.scale < 1) {
+                                      resetView();
+                                  }
+                              }}
+                              className="w-4 h-4 text-brand-accent bg-gray-100 border-gray-300 rounded focus:ring-brand-accent dark:focus:ring-brand-accent dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                          />
+                          <label htmlFor="allow-shrink-checkbox" className="text-xs text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('allow_shrinking')}</label>
+                      </div>
+                  </div>
+              )}
+          </div>
+
+          <div className="h-px bg-white/20 mx-1.5 my-1"></div>
+          
+          <div className="relative">
+            <button
+                ref={brushSettingsButtonRef}
+                onClick={() => setIsBrushSettingsOpen(prev => !prev)}
+                title={t('mask_color')}
+                className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 w-full flex justify-center items-center"
+            >
+                <div 
+                    className="w-5 h-5 rounded-full border-2 border-white/50 shadow-md"
+                    style={{ backgroundColor: brushColor }}
+                    aria-hidden="true"
+                />
+            </button>
+            {isBrushSettingsOpen && (
+                <div 
+                    ref={brushSettingsRef} 
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col gap-4 animate-fade-in"
+                >
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="brush-color-popover" className="sr-only">{t('mask_color')}</label>
+                        <input id="brush-color-popover" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-9 h-9 p-0 border-none rounded-md cursor-pointer bg-transparent" />
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('mask_color')}</span>
+                    </div>
+                     <div className="flex flex-col items-center gap-2">
+                        <label htmlFor="brush-size-popover" className="text-sm font-semibold text-gray-700 dark:text-gray-300 self-start">{t('brush_size')}</label>
+                        <div className="flex items-center gap-2">
+                             <input
+                                id="brush-size-popover"
+                                type="range"
+                                min="5" max="100"
+                                value={brushSize}
+                                onChange={(e) => setBrushSize(Number(e.target.value))}
+                                className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
+                              />
+                              <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+          </div>
         </div>
       </div>
     );

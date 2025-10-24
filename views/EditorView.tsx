@@ -6,8 +6,6 @@ import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
 import { ActionButton } from '../components/ActionButton';
-import { EyeIcon } from '../components/icons/EyeIcon';
-import { EyeSlashIcon } from '../components/icons/EyeSlashIcon';
 
 type CanvasHandle = {
   getCanvasDataUrl: () => string | undefined;
@@ -133,37 +131,17 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('mask_area_label')}</label>
             <p className="text-sm text-gray-500 dark:text-gray-400 -mt-3 mb-2">{t('mask_area_desc')}</p>
             
-            {/* Toolbar */}
-            <div className="bg-gray-100 dark:bg-gray-900/50 p-2 rounded-lg flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                  <label htmlFor="brush-size" className="sr-only">{t('brush_size')}</label>
-                  <input
-                    id="brush-size"
-                    type="range"
-                    min="5" max="100"
-                    value={brushSize}
-                    onChange={(e) => setBrushSize(Number(e.target.value))}
-                    className="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
-                  />
-                  <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
-              </div>
-               <div className="flex items-center gap-2">
-                <label htmlFor="brush-color" className="sr-only">{t('mask_color')}</label>
-                <input id="brush-color" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-8 h-8 rounded-md border-gray-300 dark:border-gray-600 cursor-pointer bg-transparent" />
-              </div>
-               <button onClick={() => setIsMaskVisible(!isMaskVisible)} title={t('toggle_mask_visibility')} className="p-2 rounded-md transition-colors text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700">
-                  {isMaskVisible ? <EyeIcon className="w-5 h-5"/> : <EyeSlashIcon className="w-5 h-5"/>}
-               </button>
-            </div>
-            
             <ImageEditorCanvas 
               ref={canvasRef}
               imageSrc={baseImage[0]?.dataUrl}
               tool={tool}
               setTool={setTool}
               brushColor={brushColor}
+              setBrushColor={setBrushColor}
               brushSize={brushSize}
+              setBrushSize={setBrushSize}
               isMaskVisible={isMaskVisible}
+              setIsMaskVisible={setIsMaskVisible}
               onStrokeComplete={handleStrokeComplete}
               onClear={handleCanvasReset}
               onUndoToEmpty={handleCanvasReset}
