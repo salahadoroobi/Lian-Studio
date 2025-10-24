@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useLayoutEffect,
 } from 'react';
-import type { TFunction } from '../hooks/useLocalization';
+import type { TFunction, Language } from '../hooks/useLocalization';
 import { UndoIcon } from './icons/UndoIcon';
 import { RedoIcon } from './icons/RedoIcon';
 import { TrashIcon } from './icons/TrashIcon';
@@ -57,6 +57,7 @@ interface ImageEditorCanvasProps {
   onStrokeComplete: (color: string) => void;
   onClear: () => void;
   onUndoToEmpty: () => void;
+  language: Language;
   t: TFunction;
 }
 
@@ -80,6 +81,7 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       onStrokeComplete,
       onClear,
       onUndoToEmpty,
+      language,
       t,
     },
     ref
@@ -114,31 +116,53 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
         if (isBrushSettingsOpen && brushSettingsButtonRef.current && containerRef.current) {
             const buttonRect = brushSettingsButtonRef.current.getBoundingClientRect();
             const containerRect = containerRef.current.getBoundingClientRect();
-            const right = (containerRect.right - buttonRect.left) + 12; // 12px for mr-3
             const top = (buttonRect.top - containerRect.top) + (buttonRect.height / 2);
-            setBrushPopupStyle({
-                position: 'absolute',
-                top: `${top}px`,
-                right: `${right}px`,
-                transform: 'translateY(-50%)',
-            });
+
+            if (language === 'ar') {
+                const right = (containerRect.right - buttonRect.left) + 12; // 12px for space
+                setBrushPopupStyle({
+                    position: 'absolute',
+                    top: `${top}px`,
+                    right: `${right}px`,
+                    transform: 'translateY(-50%)',
+                });
+            } else {
+                 const left = (buttonRect.right - containerRect.left) + 12; // 12px for space
+                 setBrushPopupStyle({
+                    position: 'absolute',
+                    top: `${top}px`,
+                    left: `${left}px`,
+                    transform: 'translateY(-50%)',
+                });
+            }
         }
-    }, [isBrushSettingsOpen]);
+    }, [isBrushSettingsOpen, language]);
 
     useLayoutEffect(() => {
         if (isZoomControlOpen && zoomControlButtonRef.current && containerRef.current) {
             const buttonRect = zoomControlButtonRef.current.getBoundingClientRect();
             const containerRect = containerRef.current.getBoundingClientRect();
-            const right = (containerRect.right - buttonRect.left) + 12; // 12px for mr-3
             const top = (buttonRect.top - containerRect.top) + (buttonRect.height / 2);
-            setZoomPopupStyle({
-                position: 'absolute',
-                top: `${top}px`,
-                right: `${right}px`,
-                transform: 'translateY(-50%)',
-            });
+            
+            if (language === 'ar') {
+                const right = (containerRect.right - buttonRect.left) + 12; // 12px for space
+                setZoomPopupStyle({
+                    position: 'absolute',
+                    top: `${top}px`,
+                    right: `${right}px`,
+                    transform: 'translateY(-50%)',
+                });
+            } else {
+                const left = (buttonRect.right - containerRect.left) + 12;
+                setZoomPopupStyle({
+                    position: 'absolute',
+                    top: `${top}px`,
+                    left: `${left}px`,
+                    transform: 'translateY(-50%)',
+                });
+            }
         }
-    }, [isZoomControlOpen]);
+    }, [isZoomControlOpen, language]);
 
 
     const getCanvasContext = () => canvasRef.current?.getContext('2d');
@@ -409,6 +433,7 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
     
     const isPanActive = isPanning || tool === 'pan';
     const cursor = isGrabbing ? 'grabbing' : isPanActive ? 'grab' : 'crosshair';
+    const toolbarPositionClass = language === 'ar' ? 'right-2' : 'left-2';
 
     return (
       <div className="relative w-full min-h-[250px] bg-gray-200 dark:bg-gray-900 rounded-lg overflow-hidden grid place-items-center select-none"
@@ -473,7 +498,7 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
             />
           </div>
         </div>
-        <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-sm p-1.5 rounded-lg z-10">
+        <div className={`absolute top-2 ${toolbarPositionClass} bg-black/30 backdrop-blur-sm p-1.5 rounded-lg z-10`}>
           <button
             onClick={() => setIsToolbarExpanded(prev => !prev)}
             title={t(isToolbarExpanded ? 'collapse_toolbar' : 'expand_toolbar')}

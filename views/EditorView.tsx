@@ -146,6 +146,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
               onClear={handleCanvasReset}
               onUndoToEmpty={handleCanvasReset}
               t={t}
+              language={language}
             />
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">{t('editor_pan_instruction')}</p>
           </div>
