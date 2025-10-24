@@ -12,7 +12,7 @@ import { UndoIcon } from './icons/UndoIcon';
 import { RedoIcon } from './icons/RedoIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { ResetViewIcon } from './icons/ResetViewIcon';
-import type { EditorTool } from '../views/EditorView';
+import type { EditorTool, Path, Point } from '../types';
 import { HandIcon } from './icons/HandIcon';
 import { BrushIcon } from './icons/BrushIcon';
 import { EraserIcon } from './icons/EraserIcon';
@@ -32,18 +32,6 @@ const ChevronDownIcon: React.FC = () => (
     </svg>
 );
 
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface Path {
-  points: Point[];
-  color: string;
-  size: number;
-  tool: EditorTool;
-}
-
 interface ImageEditorCanvasProps {
   imageSrc?: string;
   tool: EditorTool;
@@ -56,7 +44,7 @@ interface ImageEditorCanvasProps {
   setIsMaskVisible: (isVisible: boolean | ((prevState: boolean) => boolean)) => void;
   onStrokeComplete: (color: string) => void;
   onClear: () => void;
-  onUndoToEmpty: () => void;
+  onHistoryChange: (paths: Path[]) => void;
   language: Language;
   t: TFunction;
 }
@@ -80,7 +68,7 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       setIsMaskVisible,
       onStrokeComplete,
       onClear,
-      onUndoToEmpty,
+      onHistoryChange,
       language,
       t,
     },
@@ -102,6 +90,7 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
     const [isBrushSettingsOpen, setIsBrushSettingsOpen] = useState(false);
     const [isZoomControlOpen, setIsZoomControlOpen] = useState(false);
     const [allowZoomOut, setAllowZoomOut] = useState(false);
+    const [isZoomEnabled, setIsZoomEnabled] = useState(true);
     const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
     
     const [brushPopupStyle, setBrushPopupStyle] = useState<React.CSSProperties>({});
@@ -201,7 +190,7 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
         const canvas = canvasRef.current;
         const imageContainer = imageContainerRef.current;
         if (canvas && imageContainer) {
-            const { width, height } = imageContainer.getBoundingClientRect();
+            const { offsetWidth: width, offsetHeight: height } = imageContainer;
             if (canvas.width !== width || canvas.height !== height) {
                 canvas.width = width;
                 canvas.height = height;
@@ -225,10 +214,17 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       const rect = canvas.getBoundingClientRect();
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      return {
-        x: (clientX - rect.left),
-        y: (clientY - rect.top),
-      };
+
+      // Mouse position relative to the on-screen canvas's top-left corner
+      const xOnScreen = clientX - rect.left;
+      const yOnScreen = clientY - rect.top;
+
+      // Convert the on-screen position to a coordinate on the original canvas buffer
+      // by finding the proportional position and multiplying by the buffer dimensions.
+      const pointX = (xOnScreen / rect.width) * canvas.width;
+      const pointY = (yOnScreen / rect.height) * canvas.height;
+      
+      return { x: pointX, y: pointY };
     };
 
     const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
@@ -278,8 +274,11 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
 
     const handleWheel = useCallback((e: WheelEvent) => {
         e.preventDefault();
+        if (!isZoomEnabled) return;
+        
         const container = containerRef.current;
-        if (!container) return;
+        const imageContainer = imageContainerRef.current;
+        if (!container || !imageContainer) return;
     
         const scaleAmount = -e.deltaY * 0.005;
         const rect = container.getBoundingClientRect();
@@ -299,9 +298,17 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
             const newX = mouseX - (mouseX - prev.x) * (newScale / prev.scale);
             const newY = mouseY - (mouseY - prev.y) * (newScale / prev.scale);
             
-            return { x: newX, y: newY, scale: newScale };
+            // Clamp pan
+            const scaledWidth = imageContainer.offsetWidth * newScale;
+            const scaledHeight = imageContainer.offsetHeight * newScale;
+            const maxPanX = Math.max(0, (scaledWidth - container.clientWidth) / 2);
+            const maxPanY = Math.max(0, (scaledHeight - container.clientHeight) / 2);
+            const clampedX = Math.max(-maxPanX, Math.min(maxPanX, newX));
+            const clampedY = Math.max(-maxPanY, Math.min(maxPanY, newY));
+
+            return { x: clampedX, y: clampedY, scale: newScale };
         });
-      }, [allowZoomOut]);
+      }, [allowZoomOut, isZoomEnabled]);
     
     useEffect(() => {
       const container = containerRef.current;
@@ -366,20 +373,21 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       if (historyIndex > 0) {
         const newIndex = historyIndex - 1;
         setHistoryIndex(newIndex);
-        setPaths(history[newIndex]);
-        if (history[newIndex].length === 0) {
-          onUndoToEmpty();
-        }
+        const newPaths = history[newIndex];
+        setPaths(newPaths);
+        onHistoryChange(newPaths);
       }
-    }, [history, historyIndex, onUndoToEmpty]);
+    }, [history, historyIndex, onHistoryChange]);
 
     const localRedo = useCallback(() => {
       if (historyIndex < history.length - 1) {
         const newIndex = historyIndex + 1;
         setHistoryIndex(newIndex);
-        setPaths(history[newIndex]);
+        const newPaths = history[newIndex];
+        setPaths(newPaths);
+        onHistoryChange(newPaths);
       }
-    }, [history, historyIndex]);
+    }, [history, historyIndex, onHistoryChange]);
 
     const localClearCanvas = useCallback(() => {
       setPaths([]);
@@ -431,6 +439,37 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       clearCanvas: localClearCanvas,
     }));
     
+    const handleZoom = (direction: 'in' | 'out') => {
+        const scaleAmount = 0.2 * (direction === 'in' ? 1 : -1);
+        const container = containerRef.current;
+        const imageContainer = imageContainerRef.current;
+        if (!container || !imageContainer) return;
+
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        setTransform(prev => {
+            const minScale = allowZoomOut ? 0.1 : 1;
+            const newScale = Math.max(minScale, Math.min(5, prev.scale + scaleAmount));
+
+            if (Math.abs(newScale - prev.scale) < 0.001) return prev;
+            
+            const newX = centerX - (centerX - prev.x) * (newScale / prev.scale);
+            const newY = centerY - (centerY - prev.y) * (newScale / prev.scale);
+
+            // Clamp pan
+            const scaledWidth = imageContainer.offsetWidth * newScale;
+            const scaledHeight = imageContainer.offsetHeight * newScale;
+            const maxPanX = Math.max(0, (scaledWidth - container.clientWidth) / 2);
+            const maxPanY = Math.max(0, (scaledHeight - container.clientHeight) / 2);
+            const clampedX = Math.max(-maxPanX, Math.min(maxPanX, newX));
+            const clampedY = Math.max(-maxPanY, Math.min(maxPanY, newY));
+
+            return { x: clampedX, y: clampedY, scale: newScale };
+        });
+    };
+
     const isPanActive = isPanning || tool === 'pan';
     const cursor = isGrabbing ? 'grabbing' : isPanActive ? 'grab' : 'crosshair';
     const toolbarPositionClass = language === 'ar' ? 'right-2' : 'left-2';
@@ -468,8 +507,24 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
                 if (isGrabbing) {
                     const dx = e.clientX - panStart.x;
                     const dy = e.clientY - panStart.y;
-                    setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
                     setPanStart({ x: e.clientX, y: e.clientY });
+                    setTransform(prev => {
+                        const newX = prev.x + dx;
+                        const newY = prev.y + dy;
+
+                        const container = containerRef.current;
+                        const imageContainer = imageContainerRef.current;
+                        if (!container || !imageContainer) return prev;
+
+                        const scaledWidth = imageContainer.offsetWidth * prev.scale;
+                        const scaledHeight = imageContainer.offsetHeight * prev.scale;
+                        const maxPanX = Math.max(0, (scaledWidth - container.clientWidth) / 2);
+                        const maxPanY = Math.max(0, (scaledHeight - container.clientHeight) / 2);
+                        const clampedX = Math.max(-maxPanX, Math.min(maxPanX, newX));
+                        const clampedY = Math.max(-maxPanY, Math.min(maxPanY, newY));
+
+                        return { ...prev, x: clampedX, y: clampedY };
+                    });
                 } else {
                     handleMouseMove(e);
                 }
@@ -491,8 +546,8 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
             <canvas
                 ref={canvasRef}
                 className="absolute top-0 left-0 w-full h-full"
-                style={{ 
-                    opacity: isMaskVisible ? 0.6 : 0, 
+                style={{
+                    opacity: isMaskVisible ? 0.6 : 0,
                     pointerEvents: 'none',
                 }}
             />
@@ -581,22 +636,37 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
                 ref={zoomControlRef}
                 style={zoomPopupStyle}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col items-center gap-4 animate-fade-in"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col items-center gap-4 animate-fade-in w-48"
             >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between w-full">
                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('zoom_tool')}</span>
                     <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-12 text-center">{(transform.scale * 100).toFixed(0)}%</span>
                 </div>
-                <input
-                    type="range"
-                    min={allowZoomOut ? 0.1 : 1}
-                    max="5"
-                    step="0.05"
-                    value={transform.scale}
-                    onChange={(e) => setTransform(prev => ({ ...prev, scale: Number(e.target.value) }))}
-                    className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
-                />
-                <div className="flex items-center gap-2 self-start">
+                <div className="flex items-center gap-2 w-full">
+                    <button onClick={() => handleZoom('out')} disabled={!isZoomEnabled} className="px-2 py-0.5 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">-</button>
+                    <input
+                        type="range"
+                        min={allowZoomOut ? 0.1 : 1}
+                        max="5"
+                        step="0.05"
+                        value={transform.scale}
+                        onChange={(e) => setTransform(prev => ({ ...prev, scale: Number(e.target.value) }))}
+                        disabled={!isZoomEnabled}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent disabled:opacity-50"
+                    />
+                    <button onClick={() => handleZoom('in')} disabled={!isZoomEnabled} className="px-2 py-0.5 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">+</button>
+                </div>
+                <div className="flex items-center gap-2 self-start w-full">
+                    <input
+                        type="checkbox"
+                        id="enable-zoom-checkbox"
+                        checked={isZoomEnabled}
+                        onChange={(e) => setIsZoomEnabled(e.target.checked)}
+                        className="w-4 h-4 text-brand-accent bg-gray-100 border-gray-300 rounded focus:ring-brand-accent dark:focus:ring-brand-accent dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label htmlFor="enable-zoom-checkbox" className="text-xs text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('allow_zooming')}</label>
+                </div>
+                <div className="flex items-center gap-2 self-start w-full">
                     <input
                         type="checkbox"
                         id="allow-shrink-checkbox"

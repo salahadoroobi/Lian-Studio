@@ -2,7 +2,7 @@ import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
 import { editImage } from '../services/geminiService';
-import type { ReferenceImage } from '../types';
+import type { ReferenceImage, Path, EditorTool } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
 import { ActionButton } from '../components/ActionButton';
@@ -11,8 +11,6 @@ type CanvasHandle = {
   getCanvasDataUrl: () => string | undefined;
   clearCanvas: () => void;
 };
-
-export type EditorTool = 'brush' | 'eraser' | 'pan';
 
 interface EditorViewProps {
   t: TFunction;
@@ -105,11 +103,16 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
     }
   };
 
-  // This function is called by the canvas child component when it clears itself
-  // or when an undo action results in an empty canvas.
   const handleCanvasReset = useCallback(() => {
     setActiveColors([]);
     setColorPrompts({});
+  }, []);
+  
+  const updateActiveColorsFromPaths = useCallback((currentPaths: Path[]) => {
+      const uniqueBrushColors = [...new Set(
+          currentPaths.filter(p => p.tool === 'brush').map(p => p.color)
+      )];
+      setActiveColors(uniqueBrushColors);
   }, []);
 
   const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
@@ -144,7 +147,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
               setIsMaskVisible={setIsMaskVisible}
               onStrokeComplete={handleStrokeComplete}
               onClear={handleCanvasReset}
-              onUndoToEmpty={handleCanvasReset}
+              onHistoryChange={updateActiveColorsFromPaths}
               t={t}
               language={language}
             />
