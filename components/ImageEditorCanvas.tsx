@@ -1,14 +1,38 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useImperativeHandle,
+  forwardRef,
+  useLayoutEffect,
+} from 'react';
 import type { TFunction } from '../hooks/useLocalization';
 import { UndoIcon } from './icons/UndoIcon';
-import { TrashIcon } from './icons/TrashIcon';
 import { RedoIcon } from './icons/RedoIcon';
-import type { EditorTool } from '../views/EditorView';
+import { TrashIcon } from './icons/TrashIcon';
 import { ResetViewIcon } from './icons/ResetViewIcon';
+import type { EditorTool } from '../views/EditorView';
+import { HandIcon } from './icons/HandIcon';
+import { BrushIcon } from './icons/BrushIcon';
+import { EraserIcon } from './icons/EraserIcon';
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface Path {
+  points: Point[];
+  color: string;
+  size: number;
+  tool: EditorTool;
+}
 
 interface ImageEditorCanvasProps {
-  imageSrc: string | null;
+  imageSrc?: string;
   tool: EditorTool;
+  setTool: (tool: EditorTool) => void;
   brushColor: string;
   brushSize: number;
   isMaskVisible: boolean;
@@ -18,343 +42,387 @@ interface ImageEditorCanvasProps {
   t: TFunction;
 }
 
-export const ImageEditorCanvas = forwardRef<
-    { getCanvasDataUrl: () => string | undefined; clearCanvas: () => void; },
-    ImageEditorCanvasProps
->(({
-  imageSrc,
-  tool,
-  brushColor,
-  brushSize,
-  isMaskVisible,
-  onStrokeComplete,
-  onClear,
-  onUndoToEmpty,
-  t
-}, ref) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [lastPosition, setLastPosition] = useState<{ x: number, y: number } | null>(null);
-  const [history, setHistory] = useState<string[]>([]);
-  const [redoHistory, setRedoHistory] = useState<string[]>([]);
+export type CanvasHandle = {
+  getCanvasDataUrl: () => string | undefined;
+  clearCanvas: () => void;
+};
 
-  const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [isSpacePressed, setIsSpacePressed] = useState(false);
-  const panStart = useRef({ x: 0, y: 0 });
-
-  
-  const handleInternalClear = () => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext('2d');
-    if (canvas && context) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      setHistory([]);
-      setRedoHistory([]);
-      setTransform({ scale: 1, x: 0, y: 0 }); // Reset zoom/pan
-    }
-  };
-
-  useImperativeHandle(ref, () => ({
-    getCanvasDataUrl: () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return undefined;
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx) {
-            tempCtx.fillStyle = '#FFFFFF';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            tempCtx.drawImage(canvas, 0, 0);
-            return tempCanvas.toDataURL('image/png');
-        }
-        return canvas.toDataURL('image/png');
+export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps>(
+  (
+    {
+      imageSrc,
+      tool,
+      setTool,
+      brushColor,
+      brushSize,
+      isMaskVisible,
+      onStrokeComplete,
+      onClear,
+      onUndoToEmpty,
+      t,
     },
-    clearCanvas: handleInternalClear,
-  }));
-  
-    const resizeCanvas = () => {
-        const image = imageRef.current;
-        const canvas = canvasRef.current;
-        if (image && canvas && image.naturalWidth > 0) {
-            canvas.width = image.naturalWidth;
-            canvas.height = image.naturalHeight;
+    ref
+  ) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const imageRef = useRef<HTMLImageElement>(null);
+    const imageContainerRef = useRef<HTMLDivElement>(null);
+    const initialOffsetRef = useRef({ x: 0, y: 0 });
+
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [paths, setPaths] = useState<Path[]>([]);
+    const [history, setHistory] = useState<Path[][]>([[]]);
+    const [historyIndex, setHistoryIndex] = useState(0);
+
+    const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
+    const [isPanning, setIsPanning] = useState(false);
+    const [isGrabbing, setIsGrabbing] = useState(false);
+    const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+
+    const getCanvasContext = () => canvasRef.current?.getContext('2d');
+
+    const drawPath = useCallback((ctx: CanvasRenderingContext2D, path: Path) => {
+      ctx.beginPath();
+      ctx.strokeStyle = path.tool === 'brush' ? path.color : 'black';
+      ctx.lineWidth = path.size;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = path.tool === 'brush' ? 'source-over' : 'destination-out';
+
+      if (path.points.length > 0) {
+        ctx.moveTo(path.points[0].x, path.points[0].y);
+        for (let i = 1; i < path.points.length; i++) {
+          ctx.lineTo(path.points[i].x, path.points[i].y);
         }
-    };
-    
-    // Keyboard listener for panning
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                setIsSpacePressed(true);
-            }
-        };
-        const handleKeyUp = (e: KeyboardEvent) => {
-            if (e.code === 'Space') {
-                setIsSpacePressed(false);
-                setIsPanning(false);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
+      }
+      ctx.stroke();
     }, []);
 
-  useEffect(() => {
-    if (imageSrc) {
-        const image = new Image();
-        image.src = imageSrc;
-        image.onload = () => {
-            if (imageRef.current) {
-                imageRef.current.src = image.src;
-            }
-            // Wait for image to render to get correct dimensions
-            setTimeout(() => {
-                resizeCanvas();
-                handleInternalClear();
-            }, 0);
-        };
-    }
-  }, [imageSrc]);
+    const pathsRef = useRef(paths);
+    pathsRef.current = paths;
 
-  const getCoordinates = (e: React.MouseEvent | React.TouchEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    const canvas = canvasRef.current;
-    if (!container || !canvas || canvas.clientWidth === 0 || canvas.clientHeight === 0) return null;
-
-    const rect = container.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    // Mouse position relative to the container element
-    const mouseXInContainer = clientX - rect.left;
-    const mouseYInContainer = clientY - rect.top;
-
-    // Reverse the CSS transform to find where the click happened on the untransformed element
-    const mouseXOnElement = (mouseXInContainer - transform.x) / transform.scale;
-    const mouseYOnElement = (mouseYInContainer - transform.y) / transform.scale;
-    
-    // Map the coordinates from the element's display size to the canvas's internal resolution
-    const scaleX = canvas.width / canvas.clientWidth;
-    const scaleY = canvas.height / canvas.clientHeight;
-    
-    const finalX = mouseXOnElement * scaleX;
-    const finalY = mouseYOnElement * scaleY;
-
-    return { x: finalX, y: finalY };
-  };
-
-  const startDrawing = (e: React.MouseEvent | React.TouchEvent<HTMLDivElement>) => {
-    const coords = getCoordinates(e);
-    if (coords) {
-      setIsDrawing(true);
-      setLastPosition(coords);
-    }
-  };
-
-  const draw = (e: React.MouseEvent | React.TouchEvent<HTMLDivElement>) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext('2d');
-    const currentPosition = getCoordinates(e);
-    if (context && currentPosition && lastPosition && canvas.clientWidth > 0) {
-      context.beginPath();
-      context.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
-      context.strokeStyle = brushColor;
-      // Adjust brush size to appear consistent on screen, regardless of zoom or canvas resolution.
-      const canvasToDisplayScale = canvas.width / canvas.clientWidth;
-      context.lineWidth = (brushSize * canvasToDisplayScale) / transform.scale;
-      context.lineCap = 'round';
-      context.lineJoin = 'round';
-      context.globalAlpha = 0.5;
-      context.moveTo(lastPosition.x, lastPosition.y);
-      context.lineTo(currentPosition.x, currentPosition.y);
-      context.stroke();
-      setLastPosition(currentPosition);
-    }
-  };
-
-  const stopDrawing = () => {
-    if (!isDrawing) return;
-    setIsDrawing(false);
-    setLastPosition(null);
-    const canvas = canvasRef.current;
-    if (canvas) {
-        setHistory(prev => [...prev, canvas.toDataURL()]);
-        setRedoHistory([]);
-        onStrokeComplete(brushColor);
-    }
-  };
-  
-  const handleMouseDown = (e: React.MouseEvent) => {
-      if (isSpacePressed) {
-          setIsPanning(true);
-          panStart.current = { x: e.clientX - transform.x, y: e.clientY - transform.y };
-      } else {
-          startDrawing(e);
-      }
-  };
-  
-  const handleMouseMove = (e: React.MouseEvent) => {
-      if (isPanning) {
-          const x = e.clientX - panStart.current.x;
-          const y = e.clientY - panStart.current.y;
-          setTransform(prev => ({ ...prev, x, y }));
-      } else {
-          draw(e);
-      }
-  };
-  
-  const handleMouseUp = () => {
-      if (isPanning) setIsPanning(false);
-      else stopDrawing();
-  };
-  
-  const handleWheel = useCallback((e: WheelEvent) => {
-    e.preventDefault();
-    const container = containerRef.current;
-    if (!container) return;
-
-    const rect = container.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    setTransform(prevTransform => {
-        const scaleAmount = -e.deltaY * 0.001;
-        const newScale = Math.max(0.5, Math.min(5, prevTransform.scale + scaleAmount));
+    const redrawCanvas = useCallback(() => {
+        const canvas = canvasRef.current;
+        const ctx = getCanvasContext();
+        if (!canvas || !ctx) return;
         
-        const newX = mouseX - (mouseX - prevTransform.x) * (newScale / prevTransform.scale);
-        const newY = mouseY - (mouseY - prevTransform.y) * (newScale / prevTransform.scale);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = 'source-over';
+        pathsRef.current.forEach(path => drawPath(ctx, path));
+    }, [drawPath]);
 
-        return { scale: newScale, x: newX, y: newY };
-    });
-  }, []);
+    const resizeCanvas = useCallback(() => {
+        const canvas = canvasRef.current;
+        const imageContainer = imageContainerRef.current;
+        if (canvas && imageContainer) {
+            const { width, height } = imageContainer.getBoundingClientRect();
+            if (canvas.width !== width || canvas.height !== height) {
+                canvas.width = width;
+                canvas.height = height;
+                redrawCanvas();
+            }
+        }
+    }, [redrawCanvas]);
 
-  useEffect(() => {
-    const node = containerRef.current;
-    if (node) {
-        node.addEventListener('wheel', handleWheel, { passive: false });
-        return () => {
-            node.removeEventListener('wheel', handleWheel);
-        };
-    }
-  }, [handleWheel]);
-  
-  const handleUndo = () => {
-    if (history.length === 0) return;
-    const lastState = history[history.length - 1];
-    setRedoHistory(prev => [lastState, ...prev]);
-    const newHistory = history.slice(0, -1);
-    setHistory(newHistory);
-    const prevStateUrl = newHistory[newHistory.length - 1] || null;
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext('2d');
-    if (!canvas || !context) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    if (prevStateUrl) {
-        const img = new Image();
-        img.onload = () => context.drawImage(img, 0, 0);
-        img.src = prevStateUrl;
-    } else {
-        onUndoToEmpty();
-    }
-  };
-  
-  const handleRedo = () => {
-      if (redoHistory.length === 0) return;
-      const nextState = redoHistory[0];
-      const newRedoHistory = redoHistory.slice(1);
-      setRedoHistory(newRedoHistory);
-      setHistory(prev => [...prev, nextState]);
+    useEffect(() => {
+        redrawCanvas();
+    }, [paths, redrawCanvas]);
+
+    useEffect(() => {
+        window.addEventListener('resize', resizeCanvas);
+        return () => window.removeEventListener('resize', resizeCanvas);
+    }, [resizeCanvas]);
+    
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        const imageContainer = imageContainerRef.current;
+        if (imageSrc && container && imageContainer && transform.scale === 1) {
+            const containerRect = container.getBoundingClientRect();
+            const imageContainerRect = imageContainer.getBoundingClientRect();
+            initialOffsetRef.current = {
+                x: imageContainerRect.left - containerRect.left,
+                y: imageContainerRect.top - containerRect.top,
+            };
+        }
+    }, [imageSrc, transform.scale]);
+
+    const getPoint = (e: React.MouseEvent | React.TouchEvent): Point | null => {
       const canvas = canvasRef.current;
-      const context = canvas?.getContext('2d');
-      if (!canvas || !context) return;
-      const img = new Image();
-      img.onload = () => {
-          context.clearRect(0, 0, canvas.width, canvas.height);
-          context.drawImage(img, 0, 0);
+      if (!canvas) return null;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left),
+        y: (clientY - rect.top),
       };
-      img.src = nextState;
-  };
+    };
 
-  if (!imageSrc) return null;
-  
-  const cursorClass = isSpacePressed ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-crosshair';
+    const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+      if (isPanning || tool === 'pan' || ('button' in e && e.button !== 0)) return;
+      setIsDrawing(true);
+      const point = getPoint(e);
+      if (!point) return;
 
-  return (
-    <div
-      ref={containerRef}
-      className={`relative w-full h-auto aspect-[${imageRef.current?.naturalWidth || 1}/${imageRef.current?.naturalHeight || 1}] overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-900 ${cursorClass}`}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onTouchStart={startDrawing} // Basic touch drawing, no pan/zoom
-      onTouchMove={draw}
-      onTouchEnd={stopDrawing}
-    >
-      <img
-        ref={imageRef}
-        alt="base for editing"
-        className="absolute top-0 left-0 w-full h-full object-contain select-none pointer-events-none"
-        style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`, transformOrigin: 'top left' }}
-        draggable={false}
-      />
-      <canvas
-        ref={canvasRef}
-        className={`absolute top-0 left-0 w-full h-full touch-none pointer-events-none ${!isMaskVisible ? 'hidden' : ''}`}
-        style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`, transformOrigin: 'top left' }}
-      />
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-          <button
-              onClick={handleUndo}
-              disabled={history.length === 0}
-              className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
-              aria-label={t('undo_mask')}
-              title={t('undo_mask')}
-          >
-              <UndoIcon />
-          </button>
-          <button
-              onClick={handleRedo}
-              disabled={redoHistory.length === 0}
-              className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
-              aria-label={t('redo_mask')}
-              title={t('redo_mask')}
-          >
-              <RedoIcon />
-          </button>
-      </div>
-      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
-        <button
-            onClick={() => setTransform({ scale: 1, x: 0, y: 0 })}
-            className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-            aria-label={t('reset_view')}
-            title={t('reset_view')}
-        >
-            <ResetViewIcon />
-        </button>
-        <button
-            onClick={() => {
-                handleInternalClear();
-                onClear();
+      const newPath: Path = {
+        points: [point],
+        color: brushColor,
+        size: brushSize,
+        tool,
+      };
+      setPaths(prevPaths => [...prevPaths, newPath]);
+    };
+
+    const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+      if (!isDrawing) return;
+      const point = getPoint(e);
+      if (!point) return;
+      setPaths(prevPaths => {
+        const currentPath = prevPaths[prevPaths.length - 1];
+        const updatedPath = {
+          ...currentPath,
+          points: [...currentPath.points, point],
+        };
+        return [...prevPaths.slice(0, -1), updatedPath];
+      });
+    };
+
+    const handleMouseUp = () => {
+      if (!isDrawing) return;
+      setIsDrawing(false);
+
+      if (paths.length > 0 && tool === 'brush') {
+        const lastPathColor = paths[paths.length - 1].color;
+        onStrokeComplete(lastPathColor);
+      }
+      
+      const newHistory = history.slice(0, historyIndex + 1);
+      setHistory([...newHistory, paths]);
+      setHistoryIndex(newHistory.length);
+    };
+
+    useEffect(() => {
+      const container = containerRef.current;
+
+      const handleWheel = (e: WheelEvent) => {
+        e.preventDefault();
+        if (!container) return;
+    
+        const rect = container.getBoundingClientRect();
+        const mouseX_container = e.clientX - rect.left;
+        const mouseY_container = e.clientY - rect.top;
+        
+        const point = {
+            x: mouseX_container - initialOffsetRef.current.x,
+            y: mouseY_container - initialOffsetRef.current.y,
+        };
+    
+        const scaleAmount = -e.deltaY * 0.005;
+    
+        setTransform(prev => {
+          const newScale = Math.max(0.5, Math.min(5, prev.scale + scaleAmount));
+    
+          if (Math.abs(newScale - 1) < 0.05) {
+            return { x: 0, y: 0, scale: 1 };
+          }
+          
+          const newX = point.x - (point.x - prev.x) * (newScale / prev.scale);
+          const newY = point.y - (point.y - prev.y) * (newScale / prev.scale);
+    
+          return { x: newX, y: newY, scale: newScale };
+        });
+      };
+      
+      if (container) {
+          container.addEventListener('wheel', handleWheel, { passive: false });
+      }
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.code === 'Space' && !isPanning) {
+          e.preventDefault();
+          setIsPanning(true);
+        }
+      };
+      const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.code === 'Space') {
+          setIsPanning(false);
+          setIsGrabbing(false);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+      return () => {
+        if (container) {
+            container.removeEventListener('wheel', handleWheel);
+        }
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
+      };
+    }, [isPanning]);
+    
+    const localUndo = useCallback(() => {
+      if (historyIndex > 0) {
+        const newIndex = historyIndex - 1;
+        setHistoryIndex(newIndex);
+        setPaths(history[newIndex]);
+        if (history[newIndex].length === 0) {
+          onUndoToEmpty();
+        }
+      }
+    }, [history, historyIndex, onUndoToEmpty]);
+
+    const localRedo = useCallback(() => {
+      if (historyIndex < history.length - 1) {
+        const newIndex = historyIndex + 1;
+        setHistoryIndex(newIndex);
+        setPaths(history[newIndex]);
+      }
+    }, [history, historyIndex]);
+
+    const localClearCanvas = useCallback(() => {
+      setPaths([]);
+      setHistory([[]]);
+      setHistoryIndex(0);
+      onClear();
+    }, [onClear]);
+
+    const resetView = () => setTransform({ x: 0, y: 0, scale: 1 });
+
+    const handleImageLoad = useCallback(() => {
+        const image = imageRef.current;
+        const imageContainer = imageContainerRef.current;
+        if (image && image.complete && imageContainer) {
+            const { naturalWidth, naturalHeight } = image;
+            if (naturalWidth > 0 && naturalHeight > 0) {
+                imageContainer.style.aspectRatio = `${naturalWidth} / ${naturalHeight}`;
+            }
+        }
+        resetView();
+        queueMicrotask(() => {
+            resizeCanvas();
+        });
+        localClearCanvas();
+    }, [resizeCanvas, localClearCanvas]);
+
+
+    useImperativeHandle(ref, () => ({
+      getCanvasDataUrl: () => {
+        const canvas = canvasRef.current;
+        if (!canvas || paths.length === 0) return undefined;
+        const originalCanvas = document.createElement('canvas');
+        const image = imageRef.current;
+        if (!image || !image.complete || image.naturalWidth === 0) return undefined;
+        
+        originalCanvas.width = image.naturalWidth;
+        originalCanvas.height = image.naturalHeight;
+        const ctx = originalCanvas.getContext('2d');
+        if (!ctx) return undefined;
+        
+        const scaleX = image.naturalWidth / canvas.width;
+        const scaleY = image.naturalHeight / canvas.height;
+        
+        ctx.save();
+        ctx.scale(scaleX, scaleY);
+        paths.forEach(path => drawPath(ctx, path));
+        ctx.restore();
+        
+        return originalCanvas.toDataURL('image/png');
+      },
+      clearCanvas: localClearCanvas,
+    }));
+    
+    const isPanActive = isPanning || tool === 'pan';
+    const cursor = isGrabbing ? 'grabbing' : isPanActive ? 'grab' : 'crosshair';
+
+    return (
+      <div className="relative w-full min-h-[250px] bg-gray-200 dark:bg-gray-900 rounded-lg overflow-hidden grid place-items-center select-none"
+        ref={containerRef}
+      >
+        <div
+            ref={imageContainerRef}
+            className="relative transition-transform duration-100 ease-out max-w-full max-h-full"
+            style={{ 
+                transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
             }}
-            disabled={history.length === 0}
-            className="p-2 rounded-full bg-brand-accent text-brand-bg hover:bg-brand-accent-dark disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-colors"
-            aria-label={t('clear_mask')}
-            title={t('clear_mask')}
         >
+          {imageSrc && <img
+            ref={imageRef}
+            src={imageSrc}
+            alt={t('base_image_label')}
+            className="block w-full h-full object-contain pointer-events-none"
+            onLoad={handleImageLoad}
+          />}
+          <div 
+            className="absolute top-0 left-0 w-full h-full pointer-events-auto"
+            style={{ cursor }}
+            onMouseDown={(e) => {
+                if (isPanActive && e.button === 0) {
+                    setPanStart({ x: e.clientX, y: e.clientY });
+                    setIsGrabbing(true);
+                } else {
+                    handleMouseDown(e);
+                }
+            }}
+            onMouseMove={(e) => {
+                if (isGrabbing) {
+                    const dx = e.clientX - panStart.x;
+                    const dy = e.clientY - panStart.y;
+                    setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+                    setPanStart({ x: e.clientX, y: e.clientY });
+                } else {
+                    handleMouseMove(e);
+                }
+            }}
+            onMouseUp={() => {
+                if (isGrabbing) {
+                    setIsGrabbing(false);
+                }
+                handleMouseUp();
+            }}
+            onMouseLeave={() => {
+                if(isGrabbing) setIsGrabbing(false);
+                handleMouseUp();
+            }}
+            onTouchStart={handleMouseDown}
+            onTouchMove={handleMouseMove}
+            onTouchEnd={handleMouseUp}
+          >
+            <canvas
+                ref={canvasRef}
+                className="absolute top-0 left-0 w-full h-full"
+                style={{ 
+                    opacity: isMaskVisible ? 0.6 : 0, 
+                    pointerEvents: 'none',
+                }}
+            />
+          </div>
+        </div>
+        <div className="absolute top-2 right-2 flex flex-col gap-2 bg-black/30 backdrop-blur-sm p-1.5 rounded-lg z-10">
+          <button onClick={() => setTool('brush')} title={t('tool_brush')} className={`p-2 rounded-md transition-colors ${tool === 'brush' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+              <BrushIcon className="w-5 h-5" />
+          </button>
+          <button onClick={() => setTool('eraser')} title={t('tool_eraser')} className={`p-2 rounded-md transition-colors ${tool === 'eraser' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+              <EraserIcon className="w-5 h-5" />
+          </button>
+          <button onClick={localUndo} disabled={historyIndex === 0} title={t('undo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
+            <UndoIcon />
+          </button>
+           <button onClick={localRedo} disabled={historyIndex === history.length - 1} title={t('redo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
+            <RedoIcon />
+          </button>
+           <button onClick={localClearCanvas} disabled={paths.length === 0} title={t('clear_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
             <TrashIcon />
-        </button>
+          </button>
+          <button onClick={() => setTool('pan')} title={t('tool_pan')} className={`p-2 rounded-md transition-colors ${tool === 'pan' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+            <HandIcon />
+          </button>
+           <button onClick={resetView} title={t('reset_view')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
+            <ResetViewIcon />
+          </button>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
+
+ImageEditorCanvas.displayName = 'ImageEditorCanvas';

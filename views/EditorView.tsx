@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
 import { editImage } from '../services/geminiService';
@@ -6,8 +6,6 @@ import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
 import { ActionButton } from '../components/ActionButton';
-import { BrushIcon } from '../components/icons/BrushIcon';
-import { EraserIcon } from '../components/icons/EraserIcon';
 import { EyeIcon } from '../components/icons/EyeIcon';
 import { EyeSlashIcon } from '../components/icons/EyeSlashIcon';
 
@@ -16,7 +14,7 @@ type CanvasHandle = {
   clearCanvas: () => void;
 };
 
-export type EditorTool = 'brush' | 'eraser';
+export type EditorTool = 'brush' | 'eraser' | 'pan';
 
 interface EditorViewProps {
   t: TFunction;
@@ -98,8 +96,9 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
   };
 
   const handleImageUpload = (images: ReferenceImage[]) => {
+    // Setting the new image will cause the ImageEditorCanvas to re-mount or receive a new `src`.
+    // The `onLoad` handler within ImageEditorCanvas is responsible for clearing its own state.
     setBaseImage(images);
-    handleClearMask();
   };
 
   const handleStrokeComplete = (color: string) => {
@@ -108,16 +107,12 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
     }
   };
 
-  const handleClearMask = () => {
-    canvasRef.current?.clearCanvas();
+  // This function is called by the canvas child component when it clears itself
+  // or when an undo action results in an empty canvas.
+  const handleCanvasReset = useCallback(() => {
     setActiveColors([]);
     setColorPrompts({});
-  };
-
-  const handleUndoToEmpty = () => {
-    setActiveColors([]);
-    setColorPrompts({});
-  };
+  }, []);
 
   const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
   const canEdit = !isLoading && baseImage.length > 0 && activeColors.length > 0 && (prompt.trim().length > 0 || hasColorPrompts);
@@ -140,14 +135,6 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             
             {/* Toolbar */}
             <div className="bg-gray-100 dark:bg-gray-900/50 p-2 rounded-lg flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-1 rounded-lg bg-gray-200 dark:bg-gray-700 p-1">
-                  <button onClick={() => setTool('brush')} title={t('tool_brush')} className={`p-1.5 rounded-md transition-colors ${tool === 'brush' ? 'bg-white dark:bg-gray-800 text-brand-accent' : 'text-gray-500 hover:bg-gray-300/50 dark:hover:bg-gray-600/50'}`}>
-                      <BrushIcon className="w-5 h-5" />
-                  </button>
-                  <button onClick={() => setTool('eraser')} title={t('tool_eraser')} className={`p-1.5 rounded-md transition-colors ${tool === 'eraser' ? 'bg-white dark:bg-gray-800 text-brand-accent' : 'text-gray-500 hover:bg-gray-300/50 dark:hover:bg-gray-600/50'}`}>
-                      <EraserIcon className="w-5 h-5" />
-                  </button>
-              </div>
               <div className="flex items-center gap-2">
                   <label htmlFor="brush-size" className="sr-only">{t('brush_size')}</label>
                   <input
@@ -173,12 +160,13 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
               ref={canvasRef}
               imageSrc={baseImage[0]?.dataUrl}
               tool={tool}
+              setTool={setTool}
               brushColor={brushColor}
               brushSize={brushSize}
               isMaskVisible={isMaskVisible}
               onStrokeComplete={handleStrokeComplete}
-              onClear={handleClearMask}
-              onUndoToEmpty={handleUndoToEmpty}
+              onClear={handleCanvasReset}
+              onUndoToEmpty={handleCanvasReset}
               t={t}
             />
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">{t('editor_pan_instruction')}</p>
