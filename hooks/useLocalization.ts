@@ -174,6 +174,8 @@ const translations = {
     tooltip_whatsapp: 'WhatsApp',
     tooltip_email: 'Email',
     tooltip_github: 'GitHub',
+    collapse_toolbar: 'Collapse toolbar',
+    expand_toolbar: 'Expand toolbar',
   },
   ar: {
     app_title: 'استوديو ليان',
@@ -347,6 +349,8 @@ const translations = {
     tooltip_whatsapp: 'واتساب',
     tooltip_email: 'بريد إلكتروني',
     tooltip_github: 'جيت هاب',
+    collapse_toolbar: 'طي شريط الأدوات',
+    expand_toolbar: 'توسيع شريط الأدوات',
   },
 };
 

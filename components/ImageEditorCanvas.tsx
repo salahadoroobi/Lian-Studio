@@ -20,6 +20,18 @@ import { EyeIcon } from './icons/EyeIcon';
 import { EyeSlashIcon } from './icons/EyeSlashIcon';
 import { ZoomIcon } from './icons/ZoomIcon';
 
+const ChevronUpIcon: React.FC = () => (
+    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+    </svg>
+);
+
+const ChevronDownIcon: React.FC = () => (
+    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </svg>
+);
+
 interface Point {
   x: number;
   y: number;
@@ -88,11 +100,46 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
     const [isBrushSettingsOpen, setIsBrushSettingsOpen] = useState(false);
     const [isZoomControlOpen, setIsZoomControlOpen] = useState(false);
     const [allowZoomOut, setAllowZoomOut] = useState(false);
+    const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
+    
+    const [brushPopupStyle, setBrushPopupStyle] = useState<React.CSSProperties>({});
+    const [zoomPopupStyle, setZoomPopupStyle] = useState<React.CSSProperties>({});
 
     const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
     const [isPanning, setIsPanning] = useState(false);
     const [isGrabbing, setIsGrabbing] = useState(false);
     const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+
+    useLayoutEffect(() => {
+        if (isBrushSettingsOpen && brushSettingsButtonRef.current && containerRef.current) {
+            const buttonRect = brushSettingsButtonRef.current.getBoundingClientRect();
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const right = (containerRect.right - buttonRect.left) + 12; // 12px for mr-3
+            const top = (buttonRect.top - containerRect.top) + (buttonRect.height / 2);
+            setBrushPopupStyle({
+                position: 'absolute',
+                top: `${top}px`,
+                right: `${right}px`,
+                transform: 'translateY(-50%)',
+            });
+        }
+    }, [isBrushSettingsOpen]);
+
+    useLayoutEffect(() => {
+        if (isZoomControlOpen && zoomControlButtonRef.current && containerRef.current) {
+            const buttonRect = zoomControlButtonRef.current.getBoundingClientRect();
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const right = (containerRect.right - buttonRect.left) + 12; // 12px for mr-3
+            const top = (buttonRect.top - containerRect.top) + (buttonRect.height / 2);
+            setZoomPopupStyle({
+                position: 'absolute',
+                top: `${top}px`,
+                right: `${right}px`,
+                transform: 'translateY(-50%)',
+            });
+        }
+    }, [isZoomControlOpen]);
+
 
     const getCanvasContext = () => canvasRef.current?.getContext('2d');
 
@@ -426,129 +473,150 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
             />
           </div>
         </div>
-        <div className="absolute top-2 right-2 flex flex-col gap-2 bg-black/30 backdrop-blur-sm p-1.5 rounded-lg z-10">
-          <button onClick={() => setTool('brush')} title={t('tool_brush')} className={`p-2 rounded-md transition-colors ${tool === 'brush' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
-              <BrushIcon className="w-5 h-5" />
+        <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-sm p-1.5 rounded-lg z-10">
+          <button
+            onClick={() => setIsToolbarExpanded(prev => !prev)}
+            title={t(isToolbarExpanded ? 'collapse_toolbar' : 'expand_toolbar')}
+            className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 w-full"
+            aria-expanded={isToolbarExpanded}
+            aria-controls="editor-toolbar-content"
+          >
+            {isToolbarExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
           </button>
-          <button onClick={() => setTool('eraser')} title={t('tool_eraser')} className={`p-2 rounded-md transition-colors ${tool === 'eraser' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
-              <EraserIcon className="w-5 h-5" />
-          </button>
-
-          <div className="h-px bg-white/20 mx-1.5 my-1"></div>
-          
-          <button onClick={localUndo} disabled={historyIndex === 0} title={t('undo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
-            <UndoIcon />
-          </button>
-           <button onClick={localRedo} disabled={historyIndex === history.length - 1} title={t('redo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
-            <RedoIcon />
-          </button>
-           <button onClick={localClearCanvas} disabled={paths.length === 0} title={t('clear_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
-            <TrashIcon />
-          </button>
-
-          <div className="h-px bg-white/20 mx-1.5 my-1"></div>
-
-          <button onClick={() => setIsMaskVisible(prev => !prev)} title={t('toggle_mask_visibility')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
-              {isMaskVisible ? <EyeIcon className="w-5 h-5"/> : <EyeSlashIcon className="w-5 h-5"/>}
-          </button>
-           <button onClick={() => setTool('pan')} title={t('tool_pan')} className={`p-2 rounded-md transition-colors ${tool === 'pan' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
-            <HandIcon />
-          </button>
-           <button onClick={resetView} title={t('reset_view')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
-            <ResetViewIcon />
-          </button>
-          <div className="relative">
-              <button
-                ref={zoomControlButtonRef}
-                onClick={() => setIsZoomControlOpen(prev => !prev)}
-                title={t('zoom_tool')}
-                className={`p-2 rounded-md transition-colors w-full flex justify-center items-center ${isZoomControlOpen ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}
-              >
-                  <ZoomIcon className="w-5 h-5" />
-              </button>
-              {isZoomControlOpen && (
-                  <div
-                      ref={zoomControlRef}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col items-center gap-4 animate-fade-in"
-                  >
-                      <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('zoom_tool')}</span>
-                          <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-12 text-center">{(transform.scale * 100).toFixed(0)}%</span>
-                      </div>
-                      <input
-                          type="range"
-                          min={allowZoomOut ? 0.1 : 1}
-                          max="5"
-                          step="0.05"
-                          value={transform.scale}
-                          onChange={(e) => setTransform(prev => ({ ...prev, scale: Number(e.target.value) }))}
-                          className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
-                      />
-                      <div className="flex items-center gap-2 self-start">
-                          <input
-                              type="checkbox"
-                              id="allow-shrink-checkbox"
-                              checked={allowZoomOut}
-                              onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  setAllowZoomOut(checked);
-                                  if (!checked && transform.scale < 1) {
-                                      resetView();
-                                  }
-                              }}
-                              className="w-4 h-4 text-brand-accent bg-gray-100 border-gray-300 rounded focus:ring-brand-accent dark:focus:ring-brand-accent dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                          />
-                          <label htmlFor="allow-shrink-checkbox" className="text-xs text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('allow_shrinking')}</label>
-                      </div>
-                  </div>
-              )}
-          </div>
-
-          <div className="h-px bg-white/20 mx-1.5 my-1"></div>
-          
-          <div className="relative">
-            <button
-                ref={brushSettingsButtonRef}
-                onClick={() => setIsBrushSettingsOpen(prev => !prev)}
-                title={t('mask_color')}
-                className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 w-full flex justify-center items-center"
-            >
-                <div 
-                    className="w-5 h-5 rounded-full border-2 border-white/50 shadow-md"
-                    style={{ backgroundColor: brushColor }}
-                    aria-hidden="true"
-                />
-            </button>
-            {isBrushSettingsOpen && (
-                <div 
-                    ref={brushSettingsRef} 
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col gap-4 animate-fade-in"
-                >
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="brush-color-popover" className="sr-only">{t('mask_color')}</label>
-                        <input id="brush-color-popover" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-9 h-9 p-0 border-none rounded-md cursor-pointer bg-transparent" />
-                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('mask_color')}</span>
-                    </div>
-                     <div className="flex flex-col items-center gap-2">
-                        <label htmlFor="brush-size-popover" className="text-sm font-semibold text-gray-700 dark:text-gray-300 self-start">{t('brush_size')}</label>
-                        <div className="flex items-center gap-2">
-                             <input
-                                id="brush-size-popover"
-                                type="range"
-                                min="5" max="100"
-                                value={brushSize}
-                                onChange={(e) => setBrushSize(Number(e.target.value))}
-                                className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
-                              />
-                              <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
-                        </div>
-                    </div>
+          <div
+            id="editor-toolbar-content"
+            className="grid transition-all duration-500 ease-in-out"
+            style={{ gridTemplateRows: isToolbarExpanded ? '1fr' : '0fr' }}
+          >
+            <div className="overflow-y-hidden">
+              <div className="flex flex-col gap-2 pt-2">
+                <button onClick={() => setTool('brush')} title={t('tool_brush')} className={`p-2 rounded-md transition-colors ${tool === 'brush' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+                    <BrushIcon className="w-5 h-5" />
+                </button>
+                <button onClick={() => setTool('eraser')} title={t('tool_eraser')} className={`p-2 rounded-md transition-colors ${tool === 'eraser' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+                    <EraserIcon className="w-5 h-5" />
+                </button>
+      
+                <div className="h-px bg-white/20 mx-1.5 my-1"></div>
+                
+                <button onClick={localUndo} disabled={historyIndex === 0} title={t('undo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
+                  <UndoIcon />
+                </button>
+                 <button onClick={localRedo} disabled={historyIndex === history.length - 1} title={t('redo_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
+                  <RedoIcon />
+                </button>
+                 <button onClick={localClearCanvas} disabled={paths.length === 0} title={t('clear_mask')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 disabled:text-brand-accent/40 disabled:hover:bg-transparent">
+                  <TrashIcon />
+                </button>
+      
+                <div className="h-px bg-white/20 mx-1.5 my-1"></div>
+      
+                <button onClick={() => setIsMaskVisible(prev => !prev)} title={t('toggle_mask_visibility')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
+                    {isMaskVisible ? <EyeIcon className="w-5 h-5"/> : <EyeSlashIcon className="w-5 h-5"/>}
+                </button>
+                 <button onClick={() => setTool('pan')} title={t('tool_pan')} className={`p-2 rounded-md transition-colors ${tool === 'pan' ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}>
+                  <HandIcon />
+                </button>
+                 <button onClick={resetView} title={t('reset_view')} className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20">
+                  <ResetViewIcon />
+                </button>
+                <div className="relative">
+                    <button
+                      ref={zoomControlButtonRef}
+                      onClick={() => setIsZoomControlOpen(prev => !prev)}
+                      title={t('zoom_tool')}
+                      className={`p-2 rounded-md transition-colors w-full flex justify-center items-center ${isZoomControlOpen ? 'bg-brand-accent text-white' : 'text-brand-accent hover:bg-brand-accent/20'}`}
+                    >
+                        <ZoomIcon className="w-5 h-5" />
+                    </button>
                 </div>
-            )}
+      
+                <div className="h-px bg-white/20 mx-1.5 my-1"></div>
+                
+                <div className="relative">
+                  <button
+                      ref={brushSettingsButtonRef}
+                      onClick={() => setIsBrushSettingsOpen(prev => !prev)}
+                      title={t('mask_color')}
+                      className="p-2 rounded-md transition-colors text-brand-accent hover:bg-brand-accent/20 w-full flex justify-center items-center"
+                  >
+                      <div 
+                          className="w-5 h-5 rounded-full border-2 border-white/50 shadow-md"
+                          style={{ backgroundColor: brushColor }}
+                          aria-hidden="true"
+                      />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        {isZoomControlOpen && (
+            <div
+                ref={zoomControlRef}
+                style={zoomPopupStyle}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col items-center gap-4 animate-fade-in"
+            >
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('zoom_tool')}</span>
+                    <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-12 text-center">{(transform.scale * 100).toFixed(0)}%</span>
+                </div>
+                <input
+                    type="range"
+                    min={allowZoomOut ? 0.1 : 1}
+                    max="5"
+                    step="0.05"
+                    value={transform.scale}
+                    onChange={(e) => setTransform(prev => ({ ...prev, scale: Number(e.target.value) }))}
+                    className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
+                />
+                <div className="flex items-center gap-2 self-start">
+                    <input
+                        type="checkbox"
+                        id="allow-shrink-checkbox"
+                        checked={allowZoomOut}
+                        onChange={(e) => {
+                            const checked = e.target.checked;
+                            setAllowZoomOut(checked);
+                            if (!checked && transform.scale < 1) {
+                                resetView();
+                            }
+                        }}
+                        className="w-4 h-4 text-brand-accent bg-gray-100 border-gray-300 rounded focus:ring-brand-accent dark:focus:ring-brand-accent dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label htmlFor="allow-shrink-checkbox" className="text-xs text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('allow_shrinking')}</label>
+                </div>
+            </div>
+        )}
+        {isBrushSettingsOpen && (
+          <div 
+              ref={brushSettingsRef} 
+              style={brushPopupStyle}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-lg shadow-xl flex flex-col gap-4 animate-fade-in"
+          >
+              <div className="flex items-center gap-2">
+                  <label htmlFor="brush-color-popover" className="sr-only">{t('mask_color')}</label>
+                  <input id="brush-color-popover" type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} className="w-9 h-9 p-0 border-none rounded-md cursor-pointer bg-transparent" />
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('mask_color')}</span>
+              </div>
+               <div className="flex flex-col items-center gap-2">
+                  <label htmlFor="brush-size-popover" className="text-sm font-semibold text-gray-700 dark:text-gray-300 self-start">{t('brush_size')}</label>
+                  <div className="flex items-center gap-2">
+                       <input
+                          id="brush-size-popover"
+                          type="range"
+                          min="5" max="100"
+                          value={brushSize}
+                          onChange={(e) => setBrushSize(Number(e.target.value))}
+                          className="w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
+                        />
+                        <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-8 text-center">{brushSize}</span>
+                  </div>
+              </div>
+          </div>
+        )}
       </div>
     );
   }
