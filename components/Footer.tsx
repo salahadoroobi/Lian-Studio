@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { TFunction } from '../hooks/useLocalization';
 import { AnimatedHeartIcon } from './AnimatedHeartIcon';
@@ -38,7 +37,7 @@ export const Footer: React.FC<FooterProps> = ({ t, onHeartClick }) => {
         {/* Version */}
         <ShimmerWrapper className="rounded-full">
           <span className="inline-flex items-center justify-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full min-w-[50px]">
-            v3.6.5
+            v3.6.6
           </span>
         </ShimmerWrapper>
       </div>

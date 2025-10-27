@@ -1,4 +1,3 @@
-
 export const MAX_IMAGES = 5;
 export const MAX_MERGE_IMAGES = 15;
 export const MAX_FILE_SIZE_MB = 10;
@@ -68,4 +67,9 @@ export const COMPLEXITY_LEVELS = [
     { tKey: 'complexity_simple', value: 'simple' },
     { tKey: 'complexity_standard', value: 'standard' },
     { tKey: 'complexity_advanced', value: 'advanced' },
+] as const;
+
+export const SUMMARY_FORMATS = [
+    { tKey: 'format_paragraph', value: 'paragraph' },
+    { tKey: 'format_bullet_points', value: 'bullet points' },
 ] as const;

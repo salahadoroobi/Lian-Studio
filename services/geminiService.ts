@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Modality } from '@google/genai';
 import type { ReferenceImage } from '../types';
 
@@ -571,6 +570,67 @@ ${text}
 
     if (!response.text) {
         throw new Error("Failed to humanize the text.");
+    }
+    return response.text.trim();
+};
+
+export const summarizeText = async (
+    text: string,
+    file: File | null,
+    outputLanguage: string,
+    length: number, // 0-100
+    format: string, // 'paragraph' or 'bullet_points'
+    keywords: string
+): Promise<string> => {
+    const ai = getAi();
+    const parts: any[] = [];
+
+    let lengthInstruction = '';
+    if (length <= 20) {
+        lengthInstruction = 'The summary should be very short and concise, capturing only the absolute main points.';
+    } else if (length >= 80) {
+        lengthInstruction = 'The summary should be comprehensive and detailed, covering all key aspects and supporting details.';
+    } else {
+        lengthInstruction = `The desired length of the summary is approximately ${length}% of the original text. Adjust the level of detail accordingly.`;
+    }
+
+    const formatInstruction = `Format the summary as a well-written ${format}.`;
+    
+    const keywordsInstruction = keywords.trim()
+        ? `Pay special attention to and prioritize information related to these keywords: "${keywords.trim()}".`
+        : '';
+
+    let instruction = `You are an expert summarizer. Your task is to provide a clear and accurate summary of the provided text.
+
+**Instructions:**
+- **Output Language:** The final summary must be in ${outputLanguage}.
+- **Length:** ${lengthInstruction}
+- **Format:** ${formatInstruction}
+- ${keywordsInstruction}
+
+Respond ONLY with the final summary. Do not include any headers, preambles, or explanations.`;
+
+    if (file) {
+        parts.push(await fileToGenerativePart(file));
+        instruction += `\n\nThe content to summarize is in the attached file.`;
+    } else {
+        instruction += `
+    Original Text:
+    ---
+    ${text}
+    ---
+    `;
+    }
+    
+    parts.push({ text: instruction });
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts },
+    });
+    
+    if (!response.text) {
+        throw new Error("Failed to summarize the text.");
     }
     return response.text.trim();
 };

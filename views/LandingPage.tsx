@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
@@ -23,6 +22,7 @@ import { WriterIcon } from '../components/icons/WriterIcon';
 import { TranslatorIcon } from '../components/icons/TranslatorIcon';
 import { ProofreaderIcon } from '../components/icons/ProofreaderIcon';
 import { StealthIcon } from '../components/icons/StealthIcon';
+import { SummarizerIcon } from '../components/icons/SummarizerIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -270,6 +270,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             description={t('stealth_card_desc')}
             buttonText={t('start_stealthing')}
             onClick={() => setView('stealth')}
+            isBeta={true}
+          />
+          <Card
+            icon={<SummarizerIcon />}
+            title={t('summarizer_card_title')}
+            description={t('summarizer_card_desc')}
+            buttonText={t('start_summarizing')}
+            onClick={() => setView('summarizer')}
             isBeta={true}
           />
         </div>
