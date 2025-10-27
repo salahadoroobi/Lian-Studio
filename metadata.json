@@ -1,5 +1,7 @@
 {
   "name": "Lian Studio",
   "description": "An AI-powered image generation studio. Create stunning visuals from text prompts and reference images using the power of Gemini.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "clipboard-read"
+  ]
 }

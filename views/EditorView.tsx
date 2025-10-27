@@ -55,7 +55,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
       return;
     }
 
-    const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
+    const hasColorPrompts = Object.values(colorPrompts).some((p: string) => p.trim().length > 0);
     if (!prompt.trim() && !hasColorPrompts) {
         setError('Please provide general edit instructions or instructions for at least one color.');
         return;
@@ -115,7 +115,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
       setActiveColors(uniqueBrushColors);
   }, []);
 
-  const hasColorPrompts = Object.values(colorPrompts).some(p => p.trim().length > 0);
+  const hasColorPrompts = Object.values(colorPrompts).some((p: string) => p.trim().length > 0);
   const canEdit = !isLoading && baseImage.length > 0 && activeColors.length > 0 && (prompt.trim().length > 0 || hasColorPrompts);
 
   return (
@@ -164,6 +164,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={t('edit_instructions_placeholder')}
+            dir={language === 'ar' ? 'rtl' : 'ltr'}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
           />
         </div>
@@ -182,6 +183,7 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
                             value={colorPrompts[color] || ''}
                             onChange={(e) => setColorPrompts(p => ({...p, [color]: e.target.value}))}
                             placeholder={t('color_prompt_placeholder')}
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
                             aria-label={`Instructions for color ${color}`}
                             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                         />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
 import { WandIcon } from '../components/icons/WandIcon';
@@ -9,12 +9,24 @@ import { PaintBrushIcon } from '../components/icons/PaintBrushIcon';
 import { ShimmerWrapper } from '../components/ShimmerWrapper';
 import { ActionButton } from '../components/ActionButton';
 import { PencilRulerIcon } from '../components/icons/PencilRulerIcon';
+import { RestorerIcon } from '../components/icons/RestorerIcon';
+import { PhotoIcon } from '../components/icons/PhotoIcon';
+import { VideoIcon } from '../components/icons/VideoIcon';
+import { AudioIcon } from '../components/icons/AudioIcon';
+import { TextIcon } from '../components/icons/TextIcon';
+import { InformationCircleIcon } from '../components/icons/InformationCircleIcon';
+import { CheckBadgeIcon } from '../components/icons/CheckBadgeIcon';
+import { FlagIcon } from '../components/icons/FlagIcon';
+import { Squares2X2Icon } from '../components/icons/Squares2X2Icon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
   t: TFunction;
   language: Language;
 }
+
+type ContentType = 'images' | 'videos' | 'audio' | 'text';
+type InfoTab = 'about' | 'why' | 'mission' | 'features';
 
 const FeatureCard: React.FC<{
     icon: React.ReactNode;
@@ -33,6 +45,25 @@ const FeatureCard: React.FC<{
 
 
 export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }) => {
+  const [activeContentType, setActiveContentType] = useState<ContentType>('images');
+  const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>('about');
+  
+  const contentTypes: ContentType[] = ['images', 'videos', 'audio', 'text'];
+  const infoTabs: InfoTab[] = ['about', 'why', 'mission', 'features'];
+  
+  const contentTypeIcons: Record<ContentType, React.ReactNode> = {
+    images: <PhotoIcon />,
+    videos: <VideoIcon />,
+    audio: <AudioIcon />,
+    text: <TextIcon />,
+  };
+  
+  const infoTabIcons: Record<InfoTab, React.ReactNode> = {
+    about: <InformationCircleIcon />,
+    why: <CheckBadgeIcon />,
+    mission: <FlagIcon />,
+    features: <Squares2X2Icon />,
+  };
 
   const Card: React.FC<{
     icon: React.ReactNode;
@@ -73,88 +104,164 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
     </section>
   );
 
+  const renderInfoContent = () => {
+    switch(activeInfoTab) {
+        case 'about':
+            return (
+                <InfoSection title={t('landing_about_title')}>
+                    <p>{t('landing_about_desc')}</p>
+                </InfoSection>
+            );
+        case 'why':
+            return (
+                <InfoSection title={t('landing_importance_title')}>
+                    <p>{t('landing_importance_desc')}</p>
+                </InfoSection>
+            );
+        case 'mission':
+            return (
+                <InfoSection title={t('landing_goals_title')}>
+                    <p>{t('landing_goals_desc')}</p>
+                </InfoSection>
+            );
+        case 'features':
+            return (
+                <section className="max-w-5xl mx-auto">
+                    <h2 className="text-3xl font-bold text-center text-brand-primary dark:text-white mb-8">{t('landing_features_title')}</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <FeatureCard language={language} title={t('landing_feature_1_title')} description={t('landing_feature_1_desc')} icon={<SparklesIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_5_title')} description={t('landing_feature_5_desc')} icon={<PaintBrushIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_2_title')} description={t('landing_feature_2_desc')} icon={<WandIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_7_title')} description={t('landing_feature_7_desc')} icon={<RestorerIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_6_title')} description={t('landing_feature_6_desc')} icon={<PencilRulerIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_8_title')} description={t('landing_feature_8_desc')} icon={<VideoIcon className="w-12 h-12 text-brand-accent"/>} />
+                        <FeatureCard language={language} title={t('landing_feature_9_title')} description={t('landing_feature_9_desc')} icon={<AudioIcon className="w-12 h-12 text-brand-accent"/>} />
+                        <FeatureCard language={language} title={t('landing_feature_10_title')} description={t('landing_feature_10_desc')} icon={<TextIcon className="w-12 h-12 text-brand-accent"/>} />
+                    </div>
+                </section>
+            );
+        default:
+            return null;
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="text-center">
         <h2 className="text-4xl md:text-5xl font-extrabold text-brand-primary dark:text-white mb-4">{t('landing_title')}</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-12">{t('landing_subtitle')}</p>
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t('landing_subtitle')}</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 md:mb-32">
-        <Card
-          icon={<PaintBrushIcon />}
-          title={t('editor_card_title')}
-          description={t('editor_card_desc')}
-          buttonText={t('start_editing')}
-          onClick={() => setView('editor')}
-          isBeta={true}
-        />
-        <Card
-          icon={<SparklesIcon />}
-          title={t('generator_card_title')}
-          description={t('generator_card_desc')}
-          buttonText={t('start_generating')}
-          onClick={() => setView('generator')}
-        />
-        <Card
-          icon={<WandIcon />}
-          title={t('enhancer_card_title')}
-          description={t('enhancer_card_desc')}
-          buttonText={t('start_enhancing')}
-          onClick={() => setView('enhancer')}
-        />
-        <Card
-          icon={<CombineIcon />}
-          title={t('merger_card_title')}
-          description={t('merger_card_desc')}
-          buttonText={t('start_merging')}
-          onClick={() => setView('merger')}
-          isBeta={true}
-        />
-        <Card
-          icon={<DocumentTextIcon />}
-          title={t('extractor_card_title')}
-          description={t('extractor_card_desc')}
-          buttonText={t('start_extracting')}
-          onClick={() => setView('extractor')}
-          isBeta={true}
-        />
-        <Card
-          icon={<PencilRulerIcon />}
-          title={t('corrector_card_title')}
-          description={t('corrector_card_desc')}
-          buttonText={t('start_correcting')}
-          onClick={() => setView('corrector')}
-          isBeta={true}
-        />
+      {/* Content Type Selector */}
+      <div className="flex justify-center my-8 md:my-12">
+        <div className="bg-gray-200/50 dark:bg-gray-800/50 p-1.5 rounded-full shadow-inner flex items-center gap-2 flex-wrap justify-center">
+          {contentTypes.map((type) => (
+            <button
+              key={type}
+              onClick={() => setActiveContentType(type)}
+              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center gap-2 ${
+                activeContentType === type 
+                  ? 'bg-brand-accent text-white shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              {contentTypeIcons[type]}
+              <span>{t(`content_type_${type}`)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {activeContentType === 'images' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 md:mb-32 animate-fade-in">
+          <Card
+            icon={<PaintBrushIcon />}
+            title={t('editor_card_title')}
+            description={t('editor_card_desc')}
+            buttonText={t('start_editing')}
+            onClick={() => setView('editor')}
+            isBeta={true}
+          />
+          <Card
+            icon={<SparklesIcon />}
+            title={t('generator_card_title')}
+            description={t('generator_card_desc')}
+            buttonText={t('start_generating')}
+            onClick={() => setView('generator')}
+          />
+          <Card
+            icon={<WandIcon />}
+            title={t('enhancer_card_title')}
+            description={t('enhancer_card_desc')}
+            buttonText={t('start_enhancing')}
+            onClick={() => setView('enhancer')}
+          />
+          <Card
+            icon={<CombineIcon />}
+            title={t('merger_card_title')}
+            description={t('merger_card_desc')}
+            buttonText={t('start_merging')}
+            onClick={() => setView('merger')}
+            isBeta={true}
+          />
+          <Card
+            icon={<RestorerIcon />}
+            title={t('restorer_card_title')}
+            description={t('restorer_card_desc')}
+            buttonText={t('start_restoring')}
+            onClick={() => setView('restorer')}
+            isBeta={true}
+          />
+          <Card
+            icon={<DocumentTextIcon />}
+            title={t('extractor_card_title')}
+            description={t('extractor_card_desc')}
+            buttonText={t('start_extracting')}
+            onClick={() => setView('extractor')}
+            isBeta={true}
+          />
+          <Card
+            icon={<PencilRulerIcon />}
+            title={t('corrector_card_title')}
+            description={t('corrector_card_desc')}
+            buttonText={t('start_correcting')}
+            onClick={() => setView('corrector')}
+            isBeta={true}
+          />
+        </div>
+      ) : (
+        <div className="text-center py-20 md:py-32 mb-20 md:mb-32 animate-fade-in">
+          <h3 className="text-3xl font-bold text-brand-primary dark:text-white mb-4">{t('coming_soon_title')}</h3>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">{t('coming_soon_desc')}</p>
+        </div>
+      )}
+      
+      {/* Informational Tabs */}
+      <div className="flex justify-center mb-8 md:mb-12">
+        <div className="bg-gray-200/50 dark:bg-gray-800/50 p-1.5 rounded-full shadow-inner flex items-center gap-2 flex-wrap justify-center">
+          {infoTabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveInfoTab(tab)}
+              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center gap-2 ${
+                activeInfoTab === tab 
+                  ? 'bg-brand-accent text-white shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              {infoTabIcons[tab]}
+              <span>{t(`info_tab_${tab}`)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <div key={activeInfoTab} className="animate-fade-in">
+        {renderInfoContent()}
       </div>
 
-      <div className="space-y-16">
-        <InfoSection title={t('landing_about_title')}>
-            <p>{t('landing_about_desc')}</p>
-        </InfoSection>
-        
-        <InfoSection title={t('landing_importance_title')}>
-            <p>{t('landing_importance_desc')}</p>
-        </InfoSection>
-
-        <InfoSection title={t('landing_goals_title')}>
-            <p>{t('landing_goals_desc')}</p>
-        </InfoSection>
-
-        <section className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-brand-primary dark:text-white mb-8">{t('landing_features_title')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <FeatureCard language={language} title={t('landing_feature_1_title')} description={t('landing_feature_1_desc')} icon={<SparklesIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_5_title')} description={t('landing_feature_5_desc')} icon={<PaintBrushIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_2_title')} description={t('landing_feature_2_desc')} icon={<WandIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
-                <FeatureCard language={language} title={t('landing_feature_6_title')} description={t('landing_feature_6_desc')} icon={<PencilRulerIcon />} />
-            </div>
-        </section>
-
-      </div>
     </div>
   );
 };

@@ -1,22 +1,26 @@
+
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { PromptResultDisplay } from '../components/PromptResultDisplay';
 import { correctPrompt } from '../services/geminiService';
-import type { TFunction } from '../hooks/useLocalization';
+import type { TFunction, Language } from '../hooks/useLocalization';
 import { SpinnerIcon } from '../components/icons/SpinnerIcon';
 import { ExtractionLanguageSelector } from '../components/ExtractionLanguageSelector';
 import { ActionButton } from '../components/ActionButton';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
+import { PasteIcon } from '../components/icons/PasteIcon';
 
 interface CorrectorViewProps {
   t: TFunction;
+  language: Language;
 }
 
-export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
+export const CorrectorView: React.FC<CorrectorViewProps> = ({ t, language }) => {
     const [idea, setIdea] = useState('');
     const [correctedText, setCorrectedText] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [outputLanguage, setOutputLanguage] = useState<string>('en');
+    const [pasteMessage, setPasteMessage] = useState<string | null>(null);
 
     const ideaTextareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,6 +67,23 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
         }
     };
 
+    const handlePaste = async () => {
+        setPasteMessage(null);
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+                setIdea(text);
+            } else {
+                setPasteMessage(t('paste_error_not_text'));
+                setTimeout(() => setPasteMessage(null), 3000);
+            }
+        } catch (err) {
+            console.error('Failed to read clipboard contents: ', err);
+            setPasteMessage(t('paste_error_not_text'));
+            setTimeout(() => setPasteMessage(null), 3000);
+        }
+    };
+
     const canCorrect = !isLoading && idea.trim().length > 0;
 
     return (
@@ -74,22 +95,37 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
                 <div className="relative">
                     <div className="flex justify-between items-center mb-2">
                         <label htmlFor="idea-input" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('corrector_idea_label')}</label>
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            title={t('upload_prompt_label')}
-                            aria-label={t('upload_prompt_label')}
-                            className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-                        >
-                            <UploadTextIcon />
-                        </button>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileSelect}
-                            accept=".txt"
-                            className="hidden"
-                            id="prompt-file-upload-corrector"
-                        />
+                        <div className="flex items-center gap-2 relative">
+                            {pasteMessage && (
+                                <div className="absolute right-0 -top-10 bg-gray-800 text-white text-xs font-semibold rounded-md py-1.5 px-3 animate-fade-in shadow-lg whitespace-nowrap z-10">
+                                    {pasteMessage}
+                                </div>
+                            )}
+                             <button
+                                onClick={handlePaste}
+                                title={t('paste_from_clipboard')}
+                                aria-label={t('paste_from_clipboard')}
+                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+                            >
+                                <PasteIcon />
+                            </button>
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                title={t('upload_prompt_label')}
+                                aria-label={t('upload_prompt_label')}
+                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+                            >
+                                <UploadTextIcon />
+                            </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                accept=".txt"
+                                className="hidden"
+                                id="prompt-file-upload-corrector"
+                            />
+                        </div>
                     </div>
                     <textarea
                         ref={ideaTextareaRef}
@@ -98,6 +134,7 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t }) => {
                         value={idea}
                         onChange={(e) => setIdea(e.target.value)}
                         placeholder={t('corrector_idea_placeholder')}
+                        dir={language === 'ar' ? 'rtl' : 'ltr'}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                     />
                 </div>

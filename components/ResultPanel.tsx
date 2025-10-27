@@ -9,7 +9,7 @@ interface ResultPanelProps {
   isLoading: boolean;
   error: string | null;
   t: TFunction;
-  view: 'generator' | 'enhancer' | 'merger' | 'editor';
+  view: 'generator' | 'enhancer' | 'merger' | 'editor' | 'restorer';
 }
 
 export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoading, error, t, view }) => {
@@ -38,6 +38,9 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
       } else if (view === 'editor') {
           titleKey = 'editing_title';
           descKey = 'editing_desc';
+      } else if (view === 'restorer') {
+          titleKey = 'restoring_title';
+          descKey = 'restoring_desc';
       }
 
       return (
@@ -87,11 +90,18 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
       );
     }
     
+    const getInitialDescKey = (): Parameters<TFunction>[0] => {
+        if (view === 'restorer') {
+            return 'initial_desc_restorer';
+        }
+        return 'initial_desc';
+    };
+
     return (
       <div className="text-center text-gray-400">
         <ImageIcon />
         <p className="mt-4 text-lg font-semibold text-brand-primary dark:text-brand-accent">{t('initial_title')}</p>
-        <p className="text-sm dark:text-gray-500">{t('initial_desc')}</p>
+        <p className="text-sm dark:text-gray-500">{t(getInitialDescKey())}</p>
       </div>
     );
   };

@@ -318,7 +318,10 @@ export const ImageEditorCanvas = forwardRef<CanvasHandle, ImageEditorCanvasProps
       }
 
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.code === 'Space' && !isPanning) {
+        const target = e.target as HTMLElement;
+        const isTextInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
+        if (e.code === 'Space' && !isPanning && !isTextInput) {
           e.preventDefault();
           setIsPanning(true);
         }

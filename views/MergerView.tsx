@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
@@ -7,6 +8,7 @@ import type { Language, TFunction } from '../hooks/useLocalization';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 import { MAX_MERGE_IMAGES } from '../constants';
 import { ActionButton } from '../components/ActionButton';
+import { PasteIcon } from '../components/icons/PasteIcon';
 
 interface MergerViewProps {
   t: TFunction;
@@ -16,6 +18,7 @@ interface MergerViewProps {
 export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
     const [prompt, setPrompt] = useState('');
     const [sourceImages, setSourceImages] = useState<ReferenceImage[]>([]);
+    const [pasteMessage, setPasteMessage] = useState<string | null>(null);
 
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +68,23 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
             reader.readAsText(file);
         }
     };
+
+    const handlePaste = async () => {
+        setPasteMessage(null);
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+                setPrompt(text);
+            } else {
+                setPasteMessage(t('paste_error_not_text'));
+                setTimeout(() => setPasteMessage(null), 3000);
+            }
+        } catch (err) {
+            console.error('Failed to read clipboard contents: ', err);
+            setPasteMessage(t('paste_error_not_text'));
+            setTimeout(() => setPasteMessage(null), 3000);
+        }
+    };
     
     const canMerge = !isLoading && sourceImages.length >= 2;
 
@@ -82,22 +102,37 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
                 <div className="relative">
                     <div className="flex justify-between items-center mb-2">
                         <label htmlFor="prompt-merger" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('merger_prompt_label')}</label>
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            title={t('upload_prompt_label')}
-                            aria-label={t('upload_prompt_label')}
-                            className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-                        >
-                            <UploadTextIcon />
-                        </button>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileSelect}
-                            accept=".txt"
-                            className="hidden"
-                            id="prompt-file-upload-merger"
-                        />
+                        <div className="flex items-center gap-2 relative">
+                             {pasteMessage && (
+                                <div className="absolute right-0 -top-10 bg-gray-800 text-white text-xs font-semibold rounded-md py-1.5 px-3 animate-fade-in shadow-lg whitespace-nowrap z-10">
+                                    {pasteMessage}
+                                </div>
+                            )}
+                            <button
+                                onClick={handlePaste}
+                                title={t('paste_from_clipboard')}
+                                aria-label={t('paste_from_clipboard')}
+                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+                            >
+                                <PasteIcon />
+                            </button>
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                title={t('upload_prompt_label')}
+                                aria-label={t('upload_prompt_label')}
+                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+                            >
+                                <UploadTextIcon />
+                            </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                accept=".txt"
+                                className="hidden"
+                                id="prompt-file-upload-merger"
+                            />
+                        </div>
                     </div>
                     <textarea
                         ref={promptTextareaRef}
@@ -106,6 +141,7 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder={t('merger_prompt_placeholder')}
+                        dir={language === 'ar' ? 'rtl' : 'ltr'}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
                     />
                 </div>

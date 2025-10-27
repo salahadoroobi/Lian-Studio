@@ -11,8 +11,9 @@ import { EditorView } from './views/EditorView';
 import { CorrectorView } from './views/CorrectorView';
 import { Footer } from './components/Footer';
 import { DeveloperModal } from './components/DeveloperModal';
+import { RestorerView } from './views/RestorerView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector' | 'restorer';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -65,10 +66,12 @@ const App: React.FC = () => {
                 return <EnhancerView t={t} language={language} />;
             case 'merger':
                 return <MergerView t={t} language={language} />;
+            case 'restorer':
+                return <RestorerView t={t} language={language} />;
             case 'extractor':
                 return <ExtractorView t={t} />;
             case 'corrector':
-                return <CorrectorView t={t} />;
+                return <CorrectorView t={t} language={language} />;
             case 'landing':
             default:
                 return <LandingPage setView={changeView} t={t} language={language} />;
@@ -78,7 +81,7 @@ const App: React.FC = () => {
     const mainContentClasses = isLangTransitioning || isViewTransitioning ? 'opacity-0' : 'opacity-100';
 
     return (
-        <div className={`min-h-screen bg-brand-bg dark:bg-gray-900 transition-colors duration-300 ${language === 'ar' ? 'font-cairo' : 'font-poppins'} flex flex-col`}>
+        <div className={`min-h-screen bg-brand-bg dark:bg-gray-900 transition-colors duration-300 font-sans flex flex-col`}>
             <Header
                 currentView={view}
                 setView={changeView}

@@ -206,6 +206,79 @@ export const mergeImages = async (
     throw new Error('Image merging failed. No image data received.');
 };
 
+export const restoreImage = async (
+    baseImage: ReferenceImage,
+    options: {
+        fixDamage: boolean;
+        improveClarity: boolean;
+        colorize: boolean;
+        removeNoise: boolean;
+    },
+    additionalInstructions: string
+): Promise<string> => {
+    const ai = getAi();
+    
+    const imagePart = await fileToGenerativePart(baseImage.file);
+    
+    let promptInstructions = `You are a master photo restorer with a focus on historical accuracy and preservation. Your primary goal is to repair damage while faithfully maintaining the original photograph's character and content.
+
+**CRITICAL DIRECTIVE: PRESERVE, DO NOT ALTER.** The final image must look like a perfectly preserved version of the original photo, not a modern re-imagining.
+- **DO NOT** change facial features, expressions, or the identity of the people in the photo.
+- **DO NOT** add new objects, backgrounds, or elements that were not in the original scene.
+- **DO NOT** remove existing objects or elements, even if they are unclear.
+- **DO NOT** over-smooth skin or textures to the point where they look artificial or "plastic". Retain the natural grain and texture of the original photograph as much as possible after repairs.
+
+Your restoration process based on the user's request:
+`;
+    
+    const processSteps: string[] = [];
+    if (options.fixDamage) {
+        processSteps.push("- **Damage Repair:** Meticulously fix all physical damage: scratches, tears, folds, stains, dust, and discoloration. Reconstruct missing areas logically based on surrounding context.");
+    }
+    if (options.colorize) {
+        processSteps.push("- **Color Correction & Colorization:** If the photo is black and white, colorize it using subtle, realistic, and historically appropriate colors. Avoid vibrant, oversaturated tones. If it's already in color, restore the original tonal range and correct any color fading.");
+    } else {
+        processSteps.push("- **Color Correction:** If the photo is black and white, restore its original tonal range, improving contrast and clarity without losing detail in shadows or highlights. DO NOT colorize it.");
+    }
+    if (options.improveClarity) {
+        processSteps.push("- **Subtle Detail Enhancement:** Gently sharpen blurry areas to improve clarity. The enhancement should be minimal and only serve to counteract the degradation of the original photo, not to add artificial detail.");
+    }
+    if (options.removeNoise) {
+        processSteps.push("- **Noise Reduction:** Carefully reduce excessive film grain or digital noise while preserving essential details.");
+    }
+
+    if (processSteps.length > 0) {
+        promptInstructions += processSteps.join('\n');
+    } else {
+        promptInstructions += "- Follow general best practices for photo restoration."
+    }
+
+    if (additionalInstructions.trim()) {
+        promptInstructions += `\n\n**Additional User Instructions:**\n- ${additionalInstructions.trim()}`;
+    }
+
+    promptInstructions += `\n\nProceed with the restoration of the provided image, adhering strictly to these guidelines.`
+
+    const textPart = { text: promptInstructions };
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: { parts: [imagePart, textPart] },
+        config: {
+            responseModalities: [Modality.IMAGE],
+        },
+    });
+    
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            const base64ImageBytes: string = part.inlineData.data;
+            return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
+        }
+    }
+    
+    throw new Error('Image restoration failed. No image data received.');
+};
+
 
 export const extractPromptFromImage = async (
     image: ReferenceImage,
