@@ -215,6 +215,8 @@ const translations = {
     tooltip_github: 'GitHub',
     collapse_toolbar: 'Collapse toolbar',
     expand_toolbar: 'Expand toolbar',
+    prompts_label: 'Prompts',
+    prompts_available_tooltip: '{count}+ Prompts Available',
   },
   ar: {
     app_title: 'استوديو ليان',
@@ -429,6 +431,8 @@ const translations = {
     tooltip_github: 'جيت هاب',
     collapse_toolbar: 'طي شريط الأدوات',
     expand_toolbar: 'توسيع شريط الأدوات',
+    prompts_label: 'برومت',
+    prompts_available_tooltip: '+{count} برومت متاح',
   },
 };
 

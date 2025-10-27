@@ -45,6 +45,22 @@
               shimmerRL: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
               shimmerTB: { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(100%)' } },
               shimmerBT: { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(-100%)' } },
+              slideInFromLeft: {
+                '0%': { transform: 'translateX(-150%)', opacity: '0' },
+                '70%': { transform: 'translateX(10%)', opacity: '1' },
+                '100%': { transform: 'translateX(0)', opacity: '1' },
+              },
+              slideInFromRight: {
+                '0%': { transform: 'translateX(150%)', opacity: '0' },
+                '70%': { transform: 'translateX(-10%)', opacity: '1' },
+                '100%': { transform: 'translateX(0)', opacity: '1' },
+              },
+              jiggle: {
+                '0%, 100%': { transform: 'translateX(0)' },
+                '25%': { transform: 'translateX(-3px)' },
+                '50%': { transform: 'translateX(3px)' },
+                '75%': { transform: 'translateX(-2px)' },
+              }
             },
             animation: {
               'fade-in': 'fadeIn 0.3s ease-out forwards',
@@ -58,6 +74,9 @@
               'shimmer-rl-hover': 'shimmerRL 1s ease-in-out forwards',
               'shimmer-tb-hover': 'shimmerTB 1s ease-in-out forwards',
               'shimmer-bt-hover': 'shimmerBT 1s ease-in-out forwards',
+              'slide-in-left': 'slideInFromLeft 0.4s ease-out forwards',
+              'slide-in-right': 'slideInFromRight 0.4s ease-out forwards',
+              'jiggle': 'jiggle 0.4s ease-in-out forwards 0.1s',
             }
           }
         }
