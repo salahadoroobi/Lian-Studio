@@ -9,6 +9,8 @@ import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 import { MAX_MERGE_IMAGES } from '../constants';
 import { ActionButton } from '../components/ActionButton';
 import { PasteIcon } from '../components/icons/PasteIcon';
+import { WaveIcon } from '../components/icons/WaveIcon';
+import { PROMPT_WAVES } from '../prompts';
 
 interface MergerViewProps {
   t: TFunction;
@@ -85,6 +87,13 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
             setTimeout(() => setPasteMessage(null), 3000);
         }
     };
+
+    const handlePromptWave = () => {
+        if (PROMPT_WAVES.length > 0) {
+            const randomIndex = Math.floor(Math.random() * PROMPT_WAVES.length);
+            setPrompt(PROMPT_WAVES[randomIndex]);
+        }
+    };
     
     const canMerge = !isLoading && sourceImages.length >= 2;
 
@@ -108,6 +117,14 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
                                     {pasteMessage}
                                 </div>
                             )}
+                            <button
+                                onClick={handlePromptWave}
+                                title={t('prompt_wave_tooltip')}
+                                aria-label={t('prompt_wave_tooltip')}
+                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
+                            >
+                                <WaveIcon />
+                            </button>
                             <button
                                 onClick={handlePaste}
                                 title={t('paste_from_clipboard')}
