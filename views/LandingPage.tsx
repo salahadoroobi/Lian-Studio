@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
@@ -24,6 +25,7 @@ import { ProofreaderIcon } from '../components/icons/ProofreaderIcon';
 import { StealthIcon } from '../components/icons/StealthIcon';
 import { SummarizerIcon } from '../components/icons/SummarizerIcon';
 import { TextExtractorIcon } from '../components/icons/TextExtractorIcon';
+import { StudioIcon } from '../components/icons/StudioIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -31,7 +33,7 @@ interface LandingPageProps {
   language: Language;
 }
 
-type ContentType = 'images' | 'videos' | 'audio' | 'text';
+type ContentType = 'studio' | 'images' | 'videos' | 'audio' | 'text';
 type InfoTab = 'about' | 'why' | 'mission' | 'features';
 
 const FeatureCard: React.FC<{
@@ -51,13 +53,14 @@ const FeatureCard: React.FC<{
 
 
 export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }) => {
-  const [activeContentType, setActiveContentType] = useState<ContentType>('images');
+  const [activeContentType, setActiveContentType] = useState<ContentType>('studio');
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>('about');
   
-  const contentTypes: ContentType[] = ['images', 'text', 'videos', 'audio'];
+  const contentTypes: ContentType[] = ['studio', 'images', 'text', 'videos', 'audio'];
   const infoTabs: InfoTab[] = ['about', 'why', 'mission', 'features'];
   
   const contentTypeIcons: Record<ContentType, React.ReactNode> = {
+    studio: <StudioIcon />,
     images: <PhotoIcon />,
     videos: <VideoIcon />,
     audio: <AudioIcon />,

@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 
 // Define translations
@@ -7,6 +8,7 @@ const translations = {
     back_to_home: 'Back to Home',
     landing_title: 'Unleash Your Creativity with AI',
     landing_subtitle: 'Create, enhance, and produce across images, video, audio, and text using the power of Gemini. Your complete creative studio awaits.',
+    content_type_studio: 'Studio',
     content_type_images: 'Images',
     content_type_videos: 'Videos',
     content_type_audio: 'Audio',
@@ -355,10 +357,11 @@ const translations = {
     prompts_available_tooltip: '{count}+ Prompts Available',
   },
   ar: {
-    app_title: 'استوديو ليان',
+    app_title: 'أستوديو ليان',
     back_to_home: 'العودة للرئيسية',
     landing_title: 'أطلق العنان لإبداعك مع الذكاء الاصطناعي',
-    landing_subtitle: 'أنشئ، حسّن، وأنتج عبر الصور والفيديو والصوت والنصوص باستخدام قوة Gemini. استوديو إبداعك المتكامل في انتظارك.',
+    landing_subtitle: 'أنشئ، حسّن، وأنتج عبر الصور والفيديو والصوت والنصوص باستخدام قوة Gemini. أستوديو إبداعك المتكامل في انتظارك.',
+    content_type_studio: 'أستوديو',
     content_type_images: 'صور',
     content_type_videos: 'فيديو',
     content_type_audio: 'صوت',
@@ -409,10 +412,10 @@ const translations = {
     info_tab_why: 'لماذا نحن؟',
     info_tab_mission: 'مهمتنا',
     info_tab_features: 'المميزات',
-    landing_about_title: 'عن استوديو ليان',
-    landing_about_desc: 'استوديو ليان هو مركزك الإبداعي المتكامل، المدعوم بأحدث تقنيات الذكاء الاصطناعي من Gemini. نحن نقدم مجموعة متكاملة من الأدوات للصور والفيديو والصوت والنصوص، مصممة لتكون شريكك في كل مرحلة من مراحل العملية الإبداعية—من الفكرة الأولية إلى المنتج النهائي المصقول.',
-    landing_importance_title: 'لماذا استوديو ليان؟',
-    landing_importance_desc: 'في عالم يعتمد على المحتوى الرقمي الجذاب، أصبحت القدرة على تحويل الأفكار إلى وسائط احترافية عالية الجودة أمراً ضرورياً. استوديو ليان يزيل الحواجز التقنية، ويمكّن كل مبدع—من المحترفين إلى الهواة—من تحقيق رؤيتهم في أي وسيط بسهولة ودقة لا مثيل له.',
+    landing_about_title: 'عن أستوديو ليان',
+    landing_about_desc: 'أستوديو ليان هو مركزك الإبداعي المتكامل، المدعوم بأحدث تقنيات الذكاء الاصطناعي من Gemini. نحن نقدم مجموعة متكاملة من الأدوات للصور والفيديو والصوت والنصوص، مصممة لتكون شريكك في كل مرحلة من مراحل العملية الإبداعية—من الفكرة الأولية إلى المنتج النهائي المصقول.',
+    landing_importance_title: 'لماذا أستوديو ليان؟',
+    landing_importance_desc: 'في عالم يعتمد على المحتوى الرقمي الجذاب، أصبحت القدرة على تحويل الأفكار إلى وسائط احترافية عالية الجودة أمراً ضرورياً. أستوديو ليان يزيل الحواجز التقنية، ويمكّن كل مبدع—من المحترفين إلى الهواة—من تحقيق رؤيتهم في أي وسيط بسهولة ودقة لا مثيل له.',
     landing_goals_title: 'مهمتنا',
     landing_goals_desc: 'مهمتنا هي إضفاء الطابع الديمقراطي على الإبداع من خلال وضع تقنيات الذكاء الاصطناعي متعددة الوسائط الأكثر تقدماً في متناول يديك عبر واجهة بسيطة وأنيقة. نحن نسعى لنكون الشرارة التي تلهم المبدعين لإنتاج أعمال استثنائية تترك أثراً دائماً لا يُنسى.',
     landing_features_title: 'الميزات الأساسية',
