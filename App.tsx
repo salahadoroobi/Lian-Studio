@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { GeneratorView } from './views/GeneratorView';
 import { EnhancerView } from './views/EnhancerView';
-import { ExtractorView } from './views/ExtractorView';
+import { PromptExtractorView } from './views/PromptExtractorView';
 import { LandingPage } from './views/LandingPage';
 import { useLocalization } from './hooks/useLocalization';
 import { MergerView } from './views/MergerView';
@@ -17,8 +17,9 @@ import { TranslatorView } from './views/TranslatorView';
 import { ProofreaderView } from './views/ProofreaderView';
 import { StealthView } from './views/StealthView';
 import { SummarizerView } from './views/SummarizerView';
+import { TextExtractorView } from './views/TextExtractorView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -73,8 +74,10 @@ const App: React.FC = () => {
                 return <MergerView t={t} language={language} />;
             case 'restorer':
                 return <RestorerView t={t} language={language} />;
-            case 'extractor':
-                return <ExtractorView t={t} />;
+            case 'prompt_extractor':
+                return <PromptExtractorView t={t} />;
+            case 'text_extractor':
+                return <TextExtractorView t={t} />;
             case 'corrector':
                 return <CorrectorView t={t} language={language} />;
             case 'writer':

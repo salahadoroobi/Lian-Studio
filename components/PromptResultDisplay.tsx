@@ -42,7 +42,8 @@ export const PromptResultDisplay: React.FC<PromptResultDisplayProps> = ({ text, 
       <div className="text-center text-gray-400">
         <DocumentTextIcon />
         <p className="mt-4 text-lg font-semibold text-brand-primary dark:text-brand-accent">{t('initial_title')}</p>
-        <p className="text-sm dark:text-gray-500">{t(initialDescKey || 'initial_desc_extractor')}</p>
+        {/* Fix: Corrected typo in fallback translation key */}
+        <p className="text-sm dark:text-gray-500">{t(initialDescKey || 'initial_desc_prompt_extractor')}</p>
       </div>
     );
   }

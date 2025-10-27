@@ -308,6 +308,39 @@ export const extractPromptFromImage = async (
     return response.text;
 };
 
+export const extractTextFromImage = async (
+    image: ReferenceImage,
+    language: string // 'auto' or a specific language
+): Promise<string> => {
+    const ai = getAi();
+    const imagePart = await fileToGenerativePart(image.file);
+    
+    const languageInstruction = language === 'auto'
+        ? 'The language is unknown, please auto-detect it before extraction.'
+        : `The language of the text is likely '${language}'.`;
+
+    const instruction = `You are a highly accurate OCR (Optical Character Recognition) engine. Your task is to extract all text from the provided image.
+
+    Instructions:
+    - Analyze the image and transcribe all visible text.
+    - Preserve the original line breaks and formatting as much as possible.
+    - ${languageInstruction}
+
+    Respond ONLY with the extracted text. Do not add any commentary, explanations, or formatting like markdown code blocks.`;
+    
+    const textPart = { text: instruction };
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts: [imagePart, textPart] },
+    });
+    
+    if (!response.text) {
+        throw new Error("Failed to extract text from the image.");
+    }
+    return response.text.trim();
+};
+
 export const correctPrompt = async (
     idea: string,
     outputLanguage: string

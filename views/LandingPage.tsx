@@ -23,6 +23,7 @@ import { TranslatorIcon } from '../components/icons/TranslatorIcon';
 import { ProofreaderIcon } from '../components/icons/ProofreaderIcon';
 import { StealthIcon } from '../components/icons/StealthIcon';
 import { SummarizerIcon } from '../components/icons/SummarizerIcon';
+import { TextExtractorIcon } from '../components/icons/TextExtractorIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -221,7 +222,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             onClick={() => setView('restorer')}
             isBeta={true}
           />
-          <Card
+           <Card
             icon={<PencilRulerIcon />}
             title={t('corrector_card_title')}
             description={t('corrector_card_desc')}
@@ -231,10 +232,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
           />
           <Card
             icon={<DocumentTextIcon />}
-            title={t('extractor_card_title')}
-            description={t('extractor_card_desc')}
-            buttonText={t('start_extracting')}
-            onClick={() => setView('extractor')}
+            title={t('prompt_extractor_card_title')}
+            description={t('prompt_extractor_card_desc')}
+            buttonText={t('start_prompt_extracting')}
+            onClick={() => setView('prompt_extractor')}
             isBeta={true}
           />
         </div>
@@ -278,6 +279,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             description={t('summarizer_card_desc')}
             buttonText={t('start_summarizing')}
             onClick={() => setView('summarizer')}
+            isBeta={true}
+          />
+           <Card
+            icon={<TextExtractorIcon />}
+            title={t('text_extractor_card_title')}
+            description={t('text_extractor_card_desc')}
+            buttonText={t('start_text_extracting')}
+            onClick={() => setView('text_extractor')}
             isBeta={true}
           />
         </div>
