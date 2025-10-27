@@ -384,3 +384,38 @@ Respond ONLY with the final generated content.`;
     }
     return response.text.trim();
 };
+
+export const translateText = async (
+    text: string,
+    fromLanguage: string,
+    toLanguageName: string,
+    formality: string
+): Promise<string> => {
+    const ai = getAi();
+    
+    let formalityInstruction = '';
+    if (formality !== 'default') {
+        formalityInstruction = `The desired formality is "${formality}".`;
+    }
+
+    const fromLanguageInstruction = fromLanguage === 'auto'
+        ? 'from the auto-detected language'
+        : `from ${fromLanguage}`;
+
+    const instruction = `You are an expert translator. Translate the following text ${fromLanguageInstruction} to ${toLanguageName}.
+${formalityInstruction}
+Respond ONLY with the translated text, without any additional explanations, formatting, or quotation marks.
+
+Text to translate:
+"${text}"`;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: instruction,
+    });
+
+    if (!response.text) {
+        throw new Error("Failed to translate the text.");
+    }
+    return response.text.trim();
+};

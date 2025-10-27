@@ -19,6 +19,7 @@ import { CheckBadgeIcon } from '../components/icons/CheckBadgeIcon';
 import { FlagIcon } from '../components/icons/FlagIcon';
 import { Squares2X2Icon } from '../components/icons/Squares2X2Icon';
 import { WriterIcon } from '../components/icons/WriterIcon';
+import { TranslatorIcon } from '../components/icons/TranslatorIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -136,6 +137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
                         <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_7_title')} description={t('landing_feature_7_desc')} icon={<RestorerIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_11_title')} description={t('landing_feature_11_desc')} icon={<WriterIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_12_title')} description={t('landing_feature_12_desc')} icon={<TranslatorIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_6_title')} description={t('landing_feature_6_desc')} icon={<PencilRulerIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_8_title')} description={t('landing_feature_8_desc')} icon={<VideoIcon className="w-12 h-12 text-brand-accent"/>} />
@@ -234,13 +236,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
           />
         </div>
       ) : activeContentType === 'text' ? (
-        <div className="grid grid-cols-1 max-w-sm mx-auto gap-8 mb-20 md:mb-32 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 md:mb-32 animate-fade-in">
            <Card
             icon={<WriterIcon />}
             title={t('writer_card_title')}
             description={t('writer_card_desc')}
             buttonText={t('start_writing')}
             onClick={() => setView('writer')}
+            isBeta={true}
+          />
+          <Card
+            icon={<TranslatorIcon />}
+            title={t('translator_card_title')}
+            description={t('translator_card_desc')}
+            buttonText={t('start_translating')}
+            onClick={() => setView('translator')}
             isBeta={true}
           />
         </div>

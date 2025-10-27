@@ -18,10 +18,28 @@ export const QUALITY_OPTIONS = [
 
 // Fix: Refactor to use a specific translation key (`tKey`) to avoid type errors.
 export const EXTRACTION_LANGUAGES = [
-    { tKey: 'output_language_en', value: 'en' },
-    { tKey: 'output_language_ar', value: 'ar' },
-    { tKey: 'output_language_es', value: 'es' },
-    { tKey: 'output_language_fr', value: 'fr' },
-    { tKey: 'output_language_de', value: 'de' },
-    { tKey: 'output_language_ja', value: 'ja' },
+    { tKey: 'output_language_en', value: 'English' },
+    { tKey: 'output_language_ar', value: 'Arabic' },
+    { tKey: 'output_language_es', value: 'Spanish' },
+    { tKey: 'output_language_fr', value: 'French' },
+    { tKey: 'output_language_de', value: 'German' },
+    { tKey: 'output_language_ja', value: 'Japanese' },
+] as const;
+
+export const TRANSLATION_LANGUAGES = [
+    { tKey: 'output_language_en', value: 'English' },
+    { tKey: 'output_language_ar', value: 'Arabic' },
+    { tKey: 'output_language_es', value: 'Spanish' },
+    { tKey: 'output_language_fr', value: 'French' },
+    { tKey: 'output_language_de', value: 'German' },
+    { tKey: 'output_language_ja', value: 'Japanese' },
+    { tKey: 'output_language_zh', value: 'Chinese' },
+    { tKey: 'output_language_ru', value: 'Russian' },
+    { tKey: 'output_language_hi', value: 'Hindi' },
+] as const;
+
+export const FORMALITY_OPTIONS = [
+    { tKey: 'formality_default', value: 'default' },
+    { tKey: 'formality_formal', value: 'formal' },
+    { tKey: 'formality_informal', value: 'informal' },
 ] as const;
