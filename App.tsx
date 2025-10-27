@@ -12,8 +12,9 @@ import { CorrectorView } from './views/CorrectorView';
 import { Footer } from './components/Footer';
 import { DeveloperModal } from './components/DeveloperModal';
 import { RestorerView } from './views/RestorerView';
+import { WriterView } from './views/WriterView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector' | 'restorer';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector' | 'restorer' | 'writer';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -72,6 +73,8 @@ const App: React.FC = () => {
                 return <ExtractorView t={t} />;
             case 'corrector':
                 return <CorrectorView t={t} language={language} />;
+            case 'writer':
+                return <WriterView t={t} language={language} />;
             case 'landing':
             default:
                 return <LandingPage setView={changeView} t={t} language={language} />;

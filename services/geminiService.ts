@@ -337,3 +337,50 @@ Respond only with the final, polished prompt.`;
     }
     return response.text;
 };
+
+export const generateContentText = async (
+    description: string,
+    images: ReferenceImage[],
+    tone: string,
+    contentType: string,
+    outputLanguage: string,
+    contentRatio: number
+): Promise<string> => {
+    const ai = getAi();
+    const parts: any[] = [];
+
+    let ratioInstruction = '';
+    if (contentRatio <= 20) {
+        ratioInstruction = 'Generate very concise and brief content. Keep it short and to the point.';
+    } else if (contentRatio >= 80) {
+        ratioInstruction = 'Generate highly detailed, comprehensive, and elaborate content. Provide an in-depth and thorough response.';
+    } else {
+        ratioInstruction = `Adjust the length and detail of the content to a ratio of approximately ${contentRatio} out of 100, where 100 is the most detailed and 0 is the most brief.`;
+    }
+
+    let instruction = `As an expert copywriter, generate compelling content for a "${contentType}" with a "${tone}" tone of voice. The content must be in ${outputLanguage}.
+
+Base the content on the following description: "${description}"
+
+${ratioInstruction}
+
+If an image is provided, use it for visual context about the product or idea.
+
+Respond ONLY with the final generated content.`;
+
+    for (const image of images) {
+        parts.push(await fileToGenerativePart(image.file));
+    }
+    parts.push({ text: instruction });
+
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts },
+    });
+
+    if (!response.text) {
+        throw new Error("Failed to generate content.");
+    }
+    return response.text.trim();
+};

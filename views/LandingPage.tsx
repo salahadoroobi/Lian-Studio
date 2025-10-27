@@ -18,6 +18,7 @@ import { InformationCircleIcon } from '../components/icons/InformationCircleIcon
 import { CheckBadgeIcon } from '../components/icons/CheckBadgeIcon';
 import { FlagIcon } from '../components/icons/FlagIcon';
 import { Squares2X2Icon } from '../components/icons/Squares2X2Icon';
+import { WriterIcon } from '../components/icons/WriterIcon';
 
 interface LandingPageProps {
   setView: (view: View) => void;
@@ -48,7 +49,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
   const [activeContentType, setActiveContentType] = useState<ContentType>('images');
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>('about');
   
-  const contentTypes: ContentType[] = ['images', 'videos', 'audio', 'text'];
+  const contentTypes: ContentType[] = ['images', 'text', 'videos', 'audio'];
   const infoTabs: InfoTab[] = ['about', 'why', 'mission', 'features'];
   
   const contentTypeIcons: Record<ContentType, React.ReactNode> = {
@@ -134,6 +135,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
                         <FeatureCard language={language} title={t('landing_feature_2_title')} description={t('landing_feature_2_desc')} icon={<WandIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_3_title')} description={t('landing_feature_3_desc')} icon={<CombineIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_7_title')} description={t('landing_feature_7_desc')} icon={<RestorerIcon />} />
+                        <FeatureCard language={language} title={t('landing_feature_11_title')} description={t('landing_feature_11_desc')} icon={<WriterIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_4_title')} description={t('landing_feature_4_desc')} icon={<DocumentTextIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_6_title')} description={t('landing_feature_6_desc')} icon={<PencilRulerIcon />} />
                         <FeatureCard language={language} title={t('landing_feature_8_title')} description={t('landing_feature_8_desc')} icon={<VideoIcon className="w-12 h-12 text-brand-accent"/>} />
@@ -215,6 +217,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             isBeta={true}
           />
           <Card
+            icon={<PencilRulerIcon />}
+            title={t('corrector_card_title')}
+            description={t('corrector_card_desc')}
+            buttonText={t('start_correcting')}
+            onClick={() => setView('corrector')}
+            isBeta={true}
+          />
+          <Card
             icon={<DocumentTextIcon />}
             title={t('extractor_card_title')}
             description={t('extractor_card_desc')}
@@ -222,12 +232,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             onClick={() => setView('extractor')}
             isBeta={true}
           />
-          <Card
-            icon={<PencilRulerIcon />}
-            title={t('corrector_card_title')}
-            description={t('corrector_card_desc')}
-            buttonText={t('start_correcting')}
-            onClick={() => setView('corrector')}
+        </div>
+      ) : activeContentType === 'text' ? (
+        <div className="grid grid-cols-1 max-w-sm mx-auto gap-8 mb-20 md:mb-32 animate-fade-in">
+           <Card
+            icon={<WriterIcon />}
+            title={t('writer_card_title')}
+            description={t('writer_card_desc')}
+            buttonText={t('start_writing')}
+            onClick={() => setView('writer')}
             isBeta={true}
           />
         </div>
