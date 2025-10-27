@@ -1,3 +1,4 @@
+
 export const MAX_IMAGES = 5;
 export const MAX_MERGE_IMAGES = 15;
 export const MAX_FILE_SIZE_MB = 10;
@@ -42,4 +43,29 @@ export const FORMALITY_OPTIONS = [
     { tKey: 'formality_default', value: 'default' },
     { tKey: 'formality_formal', value: 'formal' },
     { tKey: 'formality_informal', value: 'informal' },
+] as const;
+
+export const CORRECTION_LEVELS = [
+    { tKey: 'correction_level_basic', value: 'basic' },
+    { tKey: 'correction_level_advanced', value: 'advanced' },
+    { tKey: 'correction_level_rewrite', value: 'rewrite' },
+] as const;
+
+export const TARGET_AUDIENCES = [
+    { tKey: 'audience_general', value: 'general' },
+    { tKey: 'audience_academic', value: 'academic' },
+    { tKey: 'audience_business', value: 'business' },
+] as const;
+
+export const TONES_STEALTH = [
+    { tKey: 'tone_professional', value: 'professional' },
+    { tKey: 'tone_casual', value: 'casual' },
+    { tKey: 'tone_academic', value: 'academic' },
+    { tKey: 'tone_creative', value: 'creative' },
+] as const;
+
+export const COMPLEXITY_LEVELS = [
+    { tKey: 'complexity_simple', value: 'simple' },
+    { tKey: 'complexity_standard', value: 'standard' },
+    { tKey: 'complexity_advanced', value: 'advanced' },
 ] as const;

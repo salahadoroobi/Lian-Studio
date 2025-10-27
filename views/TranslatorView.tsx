@@ -9,6 +9,8 @@ import { PasteIcon } from '../components/icons/PasteIcon';
 import { TRANSLATION_LANGUAGES, FORMALITY_OPTIONS } from '../constants';
 import { ArrowSwapIcon } from '../components/icons/ArrowSwapIcon';
 import { ShimmerWrapper } from '../components/ShimmerWrapper';
+import { AccuracySlider } from '../components/AccuracySlider';
+import { XIcon } from '../components/icons/XIcon';
 
 interface TranslatorViewProps {
   t: TFunction;
@@ -19,9 +21,11 @@ type Formality = 'default' | 'formal' | 'informal';
 
 export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) => {
     const [inputText, setInputText] = useState('');
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [fromLang, setFromLang] = useState('auto');
     const [toLang, setToLang] = useState(language === 'en' ? 'Arabic' : 'English');
     const [formality, setFormality] = useState<Formality>('default');
+    const [accuracy, setAccuracy] = useState(50);
     const [isAdvancedOptionsOpen, setIsAdvancedOptionsOpen] = useState(false);
     
     const [translatedText, setTranslatedText] = useState<string | null>(null);
@@ -46,8 +50,8 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
     }, [inputText]);
 
     const handleTranslate = async () => {
-        if (!inputText.trim()) {
-            setError('Please enter text to translate.');
+        if (!inputText.trim() && !uploadedFile) {
+            setError('Please enter text or upload a file to translate.');
             return;
         }
         setIsLoading(true);
@@ -55,7 +59,8 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
         setTranslatedText(null);
         try {
             const finalFormality = isAdvancedOptionsOpen ? formality : 'default';
-            const result = await translateText(inputText, fromLang, toLang, finalFormality);
+            const finalAccuracy = isAdvancedOptionsOpen ? accuracy : 50;
+            const result = await translateText(inputText, uploadedFile, fromLang, toLang, finalFormality, finalAccuracy);
             setTranslatedText(result);
         } catch (e: any) {
             setError(e.message || 'An unexpected error occurred.');
@@ -67,17 +72,18 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target?.result as string;
-                setInputText(text);
-            };
-            reader.onerror = (e) => {
-                console.error("Failed to read file", e);
-                setError("Failed to read the selected file.");
-            }
-            reader.readAsText(file);
+            setUploadedFile(file);
+            setInputText(''); // Clear text input
+            setError(null);
         }
+        // Clear the input value so the same file can be selected again
+        if (event.target) {
+            event.target.value = '';
+        }
+    };
+
+    const handleRemoveFile = () => {
+        setUploadedFile(null);
     };
 
     const handlePaste = async () => {
@@ -86,6 +92,7 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
             const text = await navigator.clipboard.readText();
             if (text) {
                 setInputText(text);
+                setUploadedFile(null);
             } else {
                 setPasteMessage(t('paste_error_not_text'));
                 setTimeout(() => setPasteMessage(null), 3000);
@@ -104,7 +111,7 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
         setToLang(currentFrom);
     };
 
-    const canTranslate = !isLoading && inputText.trim().length > 0;
+    const canTranslate = !isLoading && (inputText.trim().length > 0 || !!uploadedFile);
 
     const LanguageSelect: React.FC<{
         id: string;
@@ -163,7 +170,7 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
                             )}
                             <button onClick={handlePaste} title={t('paste_from_clipboard')} className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"><PasteIcon /></button>
                             <button onClick={() => fileInputRef.current?.click()} title={t('upload_prompt_label')} className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"><UploadTextIcon /></button>
-                            <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".txt" className="hidden" />
+                            <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".txt,.pdf,.doc,.docx" className="hidden" />
                         </div>
                     </div>
                     <textarea
@@ -171,11 +178,29 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
                         id="translate-input"
                         rows={8}
                         value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
+                        onChange={(e) => {
+                            setInputText(e.target.value);
+                            if (uploadedFile) setUploadedFile(null);
+                        }}
                         placeholder={t('translator_input_placeholder')}
                         dir="auto"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                        disabled={!!uploadedFile}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden disabled:bg-gray-100 dark:disabled:bg-gray-700/50"
                     />
+                    {uploadedFile && (
+                        <div className="mt-2 flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-lg animate-fade-in">
+                            <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate pr-2">
+                               {t('translator_file_uploaded_label')} {uploadedFile.name}
+                            </span>
+                            <button
+                                onClick={handleRemoveFile}
+                                title={t('translator_remove_file_tooltip')}
+                                className="p-1 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                <XIcon />
+                            </button>
+                        </div>
+                    )}
                 </div>
                 
                 <div className="flex items-end gap-2">
@@ -217,6 +242,7 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
                     <div id="advanced-translator-options-content" className="grid transition-all duration-500 ease-in-out" style={{ gridTemplateRows: isAdvancedOptionsOpen ? '1fr' : '0fr' }}>
                         <div className="overflow-hidden">
                             <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-6">
+                                <AccuracySlider ratio={accuracy} setRatio={setAccuracy} t={t} />
                                 <div>
                                     <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('formality_label')}</label>
                                     <div className="grid grid-cols-3 gap-3">
@@ -250,7 +276,14 @@ export const TranslatorView: React.FC<TranslatorViewProps> = ({ t, language }) =
                         <p className="text-sm">{t('translating_desc')}</p>
                      </div>
                 ) : (
-                    <PromptResultDisplay text={translatedText} t={t} outputLanguage={toLang === 'Arabic' ? 'ar' : 'en'} initialDescKey="initial_desc_translator" />
+                    <div className="w-full h-full flex flex-col items-center justify-center">
+                        <PromptResultDisplay text={translatedText} t={t} outputLanguage={toLang === 'Arabic' ? 'ar' : 'en'} initialDescKey="initial_desc_translator" />
+                        {translatedText && uploadedFile && (
+                            <p className="mt-4 text-xs text-center text-gray-500 dark:text-gray-400 animate-fade-in">
+                                {t('translator_output_format_note')}
+                            </p>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

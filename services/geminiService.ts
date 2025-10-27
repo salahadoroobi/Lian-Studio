@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality } from '@google/genai';
 import type { ReferenceImage } from '../types';
 
@@ -387,11 +388,23 @@ Respond ONLY with the final generated content.`;
 
 export const translateText = async (
     text: string,
+    file: File | null,
     fromLanguage: string,
     toLanguageName: string,
-    formality: string
+    formality: string,
+    accuracy: number
 ): Promise<string> => {
     const ai = getAi();
+    const parts: any[] = [];
+
+    let accuracyInstruction = '';
+    if (accuracy <= 20) {
+        accuracyInstruction = 'Prioritize speed and natural phrasing over literal precision.';
+    } else if (accuracy >= 80) {
+        accuracyInstruction = 'Prioritize the highest possible accuracy and precision, focusing on nuanced meaning, even if it requires a more literal or complex translation.';
+    } else {
+        accuracyInstruction = `Balance translation accuracy and natural phrasing at a level of approximately ${accuracy} out of 100, where 100 is maximum precision and 0 is maximum speed/naturalness.`;
+    }
     
     let formalityInstruction = '';
     if (formality !== 'default') {
@@ -402,20 +415,162 @@ export const translateText = async (
         ? 'from the auto-detected language'
         : `from ${fromLanguage}`;
 
-    const instruction = `You are an expert translator. Translate the following text ${fromLanguageInstruction} to ${toLanguageName}.
+    let instructionText = '';
+    
+    if (file) {
+        parts.push(await fileToGenerativePart(file));
+        instructionText = `You are an expert translator. Translate the content of the attached file ${fromLanguageInstruction} to ${toLanguageName}.
+${accuracyInstruction}
+${formalityInstruction}
+Respond ONLY with the translated text as plain text.`;
+    } else {
+        instructionText = `You are an expert translator. Translate the following text ${fromLanguageInstruction} to ${toLanguageName}.
+${accuracyInstruction}
 ${formalityInstruction}
 Respond ONLY with the translated text, without any additional explanations, formatting, or quotation marks.
 
 Text to translate:
 "${text}"`;
+    }
+    
+    parts.push({ text: instructionText });
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: instruction,
+        contents: { parts },
     });
 
     if (!response.text) {
         throw new Error("Failed to translate the text.");
+    }
+    return response.text.trim();
+};
+
+export const proofreadText = async (
+    text: string,
+    file: File | null,
+    outputLanguage: string,
+    correctionLevel: string,
+    targetAudience: string,
+    vocalization: boolean,
+    grammaticalDiscipline: boolean
+): Promise<string> => {
+    const ai = getAi();
+    const parts: any[] = [];
+
+    let levelInstruction = '';
+    switch (correctionLevel) {
+        case 'basic':
+            levelInstruction = 'Focus on basic spelling, grammar, and punctuation errors.';
+            break;
+        case 'advanced':
+            levelInstruction = 'Perform a thorough review of spelling, grammar, punctuation, sentence structure, and style. Suggest improvements for clarity and flow.';
+            break;
+        case 'rewrite':
+            levelInstruction = 'Comprehensively rewrite the text for maximum clarity, impact, and engagement, while preserving the original meaning. This may involve significant restructuring.';
+            break;
+    }
+
+    let vocalizationInstruction = '';
+    if (vocalization && outputLanguage === 'Arabic') {
+        vocalizationInstruction = 'Additionally, apply full and accurate Arabic diacritics (Tashkeel) to the entire text, ensuring it adheres strictly to Arabic grammatical rules.';
+    }
+    
+    let disciplineInstruction = '';
+    if (grammaticalDiscipline) {
+        disciplineInstruction = 'Strictly adhere to all official grammatical rules and conventions of the target language. Ensure the highest level of grammatical accuracy and formal structure.';
+    }
+
+    let instruction = `You are an expert proofreader and editor. Your task is to correct and improve the provided content.
+
+    Correction Level: ${levelInstruction}
+    Target Audience: Your corrections should be tailored for a "${targetAudience}" audience.
+    Output Language: The final text must be in ${outputLanguage}.
+    ${vocalizationInstruction}
+    ${disciplineInstruction}
+
+    Please apply the requested level of correction. Respond ONLY with the corrected and improved text. Do not include any preambles, apologies, or explanations about your changes.
+    `;
+
+    if (file) {
+        parts.push(await fileToGenerativePart(file));
+        instruction += `\n\nThe content to proofread is in the attached file.`;
+    } else {
+        instruction += `
+    Original Text:
+    ---
+    ${text}
+    ---
+    `;
+    }
+    
+    parts.push({ text: instruction });
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts },
+    });
+    
+    if (!response.text) {
+        throw new Error("Failed to proofread the text.");
+    }
+    return response.text.trim();
+};
+
+export const humanizeText = async (
+    text: string,
+    file: File | null,
+    options: {
+        intensity: number;
+        tone: string;
+        complexity: string;
+        techniques: {
+            anecdotes: boolean;
+            varyStructure: boolean;
+            imperfections: boolean;
+        };
+    }
+): Promise<string> => {
+    const ai = getAi();
+    const parts: any[] = [];
+
+    let instruction = `You are an expert writer specializing in making AI-generated text sound authentically human to bypass AI detection tools.
+
+**Core Directives:**
+- **Goal:** Your primary objective is to rewrite the text so it appears to be written by a human.
+- **Tone:** The desired tone is "${options.tone}".
+- **Complexity:** The complexity level should be "${options.complexity}".
+- **Rewrite Intensity:** Adjust your rewriting intensity to approximately ${options.intensity}%. A higher percentage means more significant changes in wording and structure.
+
+**Humanization Techniques to Apply:**
+- ${options.techniques.varyStructure ? "Vary sentence structure and length significantly. Use a mix of short, punchy sentences and longer, more complex ones." : ""}
+- ${options.techniques.anecdotes ? "Where appropriate, subtly weave in common idioms, personal-sounding asides, or conversational phrases." : ""}
+- ${options.techniques.imperfections ? "Introduce slight, natural-sounding imperfections. This could include using contractions, starting a sentence with 'And' or 'But', or using slightly less formal language." : ""}
+
+Respond ONLY with the final, rewritten text. Do not include any preambles, apologies, or explanations about your changes.
+`;
+    
+    if (file) {
+        parts.push(await fileToGenerativePart(file));
+        instruction += `\n\nThe text to rewrite is in the attached file.`;
+    } else {
+        instruction += `
+**Original Text to Rewrite:**
+---
+${text}
+---
+`;
+    }
+    
+    parts.push({ text: instruction });
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts },
+    });
+
+    if (!response.text) {
+        throw new Error("Failed to humanize the text.");
     }
     return response.text.trim();
 };

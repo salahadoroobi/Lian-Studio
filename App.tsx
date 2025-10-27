@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { GeneratorView } from './views/GeneratorView';
@@ -14,8 +15,10 @@ import { DeveloperModal } from './components/DeveloperModal';
 import { RestorerView } from './views/RestorerView';
 import { WriterView } from './views/WriterView';
 import { TranslatorView } from './views/TranslatorView';
+import { ProofreaderView } from './views/ProofreaderView';
+import { StealthView } from './views/StealthView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -78,6 +81,10 @@ const App: React.FC = () => {
                 return <WriterView t={t} language={language} />;
             case 'translator':
                 return <TranslatorView t={t} language={language} />;
+            case 'proofreader':
+                return <ProofreaderView t={t} language={language} />;
+            case 'stealth':
+                return <StealthView t={t} language={language} />;
             case 'landing':
             default:
                 return <LandingPage setView={changeView} t={t} language={language} />;
