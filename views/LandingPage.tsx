@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
@@ -276,6 +277,126 @@ const studioCardsData = [
     {
         imageUrl: "https://i.postimg.cc/28V0bZVw/lian-studio-1761661793330.png",
         prompt: `A realistic photo of a young man standing in front of the holy kaaba in Makkah during umrah. He is wearing traditional white ihram clothes, looking humble and spiritual. The background shows the Masjid-ul- Haram with pilgrims around, golden lighting reflecting a peaceful and divine atmosphere. The focus is on the man standing near the kaaba, hands raised in prayers,full of devotion and faith.`
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A highly detailed black and white portrait of a man (fit the attached image) with a rugged, textured face, wet skin glistening under soft, directional lighting. The image captures half of his face, emphasizing the forehead, eye, nose, and mouth, with water droplets and small bubbles on his skin, creating a sense of moisture and intensity. His eye is sharp and piercing, with a contemplative expression. The background is completely black, enhancing the dramatic contrast and highlighting the contours and textures of his face. The lighting accentuates the natural details of his skin, stubble, and facial features, creating a moody, cinematic atmosphere. The overall composition is close-up, emphasizing raw emotion and the tactile quality of the wet skin."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Without changing my face or hairstyle, create an analogue portrait from the year 2025. The background is Tokyo, Japan, with a supercar. I'm in the car seat, posing like a Korean model, with an aerial view of the car's interior, looking forward. I'm wearing an oversized hoodie, black pants with ripped knees, and low-top Nike Air Jordans. My body is visible from inside the car. Body ratio: 3/4 of the image"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A stylish man with a muscular build leans against a concrete wall in an urban, industrial setting(use reference photo). He is wearing a sharp white suit with a matching blazer and trousers, paired with a deep maroon dress shirt underneath. The shirt is unbuttoned at the top, adding a bold and confident vibe. He wears aviator-style sunglasses with patterned arms and a luxury wristwatch on his left wrist. His right hand rests casually in his pocket, while his left arm leans on the wall,"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Place me sitting at a super elegant table. I am wearing an all-black suit black shirt with a silver watch visible on my wrist.\nThe atmosphere should be refined and luxurious, with a sophisticated setting - a modern fine-dining restaurant or a high-end lounge, with soft ambient lighting, crystal glasses, and polished details on the table. Keep my exact facial features from the reference photo, blending naturally with the scene. Hyper-realistic, cinematic, stylish, and classy mood."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A nighttime flash photograph with a raw Y2K aesthetic, featuring the user at a public payphone. He is turning his head back toward the camera with a detached, almost indifferent expression. He is wearing a baggy T-shirt and loose cargo jeans, one hand holding the phone receiver.\nTake only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hair style exactly. Do NOT copy clothing from the reference, use the clothing/style described in the prompt. Ultra-consistent identity across all generations.\nStrong harsh flash lighting creates deep contrast and blown-out highlights, casting sharp shadows on the pavement. Blurred car lights streak across the urban background, adding motion and chaos. A red digital timestamp is visible in the bottom corner, evoking early 2000s disposable camera photography. Slight grain, chromatic aberration, and soft blur for realism. Hyperdetailed 8k super-resolution, candid paparazzi snapshot vibe, raw and nostalgic Y2K mood."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A hyper-realistic ultra-close-up portrait of the user underwater, face partially lit with moving caustic light patterns casting across his skin. Tiny air bubbles float around, water surface reflections shimmer softly. Expression is intense and serious, with cinematic focus on the eyes.\nTake only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hair style exactly. Do NOT copy clothing from the reference, use the clothing/style described in the prompt. Ultra-consistent identity across all generations.\nMoody teal-green color grading, dramatic contrast, hyperdetailed skin texture with wet highlights, visible water particles, shallow depth of field (f/1.4), 8k super-resolution, cinematic composition, IMG_9999.CR2, shot on Leica SL2, editorial underwater photography style."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Use my uploaded photo as a reference with full sharpness and exact facial features. A man sits on a street column with a confident expression, 3/4 body relaxed.\nAppearance: moss green bomber jacket, tight black t-shirt, dark skinny jeans, and clean white sneakers. Dark sunglasses add a touch of charisma.\nScene: Avenida de Roma, with passing cars, tall buildings, and the Colosseum in the distant background.\nTechnical data sheet:\nStyle: Cosmopolitan street\nResolution: hyper-realistic portrait\nLighting: natural cloudy light, with rays breaking through clouds + urban reflections\nFrame: 3/4 body sitting\nLens: 35mm f/2.0\nColors: moss green, black, white, yellow."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "The cinematic golden watch image of the same person from the Jinal selfie, sitting in the open window of a luxury car (G-Class or Brabus), and the left arm rests on the edge of the door.\nThe subject wears black sunglasses and a dark shirt or shirt. Warm sunlight floods the car, casting orange flares and soft shades on the face. Slightly confused hair due to the breeze. The expression is comfortable and confident. Shallow depth of field, lens glare, and rich sunset tones. High-resolution editorial esthetic, photographed with low ISO and main lens. A mood glow that can be Instagram."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A sudden flash of an iPhone pierces the deep blackness, revealing his cool, half-buried sand as he relaxes with his bare feet. His soft, linen button-down shirt flutters slightly, not unlike a welcoming sea breeze, styled seamlessly with tailored shorts that exude sophistication. The faint moonlight glistens, and the clean shoreline highlights the faint sheen of his sun-kissed locks, accentuating them more precisely. A photo that enhances his calm and poise, taken on an iPhone, without altering the person's features.\nMake it stand."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A sudden flash of an iPhone pierces the deep blackness, revealing his cool, half-buried sand as he relaxes with his bare feet. His soft, linen button-down shirt flutters slightly, not unlike a welcoming sea breeze, styled seamlessly with tailored shorts that exude sophistication. The faint moonlight glistens, and the clean shoreline highlights the faint sheen of his sun-kissed locks, accentuating them more precisely. A photo that enhances his calm and poise, taken on an iPhone, without altering the person's features.\nMake him hold the sand in his hands."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "High-resolution 8K cinematic image of the man in the uploaded image, sitting on a wooden chair with his arms crossed on the chair's back. He's wearing an oversized white T-shirt, black pants, an Apple Watch, and stylish sunglasses. A strong spotlight filters through the Venetian blinds, casting dramatic shadows on his face, body, and the background wall. The composition is simple, with a dark, neutral background and geometric lighting patterns. His expression is both confident and calm, giving the image an elegant cinematic feel\nImportant: The face and hairstyle must\nmatch exactly the reference image provided. Maintain the same texture and length of the hairstyle, and the same facial proportions. The lighting should mimic the effect of the striped shadow cast by the blinds on his face and body. The person should remain seated on the wooden chair with their arms crossed, not standing"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "The cinematic golden watch image of the same person from the Jinal selfie, sitting in the open window of a luxury car (G-Class or Brabus), and the left arm rests on the edge of the door.\nThe subject wears black sunglasses and a dark shirt or shirt. Warm sunlight floods the car, casting orange flares and soft shades on the face. Slightly confused hair due to the breeze. The expression is comfortable and confident. Shallow depth of field, lens glare, and rich sunset tones. High-resolution editorial esthetic, photographed with low ISO and main lens. A mood glow that can be Instagram."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A hyper-realistic cinematic close-up portrait of the user standing in heavy rain at night, face slightly turned to the side, wearing black rectangular glasses and a dark denim jacket. Water droplets run down his face and glasses, wet hair clinging to his forehead.\nTake only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hair style exactly. Do NOT copy clothing from the reference, use the clothing/style described in the prompt. Ultra-consistent identity across all generations.\nMoody golden backlight creating a soft halo around his wet hair, strong cinematic contrast, shallow depth of field (f/1.4), visible rain streaks in foreground, dramatic film grain, desaturated cinematic tones, IMG_9940.CR2, shot on Leica M11, hyperdetailed 8k super-resolution, intimate emotional mood, film still aesthetic."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A gritty cinematic black-and-white mid-shot of the user standing shirtless in an underground fight club, sweat glistening on his skin under harsh industrial overhead lights. Medium-dark skin tone rendered in deep monochrome contrast, sharp well-groomed beard, slicked-back slightly messy hair. His fists are wrapped in white fight tape, one arm casually resting on a chain-link fence, the other gripping a water bottle loosely.\nTake only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hair style exactly. Ultra-consistent identity across all generations.\nThe background shows a blurred, shadowy crowd behind the fence, smoke and haze filling the air for a raw, tense atmosphere. Lighting is dramatic and directional, casting harsh shadows across the chest and face, highlighting muscle definition. Cinematic framing, deep blacks and clean highlights, fine 35mm film grain, Leica SL2 medium format look, hyperdetailed 8k super-resolution, moody noir-style grading,"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Full body portrait of a man standing confidently, wearing a turquoise/blue hoodie, black pants, and white sneakers with red and orange accents. Hands in pockets, neutral expression, glasses. Artistic studio photography with a clean teal background. Behind him, dynamic colorful paint splash effect in orange and teal, high contrast, glowing splatter energy, modern digital art style, cinematic lighting, sharp details, Ultra realistic, 8k, dramatic lighting, professional studio photo."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A retro 1980s-style portrait of a man wearing a colorful vintage windbreaker jacket with geometric patterns. He is confidently holding a large silver boombox on his shoulder, standing against a soft studio background. The photo has a nostalgic vibe with bold colors, slightly faded tones, a realistic washed-out look of an authentic 1980s photograph, and subtle film grain for extra realism. Lighting: a soft glow inspired by the past with light haze/fog. Style: an editorial look with strong 1980s character. Use the reference face (take 100% of the facial features and hairstyle from the uploaded image)."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A surreal aerial view of a man lying on a sandy beach with a white pillow under his head, arms resting behind his head in a relaxed pose, as ocean waves crash dramatically over his body. The perspective is top-down, cinematic, and highly detailed, with clear contrast between the brown sand, foamy white surf, and turquoise water. Ultra-realistic photography style, high definition, vibrant colors, natural lighting."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A hyper-realistic cinematic black-and-white portrait of the user standing in an open field, shot from an extreme low angle looking slightly upward, creating a dramatic towering silhouette. He is wearing a long dark overcoat with both hands in his pockets, standing perfectly still with an intense, stoic expression.\nTake only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hairstyle exactly. Ultra-consistent identity across all generations.\nHundreds of pigeons are frozen mid-flight around him, with some close to the camera wings blurred for depth and motion, others far away forming a scattered pattern across the cloudy, overcast sky. The foreground birds should frame the subject naturally, creating a sense of movement and chaos around his stillness.\nLighting is soft but contrasty, with deep shadows and clean highlights — think fine art black-and-white photography. Subtle fine 35mm"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Without changing my face or hairstyle, create an analogue portrait from the year 2025. The background is Tokyo, Japan, with a supercar. I'm in the car seat, posing like a Korean model, with an aerial view of the car's interior, looking forward. I'm wearing an oversized hoodie, black pants with ripped knees, and low-top Nike Air Jordans. My body is visible from inside the car. Body ratio: 3/4 of the image"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A stylish man with a dark beard and sunglasses, wearing a black turtleneck sweater, grey cargo pants, and black boots. He is crouching down next to a majestic black horse. Both are in a snowy mountain landscape under a clear sky. Snowflakes are gently falling around them. The man is holding the horse's lead. The overall mood is cool, serene, and adventurous."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A young Indonesian man, based on the attached photo (keep his exact face and hairstyle without any changes, do not crop or alter the face), wearing a thick white jacket with fine details, a red scarf, and casual jogger pants. An extreme low-angle view from below shows him stepping forward confidently. The main focus is on the bottom of his shoes, which feature bright white and red soles with intricate straps and buckles. He looks down toward the camera with a faint, relaxed smile and warm black eyes.\nThe background shows a clear blue sky, dotted with soft white clouds and construction cranes, making the subject stand out. The lighting is natural, bright, and clean during the day, emphasizing the contrast between his outfit and the vivid sky."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A cinematic shot capturing the essence of the Middle East, a man shrouded in a richly textured golden fabric with intricate Arabic calligraphy patterns. He stands amidst a desert landscape at sunset, with golden dust and light particles shimmering around him, creating a mystical and awe-inspiring atmosphere. The focus is on his intense gaze, emphasizing strength and dignity. The scene evokes a sense of ancient wisdom and modern luxury, blending tradition with a contemporary aesthetic."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A cinematic, highly realistic outdoor portrait.\nThe subject is a person (whose specific facial features will be provided by an external image reference). This person is depicted wearing a plain black t-shirt and dark sunglasses. A traditional black and white **Keffiyeh** scarf is draped casually over their left shoulder (from the viewer's perspective), and they are holding the edge of the Keffiyeh with their right hand in a relaxed, confident pose.\n**Composition and Pose:**\n* The person is standing with their body slightly angled to the side, but their head turned towards the camera, making direct eye contact.\n* This should be a **medium shot to a three-quarter shot**, showing the person from the waist up or knees up, framed similar to a professional editorial photograph.\n**Background:**\n* The **Dome of the Rock (Qubbat Al-Sakhra)** in Jerusalem is prominently visible directly behind the subject, slightly out of focus (bokeh effect) to create depth and emphasize the foreground. Its iconic golden dome and th"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A medium shot of a man in uploaded picture (use the same face and facial), sitting on a wooden crate in what appears to be an industrial or rustic setting with brick walls and metal structures in the background, out of focus.\nThe brick wall painted an Graffiti-style with legend of Real Madrid \"modric\" and text with black and white and purple colours font \"Hala Madrid\"\nHe is looking directly at the camera with a serious or confident expression.\nHe is wearing a white Real Madrid UEFA Champions League full-patch 2025 jersey, black jeans, and light white, - nike sneakers."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Ultra-realistic cinematic portrait of a young Middle Eastern man sitting confidently on a wicker sofa in the desert at sunset. He is wearing a traditional black outfit with golden embroidery, smoking shisha with smoke rising naturally. A luxury black SUV is parked behind him in the sand dunes. The atmosphere is powerful, dramatic, and cinematic, with warm orange and red sunset tones in the sky. Highly detailed, sharp focus, 8k resolution, photorealistic."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Studio portrait of a sophisticated man seated in a dark brown leather armchair, exuding confidence and authority. He is wearing a tailored navy-blue suit, crisp white shirt, textured dark tie, and a folded pocket square. His posture is elegant with crossed legs and hands resting on the chair’s arms. The setting conveys luxury and refinement, with soft, directional lighting highlighting the facial structure and suit details.\nTechnical Details:\n• Lighting: soft key light from a large softbox at 45° to the subject’s face, with gentle fill on the opposite side to maintain contrast. Subtle rim light behind to separate subject from background.\n• Background: upscale interior, softly blurred (bokeh), with classic décor elements such as a la"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A hyper-realistic cinematic black-and-white portrait of the user standing in an open field, shot from an extreme low angle looking slightly upward, creating a dramatic towering silhouette. He is wearing a long dark overcoat with both hands in his pockets, standing perfectly still with an intense, stoic expression.\n‎Take only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hairstyle exactly. Ultra-consistent identity across all generations.\n‎Hundreds of pigeons are frozen mid-flight around him, with some close to the camera wings blurred for depth and motion, others far away forming a scattered pattern across the cloudy, overcast sky. The foreground birds should frame the subject naturally, creating a sense of movement and chaos around his stillness.\n‎Lighting is soft but contrasty, with deep shadows and clean highlights — think fine art black-and-white photography. Subtle fine 35mm film grain, Leica M11 + Summicron lens look, sharp subject focus with slightly softer vignette edges. Hyperdetailed 8k super-resolution, moody and editorial fashion campaign atmosphere, timeless and surreal."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "Ultra-realistic fashion editorial photoshoot of a male model (keep same face & hairstyle as uploaded photo, do not change facial expression).\nOutfit: oversized textured white sweatshirt (slightly structured fabric), futuristic oversized combat jeans in muted neon lemon-green with exaggerated silhouette.\nFootwear: lemon-green Nike sneakers with bold sole details, styled with white ribbed socks.\nPose: model seated on a sleek modern metallic cube, elegant yet relaxed posture, one arm resting casually, gaze slightly off-camera.\nEnvironment: futuristic muted lemon-green gradient studio background with subtle geometric light streaks.\nLighting: cinematic soft glow with subtle rim-light highlighting skin contours and fabric textures, fashion magazine quality.\nStyle: futuristic x editorial, clean minimalism with avant-garde vibe.\nComposition: full-body centered shot with negative space around the model, perfect for magazine cover."
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A hyper- realistic image of a confident,\nStylish young man (face should match\nthe uploaded refcrence imagc)\nsitting on a luxurious dark brown\nlcather chestetrfield sofa in a dimly lit,\nopulrent room.He is drcssed sharply\nin a white suit with a black shirt\nslightly unbuttoned, wearing white\nleather shoes, a wristwatch, and dark\nsunglasses. His pose is relaxed, with\none leg crosscd and one arm casually\nresting on the armrest.the setting\nfeatures a dark, moody background\nwith rich whitc walls, a classic\nchandclietr with warm glowing bulbs\nhanging abave, and a gothic-style\npainting af a hoodred skull figure\nbehind him the atmosphere is\nintense, cinematic, and mysterious,\nwith dramatic lighting emphasizing\nelegance,pawer,and control.\nstyle: hyper-realistic,cinematic\nlighting,rich tones, dark aesthetic\nFace: match exactly with the\nuploaded image\nAspect Ratio: 3:2 or 4:5 vertical\ncamera angle: eye level, symmetrical\nframe\nMood: powerful, elite, mysterious,\nnoir-inspired"
+    },
+    {
+        imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
+        prompt: "A hyper-realistic 4K professional photo of the same man from the reference image, preserving his exact facial features, eyes, hairstyle, and skin tone. He is posing proudly with the Ballon d'Or trophy, standing in a glamorous award ceremony setting. The golden trophy is held in his hands or placed on a pedestal beside him, shining under dramatic warm lighting. He is dressed in an elegant suit, styled like a professional football award winner, with cinematic lighting that highlights both his presence and the glowing golden ball. The atmosphere feels prestigious, luxurious, and powerful, captured with ultra-sharp details and a high-end editorial photography style."
     }
 ];
 
