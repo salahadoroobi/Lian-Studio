@@ -355,6 +355,9 @@ const translations = {
     expand_toolbar: 'Expand toolbar',
     prompts_label: 'Prompts',
     prompts_available_tooltip: '{count}+ Prompts Available',
+    show_more: 'Show More',
+    show_less: 'Show Less',
+    more_creativity: 'More Creativity',
   },
   ar: {
     app_title: 'أستوديو ليان',
@@ -708,6 +711,9 @@ const translations = {
     expand_toolbar: 'توسيع شريط الأدوات',
     prompts_label: 'برومت',
     prompts_available_tooltip: '+{count} برومت متاح',
+    show_more: 'عرض المزيد',
+    show_less: 'عرض أقل',
+    more_creativity: 'المزيد من الابداع',
   },
 };
 

@@ -28,6 +28,7 @@ const App: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('light');
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
     const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
+    const [initialGeneratorPrompt, setInitialGeneratorPrompt] = useState('');
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -50,8 +51,14 @@ const App: React.FC = () => {
     
     // Add a transition effect for view change
     const [isViewTransitioning, setIsViewTransitioning] = useState(false);
-    const changeView = (newView: View) => {
-        if (newView !== view) {
+    const changeView = (newView: View, options?: { initialPrompt?: string }) => {
+        if (newView !== view || (newView === 'generator' && options?.initialPrompt)) {
+            if (newView === 'generator' && options?.initialPrompt) {
+                setInitialGeneratorPrompt(options.initialPrompt);
+            } else {
+                setInitialGeneratorPrompt('');
+            }
+
             setIsViewTransitioning(true);
             setTimeout(() => {
                 setView(newView);
@@ -67,7 +74,7 @@ const App: React.FC = () => {
             case 'editor':
                 return <EditorView t={t} language={language} />;
             case 'generator':
-                return <GeneratorView t={t} language={language} />;
+                return <GeneratorView t={t} language={language} initialPrompt={initialGeneratorPrompt} />;
             case 'enhancer':
                 return <EnhancerView t={t} language={language} />;
             case 'merger':

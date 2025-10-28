@@ -1,5 +1,6 @@
 
-import React, { useState, useRef, useLayoutEffect } from 'react';
+
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { AspectRatioSelector } from '../components/AspectRatioSelector';
 import { ImageUploader } from '../components/ImageUploader';
 import { QualitySelector } from '../components/QualitySelector';
@@ -16,10 +17,11 @@ import { PROMPT_WAVES } from '../prompts';
 interface GeneratorViewProps {
   t: TFunction;
   language: Language;
+  initialPrompt?: string;
 }
 
-export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => {
-    const [prompt, setPrompt] = useState('');
+export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language, initialPrompt }) => {
+    const [prompt, setPrompt] = useState(initialPrompt || '');
     const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
     const [aspectRatio, setAspectRatio] = useState('Default');
     const [quality, setQuality] = useState('Standard');
@@ -31,6 +33,12 @@ export const GeneratorView: React.FC<GeneratorViewProps> = ({ t, language }) => 
     
     const fileInputRef = useRef<HTMLInputElement>(null);
     const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        if (initialPrompt) {
+            setPrompt(initialPrompt);
+        }
+    }, [initialPrompt]);
 
     useLayoutEffect(() => {
         const textarea = promptTextareaRef.current;
