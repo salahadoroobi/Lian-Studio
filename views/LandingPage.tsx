@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
@@ -324,7 +325,7 @@ const studioCardsData = [
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
-        prompt: "The cinematic golden watch image of the same person from the Jinal selfie, sitting in the open window of a luxury car (G-Class or Brabus), and the left arm rests on the edge of the door.\nThe subject wears black sunglasses and a dark shirt or shirt. Warm sunlight floods the car, casting orange flares and soft shades on the face. Slightly confused hair due to the breeze. The expression is comfortable and confident. Shallow depth of field, lens glare, and rich sunset tones. High-resolution editorial esthetic, photographed with low ISO and main lens. A mood glow that can be Instagram."
+        prompt: "The cinematic golden watch image of the same person from the Jinal selfie, sitting in the open window of a luxury car (G-Class or Brabus), and the left arm rests on the edge of the door.\n743The subject wears black sunglasses and a dark shirt or shirt. Warm sunlight floods the car, casting orange flares and soft shades on the face. Slightly confused hair due to the breeze. The expression is comfortable and confident. Shallow depth of field, lens glare, and rich sunset tones. High-resolution editorial 663esthetic, photographed with low ISO and main lens. A mood glow that can be Instagram."
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
@@ -356,7 +357,7 @@ const studioCardsData = [
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
-        prompt: "A stylish man with a dark beard and sunglasses, wearing a black turtleneck sweater, grey cargo pants, and black boots. He is crouching down next to a majestic black horse. Both are in a snowy mountain landscape under a clear sky. Snowflakes are gently falling around them. The man is holding the horse's lead. The overall mood is cool, serene, and adventurous."
+        prompt: "A stylish man with a dark beard and sunglasses, wearing a black turtleneck sweater, grey cargo pants, and black boots. He is crouching down next to a majestic black horse. Both are in a snowy mountain landscape under a clear sky. Snowflakes are gently falling around them. The man is holding the horse's lead. The overall mood is cool, serene, and adventurous.\""
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
@@ -364,7 +365,7 @@ const studioCardsData = [
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
-        prompt: "A cinematic shot capturing the essence of the Middle East, a man shrouded in a richly textured golden fabric with intricate Arabic calligraphy patterns. He stands amidst a desert landscape at sunset, with golden dust and light particles shimmering around him, creating a mystical and awe-inspiring atmosphere. The focus is on his intense gaze, emphasizing strength and dignity. The scene evokes a sense of ancient wisdom and modern luxury, blending tradition with a contemporary aesthetic."
+        prompt: "A cinematic shot capturing the essence of the Middle East, a man shrouded in a richly textured golden fabric with intricate Arabic calligraphy patterns. He stands amidst a desert landscape at sunset, with golden dust and light particles shimmering around him, creating a mystical and awe-inspiring atmosphere. The focus is on his intense gaze, emphasizing strength and dignity. The scene evokes a sense of ancient wisdom and modern luxury, blending tradition with a contemporary aesthetic.\""
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
