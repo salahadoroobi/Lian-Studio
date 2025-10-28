@@ -158,123 +158,123 @@ const studioCardsData = [
         prompt: "3 : Ultra-realistic artistic portrait of the model in the reference photo, preserving all real features. [same face as in the submitted photo], [do not alter the face in the submitted photo], wearing a stylish black sweatshirt, hair glowing with golden backlighting, contrasted by cool green light on the face and chest, against a deep black background. The model is posed slightly in profile, head turned gently to the side with a thoughtful expression, avoiding direct eye contact with the camera Do not change the facial features at all, do not approach the face at all, and do not change the hairstyle"
     },
     {
-        imageUrl: "https://picsum.photos/500?random=31",
+        imageUrl: "https://i.postimg.cc/Wbst4GzF/lian-studio-1761616074047.png",
         prompt: `The image shows a young man sitting on a white cubic object, against a red gradient background. He is wearing a white sweatsuit, consisting of a crewneck sweatshirt and sweatpants, paired with white sneakers. His hair is short and dark. He is looking directly at the camera. The lighting is studio-style, creating soft shadows.\nYoung Man in White Sweatsuit, A young man is seated on a white cube positioned at an angle to the camera, with his gaze directed forward, the backdrop consists of a vibrant gradient transitioning into red hues, he is dressed in a matching white sweatsuit and sneakers, showcasing a minimalist aesthetic, the instruction is to render the subject within a studio-style lighting arrangement with attention to capturing the texture of the clothing and the soft gradation of the backdrop, also maintain the direct eye contact for an engaging portrait.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=32",
+        imageUrl: "https://i.postimg.cc/hv1jrjyQ/lian-studio-1761616638506.png",
         prompt: `A very realistic black and white photograph of the same man in these photos, without changing his facial features. He is confident and seated on a chair, wearing a tight black suit with a button-down shirt slightly open at the collar. All facial expressions are captured without changing his face, but rather making him look real in these photos. He casually places one hand on his thigh, while the other is in his pocket, revealing a wristwatch. The man stares directly into the camera with a serious and thoughtful expression. The studio lighting creates strong contrast and soft shadows, highlighting the texture of the suit and natural skin tone. The background is dark, soft, and simple, creating a sophisticated cinematic atmosphere. The overall style is elegant, modern, and in keeping with the latest fashion trends.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=33",
+        imageUrl: "https://i.postimg.cc/qRngNQ2X/lian-studio-1761616657359.png",
         prompt: `A hyper-realistic cinematic portrait of the same person sitting confidently on an ornate golden royal throne, upholstered in black leather. His face, as seen in the photograph, remains unaltered, wearing black sunglasses, formal black clothing, and white sneakers. His hands rest firmly on the carved golden armrests, exuding authority and power. Beside him on the ground lies a majestic white Bengal tiger with piercing blue eyes, wearing an ornate golden crown studded with green and red gemstones. The tiger appears regal and calm, symbolizing power and royalty. The background is a dark, tonal studio setting, with soft, dramatic lighting, creating a powerful and regal atmosphere. High resolution, with extreme detail in the texture of the leather, fur, fabric, and gold engravings. Perfect symmetry and cinematic shadows enhance his dominance and regal elegance.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=34",
+        imageUrl: "https://i.postimg.cc/SKnnhms5/lian-studio-1761616680422.png",
         prompt: `A confident man standing on a tropical beach with turquoise water and white sand. He has a well-groomed short beard and dark styled hair. He is wearing a white unbuttoned shirt with rolled-up sleeves, exposing part of his chest and a silver chain necklace. He also wears a silver wristwatch and aviator sunglasses, holding the sunglasses with one hand as if adjusting them. The background shows luxury overwater bungalows on stilts above the sea, with clear blue sky and soft natural sunlight. The photo has a cinematic, high-quality vacation vibe.\n\nStyle keywords: realistic, sharp focus, cinematic portrait, vibrant colors, luxury beach resort, sunny atmosphere.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=35",
+        imageUrl: "https://i.postimg.cc/W1WdCd21/lian-studio-1761616704640.png",
         prompt: `A confident man standing inside a modern stainless steel elevator, wearing a sleek all-black outfit: tailored black suit, black dress shirt slightly unbuttoned, and black trousers. He has short neatly styled hair, a trimmed beard, and is wearing stylish black sunglasses. The man holds a black takeaway coffee cup in his right hand while his left hand rests casually in his pocket. He also wears a silver wristwatch. The elevator has metallic walls, illuminated by bright ceiling lights, with a control panel of buttons on the right side. The overall atmosphere is elegant, stylish, and cinematic, giving off a powerful, sophisticated vibe.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=36",
+        imageUrl: "https://i.postimg.cc/XN5LcbVn/lian-studio-1761616762307.png",
         prompt: `Edit the uploaded photo in high resolution. Keep everything the same: I stand in a three-quarter pose, my body slightly to the left, and my right shoulder closer to the camera. My head is slightly turned toward the camera, looking directly at me with confidence. My right hand is raised, touching the edge of the keffiyeh on my shoulder, while my left arm lies naturally at my side. I am wearing a black shirt with rolled-up sleeves, a Rolex watch, and sunglasses. The black and white Palestinian keffiyeh is wrapped around my neck, flapping backward in the wind. The background shows the Dome of the Rock in Jerusalem and the Old City walls, in warm, golden light. Keep your facial features, beard, skin tone, and expression sharp, and don't overdo it.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=37",
+        imageUrl: "https://i.postimg.cc/GtvjckMT/lian-studio-1761616787387.png",
         prompt: `A cinematic portrait of a young man sitting on a stone wall during golden hour. He is wearing a red sweatshirt, dark jeans, and white sneakers. He has stylish hair, a short beard, and is wearing round black sunglasses and a large wristwatch. The sunlight behind him creates a warm golden glow with soft bokeh in the background, highlighting the details of his face and outfit. The atmosphere feels cool, confident, and modern, with a subtle urban vibe.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=38",
+        imageUrl: "https://i.postimg.cc/C5b4Fjvy/lian-studio-1761616806632.png",
         prompt: `Hyper ultra realistic 8K portrait of a 5ft 6in light-skinned man with short dark hair (face unchanged from reference), walking on a rocky shoreline or sandy beach, wearing a yellow semi-sheer half-sleeve button-down shirt, white pants, watch, and frameless sunglasses.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=39",
+        imageUrl: "https://i.postimg.cc/d3G9q8W7/lian-studio-1761616926151.png",
         prompt: `Ultra-realistic full-body shot of a 20-year-old handsome boy sitting on a chair in a modern café. Wearing a muted olive-green rolled-sleeve button-up shirt (unbuttoned at the top), relaxed white linen pants, white sneakers, sunglasses, and a watch. One hand in pocket, the other holding a dark beverage in a clear cup, leaning slightly. Background: light wood shelves with coffee items, pastry display case, and counter with glasses. Keep face exactly the same.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=40",
+        imageUrl: "https://i.postimg.cc/Hxq2DS9F/lian-studio-1761616949199.png",
         prompt: `A surreal, ethereal scene of a person walking calmly on a mirror-like water surface that perfectly reflects the sky and clouds. The person is wearing clean white casual shirt and walking barefoot, with gentle ripples forming around their feet. The sky is bright blue with fluffy white clouds, creating a feeling of peace and divinity. The reflection in the water is crystal clear, showing a perfect mirror image of the person and the clouds. The overall mood is serene, pure, and dreamlike.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=41",
+        imageUrl: "https://i.postimg.cc/WzsdkgNg/lian-studio-1761616973763.png",
         prompt: `A cinematic portrait of a young man sitting on a grassy field, leaning slightly to one side with a black acoustic guitar resting beside him. He is wearing a white t-shirt layered with a checkered blue and white shirt, light blue jeans, and brown loafers. The background is filled with tall green trees and a clear blue sky, giving a peaceful and natural outdoor vibe. The lighting is soft and natural, highlighting his calm and confident expression. The overall style is realistic, bright, and artistic with a professional photography feel.\n\nStyle: cinematic, realistic, natural light, outdoor photography, portrait shot\nAspect Ratio:`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=42",
+        imageUrl: "https://i.postimg.cc/mDYck8sx/lian-studio-1761617068775.png",
         prompt: `A cinematic 9:16 portrait of a young man (your face) sitting casually on a rooftop ledge against a bright blue sky with soft clouds. He is wearing a dark t-shirt layered with a blue and green checkered shirt, black jeans, and white sneakers. His pose is relaxed and natural — sitting cross-legged, resting his cheek on one hand with a gentle, confident smile. The lighting is soft and natural, with a daylight tone that enhances the calm and peaceful mood. The overall vibe is friendly, youthful, and aesthetic — perfect for a casual outdoor portrait with sky background and warm natural tones.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=43",
+        imageUrl: "https://i.postimg.cc/rm1dsQL7/lian-studio-1761617099830.png",
         prompt: `Edit this image of the man. He is wearing black a White baggi shirt black White. Baggi shoes, and.: left hand in pocket, right hand resting casually on his knee. The man is sitting on the hood of a black and. Fortuner. The license plate 'JAYU" is clearly visible on the front of the car. The background shows mountains or hills covered in thick fog, And Hair Same as my uploaded Photo 18 years boy Face reference 100%`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=44",
+        imageUrl: "https://i.postimg.cc/nz4sr0tW/lian-studio-1761617125788.png",
         prompt: `A man wearing Ihram is distributing date packets from one hand to a crowd of people, holding more date packets in his other hand. The man in the Ihram is smiling and looking at the person he is giving the dates to. He has the exact face from the uploaded photo. He is also wearing a small black shoulder bag. This is a half-body shot with a large crowd gathered to receive the dates. The image should be of DSLR camera quality with high resolution and bokeh effect.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=45",
+        imageUrl: "https://i.postimg.cc/FsDL0WJX/lian-studio-1761617152595.png",
         prompt: `A close-up, highly detailed, hyper-realistic portrait of a handsome young man. He is wearing a red sweatshirt and black trousers, sitting on the floor or a low stool directly in front of a modern, stylish bed. He has an intense, focused gaze. He is holding a large, non-venomous snake (like a python or boa constrictor) coiled gently around his hands or shoulders. The main light source is a vibrant neon light strip (e.g., electric blue and magenta) installed behind the headboard of the bed, creating a strong rim light and a modern, dramatic cyberpunk-like atmosphere. The room is dimly lit, emphasizing the glow of the neon. Sharp focus on the man and the snake, detailed skin texture and snake scales, volumetric lighting, cinematic lighting, 8k, photorealistic.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=46",
+        imageUrl: "https://i.postimg.cc/zX0gTtHQ/lian-studio-1761617180838.png",
         prompt: `A hyper-realistic portrait of a young man standing confidently in front of the Abu Simbel Temple in Egypt, during a bright, clear morning. The massive ancient statues of Pharaoh Ramses II are visible in the background, carved into the sandstone cliffs. The man is wearing a light beige open shirt over a plain white T-shirt, with dark jeans and a silver wristwatch. His hands are casually in his pockets, and he’s facing slightly to the side with a relaxed, composed expression.\nHe has no beard, clean-shaven face, neatly styled short dark hair, and is wearing black sunglasses.\nThe lighting is natural and warm, casting soft shadows on his face and body. The overall tone of the image is golden and cinematic, with fine texture details in the temple stone and desert sand.\nUse the facial features from the uploaded reference photo for accurate resemblance, maintaining the same hairstyle, facial expression, and posture.\nultra-realistic, 8k, cinematic lighting, warm desert tones, clear sky, natural skin texture, soft back`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=47",
+        imageUrl: "https://i.postimg.cc/44vtxNfn/lian-studio-1761617205386.png",
         prompt: `A close-up, highly realistic portrait of a young man. He is wearing a black jacket, with slightly bright lighting. He holds a terrifying doll in his hands, and the doll is actively on fire. The flames cast an eerie, warm glow on parts of his face and the doll. His expression is a complex mix of fear and unsettling calmness. The background is softly blurred to keep the focus on him and the burning doll. High detail, photorealistic, shallow depth of field, dramatic lighting, warm and cool color contrast, smoke.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=48",
+        imageUrl: "https://i.postimg.cc/bY0bwNyw/lian-studio-1761617227212.png",
         prompt: `A young man adjusting a circular LED ring light in a dark studio setting. He is wearing a red patterned long-sleeve shirt, and the light from the ring creates a soft glow on his face. The background is dark teal or black, giving a cinematic and moody atmosphere. The lighting emphasizes his facial features and hands as he carefully adjusts the ring light. Professional portrait photography style, sharp focus, high contrast, dramatic lighting, shallow depth of fiel`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=49",
+        imageUrl: "https://i.postimg.cc/90Bq818L/lian-studio-1761617314174.png",
         prompt: `A young woman adjusting a circular LED ring light in a dark studio setting. She is wearing a red patterned long-sleeve shirt, and the light from the ring creates a soft glow on her face. The background is dark teal or black, giving a cinematic and moody atmosphere. The lighting emphasizes her facial features and hands as she carefully adjusts the ring light. Professional portrait photography style, sharp focus, high contrast, dramatic lighting, shallow depth of field.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=50",
+        imageUrl: "https://i.postimg.cc/qqr3xWLg/lian-studio-1761617338862.png",
         prompt: `Editorial fashion portrait, medium close-up shot, Canon EOS 5D Mark IV with 35mm f/1.8 lens, [Based on photo uploaded, don't change the face] wear a dark t-shirt lying in water surrounded by floating cherry blossoms flowers, glossy wet skin with dramatic light refractions, natural lip color, natural fresh look, cinematic golden hour lighting reflecting ripples across his face dark aquatic background filled with flowers, luxury skincare commercial vibe -ar 2:3\n-v 6 -q 5-s 750--style raw`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=51",
+        imageUrl: "https://i.postimg.cc/3W50xVkz/lian-studio-1761661070070.png",
         prompt: `A black and white portrait of a man intensely focused on a chessboard in front of him. He is leaning forward, resting his chin on his clasped hands, which show a wristwatch. The chess pieces are made of transparent material, possibly glass or acrylic. The man is dressed in a dark suit, and the background is softly blurred, with framed artwork visible. The lighting creates a dramatic and thoughtful atmosphere.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=52",
+        imageUrl: "https://i.postimg.cc/xd0Hmw6c/lian-studio-1761661129657.png",
         prompt: `From the original image, create an attached image. The face looks 100%. Do not edit. Good woman. Wear an unbuttoned black shirt to see the chest hill. Cylindrical khaki slack pants. Small legs floating above the shoes. Wear white original adidas shoes. Silver aunt stripe. One hand holds a glass. 20 oz. Clear plastic afaceon with black lid and tube. Stand against the wall, suck tea. Coffee posture. Cross-legged bottom in front of the cafe. Brickmould. Full-body image. Atmospheric background. Amazon storefront. Vibrant morning atmosphere. Gives a sense of stylish street fashion. Realistic, crisp, realistic image.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=53",
+        imageUrl: "https://i.postimg.cc/Y2V1PyCx/lian-studio-1761661154501.png",
         prompt: `From the original image, create an attached image. The face looks 100%. Do not edit. Good man. Wear an unbuttoned black shirt to see the chest hill. Cylindrical khaki slack pants. Small legs floating above the shoes. Wear white orisinal adidas shoes. Silver aunt stripe. One hand holds a glass. 20 oz. Clear plastic afaceon with black lid and tube. Stand against the wall, suck tea. Coffee posture. Cross-legged bottom in front of the cafe. Brickmould. Full-body image. Atmospheric background. Amazon storefront. Vibrant morning atmosphere. Gives a sense of stylish street fashion. Realistic, crisp, realistic image.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=54",
+        imageUrl: "https://i.postimg.cc/LsTt09Jj/lian-studio-1761661278361.png",
         prompt: `A close-up, intimate shot based on my uploaded photo, featuring the same facial features. She is wearing a red jacket, with her eyes closed, gently embracing a white cat with thick, soft fur. Both appear to be in a state of complete calm and deep relaxation, their eyes closed as if enjoying a moment of profound serenity and affection. The lighting is characterized by a dark room with an illuminated LED bulb overhead, highlighting the scene's purity and tranquil beauty. The focus is sharp on the faces, creating a sense of warmth and intimacy.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=55",
+        imageUrl: "https://i.postimg.cc/GpQFSL4P/lian-studio-1761661314933.png",
         prompt: `Create a sharp and realistic portrait of a man whose face is exactly the same as in the uploaded reference photo, ensuring full likeness and identity. The man’s body is toned and active. He is casually leaning against a concrete wall in an urban setting, wearing white thobe, asib, jambiya dagger and shawl around his sholders . He wears stylish sunglasses and looks confidently over his shoulder.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=56",
+        imageUrl: "https://i.postimg.cc/zfjCPzy3/lian-studio-1761661359310.png",
         prompt: `Reference: Use the uploaded user photo labeled "face_ref" as the sole facial reference. Preserve the user's identity exactly; do NOT alter facial features, age, ethnicity, or expression. Integrate face_ref seamlessly with scene lighting and perspective.\nCreate one hyper-realistic photograph of the subject in an urban location (sidewalk ledge, graffiti wall behind, wet asphalt foreground with night reflections).\nPose & Vehicle:\n- Subject seated confidently on a modern, sleek, high-end motorcycle (matte black with chrome details). The motorcycle is stationary (not moving).\n- One foot rests firmly on the motorcycle’s foot peg, while the other foot is planted strongly on the wet asphalt ground.\n- The overall body posture is relaxed but confident, suggesting quiet danger and control. Hands may rest casually on the handlebars or on thighs, not gripping aggressively.\nCamera & perspective:\n- Extreme low camera height ~8–15 cm (3–6 in) from the ground.\n- Wide-angle lens ~20mm focal length.\n- Camera aimed slightly upward at subject’s body, maintaining dramatic foreshortening effect.\n- Slight horizontal offset (camera not perfectly centered) to emphasize perspective distortion.\n- Ensure natural wide-angle distortion consistent with ~20mm lens.\nDepth of field:\n- Aperture f/5.6 (or similar) to balance: sharp detail on subject’s face while gently softening background graffiti and asphalt reflections.\n- DO NOT blur the face. Facial details from face_ref must remain crisp and photorealistic.\nLighting & environment:\n- nighttime cinematic setup.\n- Cool blue rim lights along subject and bike edges.\n- Wet asphalt reflects neon glows and graffiti colors.\n- Graffiti wall remains vibrant but softly defocused to keep attention on subject.\nClothing & accessories:\n- Maroon fitted t-shirt, distressed gray jeans, gray canvas sneakers with scuffs, leather strap watch on left wrist, bracelets on right.\nTechnical details:\n- Output in 4k photoreal quality with realistic textures (canvas shoe fabric, asphalt wetness, chrome on motorcycle, skin pores).\n- Maintain original cinematic, moody atmosphere.\nConstraints:\n- DO use face_ref for the subject’s face only, preserving identity exactly.\n- DO NOT change clothes or accessories.\n- DO NOT crop out the motorcycle; it must appear as a clear, central part of the composition.\n- DO NOT blur or soften the subject’s face; all facial details must remain sharp and lifelike.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=57",
+        imageUrl: "https://i.postimg.cc/kMhcmgft/lian-studio-1761661526988.png",
         prompt: `A realistic studio-quality portrait of a young man sitting on a Yemeni-style patterned sofa, in a modern high-rise apartment. He is dressed in a light beige thobe, wearing a brown Jacket, wearing an authentic Yemeni dagger, a falcon on his shoulder, holding a modern smartphone in his right hand, and wearing classic round sunglasses. His skin is smooth, with a calm, confident, and contemplative expression, looking slightly away from the camera. Soft natural daylight diffused from a large window, shallow depth of field (85mm/2.😎 with a soft, blurry city skyline background. Highly detailed textures on the fabric and dagger, realistic skin pores, warm color grading. Cinematic images, high resolution, and realistic, without altering my facial features. Small personalized signature in the upper left corner of the mirror "waleed waeel"`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=58",
+        imageUrl: "https://i.postimg.cc/3N6CCtdn/lian-studio-1761661562050.png",
         prompt: `Create a high-quality photograph of the same person in the attached full-length photo, standing confidently in a mountainous area on a sunny day. Man: Appearance: Same person as in the attached photo, wearing sunglasses that suit his style and face shape. Dress: Wearing a traditional headband similar to the one in the attached photo wrapped around his head. Wearing a traditional dark blue or navy thobe, the same headband as in the photo, and wearing a men's winter tactical softshell jacket. Pattern and color: Digital camo predominantly in shades of gray, white, and black (urban style).`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=59",
+        imageUrl: "https://i.postimg.cc/QMkmGgyG/lian-studio-1761661590030.png",
         prompt: `Use my exact face for the attached high-resolution image without altering the features. A stylish and powerful portrait of a modern Arab man sitting in the driver's seat of a luxurious black SUV (most likely a Lexus Land Cruiser/LX Series). The subject is wearing dark, mirrored sunglasses that reflect the exterior. His clothing is a mix of traditional and modern: a crisp white thobe (thawb). Over the thobe is a sharp, tailored, and well-fitting chocolate or brown jacket/blazer with a cuff tucked into the right sleeve. A traditional decorative belt or sash is visible across his waist, featuring intricate gold and beige embroidery, and he holds a small, ornate dagger (jambiya) in a sheath. He wears a silver or metal watch on his left wrist (visible on the steering wheel). His stance is confident and relaxed, with his left hand resting lightly on the wood and leather steering wheel. Scene (inside and outside the car): The photo was taken from the passenger side, slightly turned towards the driver. The interior is luxurious, with black leather seats and wood inlays on the dashboard and steering wheel. The console and gear shifter are visible at the front of the car. The background, seen through the windshield and driver's window, is a bit blurry (shallow depth of field). The image suggests a street in a Middle Eastern city or the Gulf.`
     },
     {
-        imageUrl: "https://picsum.photos/500?random=60",
+        imageUrl: "https://i.postimg.cc/28V0bZVw/lian-studio-1761661793330.png",
         prompt: `A realistic photo of a young man standing in front of the holy kaaba in Makkah during umrah. He is wearing traditional white ihram clothes, looking humble and spiritual. The background shows the Masjid-ul- Haram with pilgrims around, golden lighting reflecting a peaceful and divine atmosphere. The focus is on the man standing near the kaaba, hands raised in prayers,full of devotion and faith.`
     }
 ];
