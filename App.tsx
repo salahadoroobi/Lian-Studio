@@ -29,6 +29,7 @@ const App: React.FC = () => {
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
     const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
     const [initialGeneratorPrompt, setInitialGeneratorPrompt] = useState('');
+    const [visibleCards, setVisibleCards] = useState(15);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -99,7 +100,13 @@ const App: React.FC = () => {
                 return <SummarizerView t={t} language={language} />;
             case 'landing':
             default:
-                return <LandingPage setView={changeView} t={t} language={language} />;
+                return <LandingPage 
+                    setView={changeView} 
+                    t={t} 
+                    language={language} 
+                    visibleCards={visibleCards}
+                    setVisibleCards={setVisibleCards}
+                />;
         }
     };
 

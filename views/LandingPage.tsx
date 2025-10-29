@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
@@ -33,6 +31,8 @@ interface LandingPageProps {
   setView: (view: View, options?: { initialPrompt?: string }) => void;
   t: TFunction;
   language: Language;
+  visibleCards: number;
+  setVisibleCards: React.Dispatch<React.SetStateAction<number>>;
 }
 
 type ContentType = 'studio' | 'images' | 'videos' | 'audio' | 'text';
@@ -385,7 +385,7 @@ const studioCardsData = [
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
-        prompt: "A hyper-realistic cinematic black-and-white portrait of the user standing in an open field, shot from an extreme low angle looking slightly upward, creating a dramatic towering silhouette. He is wearing a long dark overcoat with both hands in his pockets, standing perfectly still with an intense, stoic expression.\n‎Take only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hairstyle exactly. Ultra-consistent identity across all generations.\n‎Hundreds of pigeons are frozen mid-flight around him, with some close to the camera wings blurred for depth and motion, others far away forming a scattered pattern across the cloudy, overcast sky. The foreground birds should frame the subject naturally, creating a sense of movement and chaos around his stillness.\n‎Lighting is soft but contrasty, with deep shadows and clean highlights — think fine art black-and-white photography. Subtle fine 35mm film grain, Leica M11 + Summicron lens look, sharp subject focus with slightly softer vignette edges. Hyperdetailed 8k super-resolution, moody and editorial fashion campaign atmosphere, timeless and surreal."
+        prompt: "A hyper-realistic cinematic black-and-white portrait of the user standing in an open field, shot from an extreme low angle looking slightly upward, creating a dramatic towering silhouette. He is wearing a long dark overcoat with both hands in his pockets, standing perfectly still with an intense, stoic expression.\n‎Take only the exact facial features from the user's reference photo — preserve all face proportions, skin tone, and hairstyle exactly. Ultra-consistent identity across all generations.\n‎Hundreds of pigeons are frozen mid-flight around him, with some close to the camera wings blurred for depth and motion, others far away forming a scattered pattern across the cloudy, overcast sky. The foreground birds should frame the subject naturally, creating a sense of movement and chaos around his stillness.\n‎Lighting is soft but contrasty, with deep shadows and clean highlights — think fine art black-and-white photography. Subtle fine 35mm film grain, Leica M11 + Summicron lens look, sharp subject focus with slightly softer vignette edges. Hyperdetailed 8k super-resolution, moody and editorial fashion campaign atmosphere, timeless and surreal.\""
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
@@ -393,7 +393,7 @@ const studioCardsData = [
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
-        prompt: "A hyper- realistic image of a confident,\nStylish young man (face should match\nthe uploaded refcrence imagc)\nsitting on a luxurious dark brown\nlcather chestetrfield sofa in a dimly lit,\nopulrent room.He is drcssed sharply\nin a white suit with a black shirt\nslightly unbuttoned, wearing white\nleather shoes, a wristwatch, and dark\nsunglasses. His pose is relaxed, with\none leg crosscd and one arm casually\nresting on the armrest.the setting\nfeatures a dark, moody background\nwith rich whitc walls, a classic\nchandclietr with warm glowing bulbs\nhanging abave, and a gothic-style\npainting af a hoodred skull figure\nbehind him the atmosphere is\nintense, cinematic, and mysterious,\nwith dramatic lighting emphasizing\nelegance,pawer,and control.\nstyle: hyper-realistic,cinematic\nlighting,rich tones, dark aesthetic\nFace: match exactly with the\nuploaded image\nAspect Ratio: 3:2 or 4:5 vertical\ncamera angle: eye level, symmetrical\nframe\nMood: powerful, elite, mysterious,\nnoir-inspired"
+        prompt: "‏:A hyper- realistic image of a confident,\nStylish young man (face should match\nthe uploaded refcrence imagc)\nsitting on a luxurious dark brown\nlcather chestetrfield sofa in a dimly lit,\nopulrent room.He is drcssed sharply\nin a white suit with a black shirt\nslightly unbuttoned, wearing white\nleather shoes, a wristwatch, and dark\nsunglasses. His pose is relaxed, with\none leg crosscd and one arm casually\nresting on the armrest.the setting\nfeatures a dark, moody background\nwith rich whitc walls, a classic\nchandclietr with warm glowing bulbs\nhanging abave, and a gothic-style\npainting af a hoodred skull figure\nbehind him the atmosphere is\nintense, cinematic, and mysterious,\nwith dramatic lighting emphasizing\nelegance,pawer,and control.\nstyle: hyper-realistic,cinematic\nlighting,rich tones, dark aesthetic\nFace: match exactly with the\nuploaded image\nAspect Ratio: 3:2 or 4:5 vertical\ncamera angle: eye level, symmetrical\nframe\nMood: powerful, elite, mysterious,\nnoir-inspired"
     },
     {
         imageUrl: "https://via.placeholder.com/500/2a3c73/f4f5f1?text=Lian+Studio",
@@ -417,12 +417,11 @@ const FeatureCard: React.FC<{
 );
 
 
-export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language, visibleCards, setVisibleCards }) => {
   const [activeContentType, setActiveContentType] = useState<ContentType>('studio');
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>('about');
-  const [visibleCards, setVisibleCards] = useState(15);
   
-  const contentTypes: ContentType[] = ['studio', 'images', 'text', 'videos', 'audio'];
+  const contentTypes: ContentType[] = ['studio', 'images', 'videos', 'audio', 'text'];
   const infoTabs: InfoTab[] = ['about', 'why', 'mission', 'features'];
   
   const contentTypeIcons: Record<ContentType, React.ReactNode> = {
@@ -604,20 +603,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
       {/* Content Type Selector */}
       <div className="flex justify-center my-8 md:my-12">
         <div className="bg-gray-200/50 dark:bg-gray-800/50 p-1.5 rounded-full shadow-inner flex items-center gap-2 flex-wrap justify-center">
-          {contentTypes.map((type) => (
-            <button
-              key={type}
-              onClick={() => setActiveContentType(type)}
-              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center gap-2 ${
-                activeContentType === type 
-                  ? 'bg-brand-accent text-white shadow-sm' 
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              {contentTypeIcons[type]}
-              <span>{t(`content_type_${type}`)}</span>
-            </button>
-          ))}
+          {contentTypes.map((type) => {
+            const isActive = activeContentType === type;
+            return (
+              <button
+                key={type}
+                onClick={() => setActiveContentType(type)}
+                className={`group py-2 px-4 rounded-full font-semibold transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 grid items-center
+                  ${isActive
+                    ? 'bg-brand-accent text-white shadow-sm grid-cols-[auto_1fr] gap-2'
+                    : 'text-brand-accent hover:bg-gray-100 dark:hover:bg-gray-700 grid-cols-[auto_0fr] gap-0 hover:grid-cols-[auto_1fr] hover:gap-2'
+                  }
+                `}
+              >
+                {contentTypeIcons[type]}
+                <div className="overflow-hidden">
+                    <span className="whitespace-nowrap block">
+                      {t(`content_type_${type}`)}
+                    </span>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
       
@@ -626,20 +633,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
       {/* Informational Tabs */}
       <div className="flex justify-center mb-8 md:mb-12">
         <div className="bg-gray-200/50 dark:bg-gray-800/50 p-1.5 rounded-full shadow-inner flex items-center gap-2 flex-wrap justify-center">
-          {infoTabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveInfoTab(tab)}
-              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center gap-2 ${
-                activeInfoTab === tab 
-                  ? 'bg-brand-accent text-white shadow-sm' 
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              {infoTabIcons[tab]}
-              <span>{t(`info_tab_${tab}`)}</span>
-            </button>
-          ))}
+          {infoTabs.map((tab) => {
+             const isActive = activeInfoTab === tab;
+             return (
+              <button
+                key={tab}
+                onClick={() => setActiveInfoTab(tab)}
+                className={`group py-2 px-4 rounded-full font-semibold transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 grid items-center
+                  ${isActive
+                    ? 'bg-brand-accent text-white shadow-sm grid-cols-[auto_1fr] gap-2'
+                    : 'text-brand-accent hover:bg-gray-100 dark:hover:bg-gray-700 grid-cols-[auto_0fr] gap-0 hover:grid-cols-[auto_1fr] hover:gap-2'
+                  }
+                `}
+              >
+                {infoTabIcons[tab]}
+                 <div className="overflow-hidden">
+                    <span className="whitespace-nowrap block">
+                      {t(`info_tab_${tab}`)}
+                    </span>
+                </div>
+              </button>
+             )
+          })}
         </div>
       </div>
       
