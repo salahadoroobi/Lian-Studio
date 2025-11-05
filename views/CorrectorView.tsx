@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { PromptResultDisplay } from '../components/PromptResultDisplay';
 import { correctPrompt } from '../services/geminiService';
@@ -8,8 +9,6 @@ import { ExtractionLanguageSelector } from '../components/ExtractionLanguageSele
 import { ActionButton } from '../components/ActionButton';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 import { PasteIcon } from '../components/icons/PasteIcon';
-import { WaveIcon } from '../components/icons/WaveIcon';
-import { PROMPT_WAVES } from '../prompts';
 
 interface CorrectorViewProps {
   t: TFunction;
@@ -86,13 +85,6 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t, language }) => 
         }
     };
     
-    const handlePromptWave = () => {
-        if (PROMPT_WAVES.length > 0) {
-            const randomIndex = Math.floor(Math.random() * PROMPT_WAVES.length);
-            setIdea(PROMPT_WAVES[randomIndex]);
-        }
-    };
-
     const canCorrect = !isLoading && idea.trim().length > 0;
 
     return (
@@ -110,14 +102,6 @@ export const CorrectorView: React.FC<CorrectorViewProps> = ({ t, language }) => 
                                     {pasteMessage}
                                 </div>
                             )}
-                             <button
-                                onClick={handlePromptWave}
-                                title={t('prompt_wave_tooltip')}
-                                aria-label={t('prompt_wave_tooltip')}
-                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-                            >
-                                <WaveIcon />
-                            </button>
                              <button
                                 onClick={handlePaste}
                                 title={t('paste_from_clipboard')}

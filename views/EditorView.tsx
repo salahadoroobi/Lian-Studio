@@ -6,8 +6,6 @@ import type { ReferenceImage, Path, EditorTool } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ImageEditorCanvas } from '../components/ImageEditorCanvas';
 import { ActionButton } from '../components/ActionButton';
-import { WaveIcon } from '../components/icons/WaveIcon';
-import { PROMPT_WAVES } from '../prompts';
 
 type CanvasHandle = {
   getCanvasDataUrl: () => string | undefined;
@@ -117,13 +115,6 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
       setActiveColors(uniqueBrushColors);
   }, []);
   
-  const handlePromptWave = () => {
-      if (PROMPT_WAVES.length > 0) {
-          const randomIndex = Math.floor(Math.random() * PROMPT_WAVES.length);
-          setPrompt(PROMPT_WAVES[randomIndex]);
-      }
-  };
-
   const hasColorPrompts = Object.values(colorPrompts).some((p: string) => p.trim().length > 0);
   const canEdit = !isLoading && baseImage.length > 0 && activeColors.length > 0 && (prompt.trim().length > 0 || hasColorPrompts);
 
@@ -168,14 +159,6 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             <div className="flex justify-between items-center mb-2">
                 <label htmlFor="prompt-editor" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('edit_instructions_label')}</label>
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={handlePromptWave}
-                        title={t('prompt_wave_tooltip')}
-                        aria-label={t('prompt_wave_tooltip')}
-                        className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-                    >
-                        <WaveIcon />
-                    </button>
                 </div>
             </div>
           <textarea

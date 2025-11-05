@@ -18,6 +18,7 @@ import { ProofreaderView } from './views/ProofreaderView';
 import { StealthView } from './views/StealthView';
 import { SummarizerView } from './views/SummarizerView';
 import { TextExtractorView } from './views/TextExtractorView';
+import { LiveSupportModal } from './components/LiveSupportModal';
 
 export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor';
 type Theme = 'light' | 'dark';
@@ -28,6 +29,7 @@ const App: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('light');
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
     const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
+    const [isLiveSupportModalOpen, setIsLiveSupportModalOpen] = useState(false);
     const [initialGeneratorPrompt, setInitialGeneratorPrompt] = useState('');
     const [visibleCards, setVisibleCards] = useState(15);
 
@@ -127,7 +129,7 @@ const App: React.FC = () => {
             <main className={`flex-grow transition-opacity duration-300 ease-in-out ${mainContentClasses}`}>
                 {renderView()}
             </main>
-            <Footer t={t} onHeartClick={() => setIsDeveloperModalOpen(true)} />
+            <Footer t={t} onHeartClick={() => setIsDeveloperModalOpen(true)} setIsLiveSupportModalOpen={setIsLiveSupportModalOpen} />
             <ApiKeyModal
                 isOpen={isApiKeyModalOpen}
                 onClose={() => setIsApiKeyModalOpen(false)}
@@ -137,6 +139,11 @@ const App: React.FC = () => {
             <DeveloperModal
                 isOpen={isDeveloperModalOpen}
                 onClose={() => setIsDeveloperModalOpen(false)}
+                t={t}
+            />
+            <LiveSupportModal
+                isOpen={isLiveSupportModalOpen}
+                onClose={() => setIsLiveSupportModalOpen(false)}
                 t={t}
             />
         </div>

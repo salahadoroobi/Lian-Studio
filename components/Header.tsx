@@ -5,9 +5,6 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import type { Language, TFunction } from '../hooks/useLocalization';
 import { ArrowLeftIcon } from './icons/ArrowLeftIcon';
 import { KeyIcon } from './icons/KeyIcon';
-import { PROMPT_WAVES } from '../prompts';
-import { PromptCounter } from './PromptCounter';
-import { ShimmerWrapper } from './ShimmerWrapper';
 
 type Theme = 'light' | 'dark';
 
@@ -23,7 +20,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, setTheme, language, setLanguage, t, setIsApiKeyModalOpen }) => {
-    const totalPrompts = PROMPT_WAVES.length;
     
     return (
         <header className="bg-brand-bg/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
@@ -44,13 +40,6 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, theme, set
                             <h1 className="text-2xl font-bold text-brand-primary dark:text-white">
                                 {t('app_title')}
                             </h1>
-                            <div className="hidden sm:flex items-center gap-2">
-                                <span className="text-2xl font-light text-gray-300 dark:text-gray-600 select-none">|</span>
-                                <ShimmerWrapper className="rounded-full">
-                                    <PromptCounter count={totalPrompts} t={t} language={language} />
-                                </ShimmerWrapper>
-                                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">{t('prompts_label')}</span>
-                            </div>
                          </div>
                     )}
                 </div>

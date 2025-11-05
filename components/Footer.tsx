@@ -2,13 +2,15 @@ import React from 'react';
 import type { TFunction } from '../hooks/useLocalization';
 import { AnimatedHeartIcon } from './AnimatedHeartIcon';
 import { ShimmerWrapper } from './ShimmerWrapper';
+import { ChatBubbleIcon } from './icons/ChatBubbleIcon';
 
 interface FooterProps {
   t: TFunction;
   onHeartClick: () => void;
+  setIsLiveSupportModalOpen: (isOpen: boolean) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ t, onHeartClick }) => {
+export const Footer: React.FC<FooterProps> = ({ t, onHeartClick, setIsLiveSupportModalOpen }) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -37,9 +39,27 @@ export const Footer: React.FC<FooterProps> = ({ t, onHeartClick }) => {
         {/* Version */}
         <ShimmerWrapper className="rounded-full">
           <span className="inline-flex items-center justify-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full min-w-[50px]">
-            v3.6.9
+            v3.7.0
           </span>
         </ShimmerWrapper>
+
+        {/* Separator */}
+        <span className="hidden md:block">|</span>
+
+        {/* Live Support Button */}
+        <button
+            onClick={() => setIsLiveSupportModalOpen(true)}
+            aria-label={t('live_support_tooltip')}
+            title={t('live_support_tooltip')}
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800 rounded-full"
+        >
+            <ShimmerWrapper className="rounded-full">
+              <span className="inline-flex items-center justify-center gap-1.5 bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full">
+                <ChatBubbleIcon className="w-4 h-4" />
+                {t('live_support_tooltip')}
+              </span>
+            </ShimmerWrapper>
+        </button>
       </div>
     </footer>
   );

@@ -358,6 +358,11 @@ const translations = {
     show_more: 'Show More',
     show_less: 'Show Less',
     more_creativity: 'More Creativity',
+    live_support_tooltip: 'Live Support',
+    live_support_modal_title: 'Redirecting to Live Support',
+    live_support_modal_desc: 'You will be redirected to an external service to connect with the live support team.',
+    live_support_modal_continue: 'Continue',
+    live_support_modal_close: 'Close',
   },
   ar: {
     app_title: 'أستوديو ليان',
@@ -714,6 +719,11 @@ const translations = {
     show_more: 'عرض المزيد',
     show_less: 'عرض أقل',
     more_creativity: 'المزيد من الابداع',
+    live_support_tooltip: 'الدعم المباشر',
+    live_support_modal_title: 'إعادة توجيه إلى الدعم المباشر',
+    live_support_modal_desc: 'سيتم إعادة توجيهك إلى خدمة خارجية للتواصل مع فريق الدعم المباشر.',
+    live_support_modal_continue: 'متابعة',
+    live_support_modal_close: 'إغلاق',
   },
 };
 

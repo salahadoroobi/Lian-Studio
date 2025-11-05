@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
@@ -9,8 +10,6 @@ import type { Language, TFunction } from '../hooks/useLocalization';
 import { UploadTextIcon } from '../components/icons/UploadTextIcon';
 import { ActionButton } from '../components/ActionButton';
 import { PasteIcon } from '../components/icons/PasteIcon';
-import { WaveIcon } from '../components/icons/WaveIcon';
-import { PROMPT_WAVES } from '../prompts';
 
 interface EnhancerViewProps {
   t: TFunction;
@@ -93,13 +92,6 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t, language }) => {
         }
     };
 
-    const handlePromptWave = () => {
-        if (PROMPT_WAVES.length > 0) {
-            const randomIndex = Math.floor(Math.random() * PROMPT_WAVES.length);
-            setPrompt(PROMPT_WAVES[randomIndex]);
-        }
-    };
-
     const canEnhance = !isLoading && baseImage.length > 0 && prompt.trim().length > 0;
 
     return (
@@ -122,14 +114,6 @@ export const EnhancerView: React.FC<EnhancerViewProps> = ({ t, language }) => {
                                     {pasteMessage}
                                 </div>
                             )}
-                            <button
-                                onClick={handlePromptWave}
-                                title={t('prompt_wave_tooltip')}
-                                aria-label={t('prompt_wave_tooltip')}
-                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-                            >
-                                <WaveIcon />
-                            </button>
                             <button
                                 onClick={handlePaste}
                                 title={t('paste_from_clipboard')}

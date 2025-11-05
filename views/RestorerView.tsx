@@ -6,8 +6,6 @@ import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ActionButton } from '../components/ActionButton';
 import { ShimmerWrapper } from '../components/ShimmerWrapper';
-import { WaveIcon } from '../components/icons/WaveIcon';
-import { PROMPT_WAVES } from '../prompts';
 
 interface RestorerViewProps {
   t: TFunction;
@@ -91,13 +89,6 @@ export const RestorerView: React.FC<RestorerViewProps> = ({ t, language }) => {
         }
     };
     
-    const handlePromptWave = () => {
-        if (PROMPT_WAVES.length > 0) {
-            const randomIndex = Math.floor(Math.random() * PROMPT_WAVES.length);
-            setAdditionalInstructions(PROMPT_WAVES[randomIndex]);
-        }
-    };
-
     const canRestore = !isLoading && baseImage.length > 0;
 
     return (
@@ -186,14 +177,6 @@ export const RestorerView: React.FC<RestorerViewProps> = ({ t, language }) => {
                     <div className="flex justify-between items-center mb-2">
                         <label htmlFor="additional-instructions" className="block text-lg font-semibold text-brand-primary dark:text-gray-300">{t('restorer_instructions_label')}</label>
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={handlePromptWave}
-                                title={t('prompt_wave_tooltip')}
-                                aria-label={t('prompt_wave_tooltip')}
-                                className="p-2 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accent-dark transition-colors"
-                            >
-                                <WaveIcon />
-                            </button>
                         </div>
                     </div>
                     <textarea
