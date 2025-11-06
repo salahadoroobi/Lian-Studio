@@ -27,7 +27,13 @@ type Theme = 'light' | 'dark';
 const App: React.FC = () => {
     const [view, setView] = useState<View>('landing');
     const { t, setLanguage, language, dir } = useLocalization();
-    const [theme, setTheme] = useState<Theme>('light');
+    const [theme, setTheme] = useState<Theme>(() => {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'dark' || storedTheme === 'light') {
+            return storedTheme as Theme;
+        }
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    });
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
     const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
     const [isLiveSupportModalOpen, setIsLiveSupportModalOpen] = useState(false);
@@ -39,6 +45,19 @@ const App: React.FC = () => {
         root.classList.add(theme);
         root.dir = dir;
     }, [theme, dir]);
+
+    // Listen for system theme changes
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (e: MediaQueryListEvent) => {
+            // Only update if no manual preference is stored
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        };
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
     
     // Add a transition effect for language change
     const [isLangTransitioning, setIsLangTransitioning] = useState(false);
@@ -50,6 +69,12 @@ const App: React.FC = () => {
                 setTimeout(() => setIsLangTransitioning(false), 50); // allow DOM to update
             }, 300);
         }
+    };
+
+    // Wrapper to set theme and store manual preference
+    const handleSetTheme = (newTheme: Theme) => {
+        localStorage.setItem('theme', newTheme);
+        setTheme(newTheme);
     };
     
     // Add a transition effect for view change
@@ -120,7 +145,7 @@ const App: React.FC = () => {
                 currentView={view}
                 setView={changeView}
                 theme={theme}
-                setTheme={setTheme}
+                setTheme={handleSetTheme}
                 language={language}
                 setLanguage={handleSetLanguage}
                 t={t}
