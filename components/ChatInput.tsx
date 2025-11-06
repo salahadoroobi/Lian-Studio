@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { PaperclipIcon } from './icons/PaperclipIcon';
 import { MicrophoneIcon } from './icons/MicrophoneIcon';
@@ -23,6 +23,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [isRecording, setIsRecording] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [animatedPlaceholder, setAnimatedPlaceholder] = useState('');
+    const [userHasInteracted, setUserHasInteracted] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,6 +37,58 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
             textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
         }
     }, [text]);
+    
+    useEffect(() => {
+        const placeholderTexts = [
+            t('chat_placeholder_1'),
+            t('chat_placeholder_2'),
+            t('chat_placeholder_3'),
+            t('chat_placeholder_4'),
+        ];
+        const TYPING_SPEED = 100;
+        const DELETING_SPEED = 50;
+        const DELAY_BETWEEN_TEXTS = 2000;
+
+        if (userHasInteracted || isRecording) {
+            setAnimatedPlaceholder(''); // Clear animated placeholder on interaction
+            return;
+        }
+
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let timeoutId: number;
+
+        const type = () => {
+            const currentText = placeholderTexts[textIndex];
+            if (isDeleting) {
+                setAnimatedPlaceholder(currentText.substring(0, charIndex - 1));
+                charIndex--;
+            } else {
+                setAnimatedPlaceholder(currentText.substring(0, charIndex + 1));
+                charIndex++;
+            }
+
+            if (!isDeleting && charIndex === currentText.length) {
+                isDeleting = true;
+                timeoutId = window.setTimeout(type, DELAY_BETWEEN_TEXTS);
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % placeholderTexts.length;
+                timeoutId = window.setTimeout(type, TYPING_SPEED);
+            } else {
+                timeoutId = window.setTimeout(type, isDeleting ? DELETING_SPEED : TYPING_SPEED);
+            }
+        };
+
+        const startTimeout = window.setTimeout(type, 500);
+
+        return () => {
+            clearTimeout(timeoutId);
+            clearTimeout(startTimeout);
+        };
+    }, [userHasInteracted, isRecording, t]);
+
 
     const handleSend = () => {
         if (isLoading || (!text.trim() && images.length === 0)) return;
@@ -73,16 +127,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
     };
 
     const handleMicClick = useCallback(() => {
+        if (!userHasInteracted) {
+            setUserHasInteracted(true);
+        }
+
         if (!SpeechRecognition) {
             setError(t('chat_error_unsupported'));
             setTimeout(() => setError(null), 3000);
             return;
         }
 
-        if (isRecording) {
-            recognitionRef.current?.stop();
-            setIsRecording(false);
-            return;
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            return; // onend will handle the state changes
         }
 
         const recognition = new SpeechRecognition();
@@ -91,34 +148,56 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
         recognition.interimResults = true;
         recognition.lang = language === 'ar' ? 'ar-SA' : 'en-US';
 
-        let finalTranscript = '';
+        const textBeforeRecording = textareaRef.current?.value || '';
+
         recognition.onresult = (event: any) => {
             let interimTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
+            let finalTranscript = '';
+            // Rebuild the full transcript from the beginning of the results list
+            for (let i = 0; i < event.results.length; ++i) {
+                const transcriptPart = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
+                    finalTranscript += transcriptPart;
                 } else {
-                    interimTranscript += event.results[i][0].transcript;
+                    interimTranscript += transcriptPart;
                 }
             }
-            setText(text + finalTranscript + interimTranscript);
+            // A space is added only if there was text before.
+            const prefix = textBeforeRecording ? textBeforeRecording.trim() + ' ' : '';
+            setText(prefix + finalTranscript + interimTranscript);
         };
-        
+
         recognition.onerror = (event: any) => {
-            console.error("Speech recognition error", event.error);
-            setIsRecording(false);
+            // "aborted" can happen if the user stops the recording.
+            // "no-speech" can happen if the user is silent.
+            // Both are not really errors we need to show the user.
+            if (event.error !== 'aborted' && event.error !== 'no-speech') {
+                console.error("Speech recognition error:", event.error);
+                setError(t('chat_error_unsupported')); // Show a generic error
+                setTimeout(() => setError(null), 3000);
+            }
+        };
+
+        recognition.onstart = () => {
+            setIsRecording(true);
         };
 
         recognition.onend = () => {
             setIsRecording(false);
+            recognitionRef.current = null;
         };
 
         recognition.start();
-        setIsRecording(true);
 
-    }, [isRecording, language, t, text]);
+    }, [language, t, userHasInteracted]);
 
     const canSend = !isLoading && (text.trim().length > 0 || images.length > 0);
+
+    const placeholderText = isRecording 
+        ? t('chat_listening') 
+        : (userHasInteracted || text) 
+            ? t('chat_placeholder') 
+            : animatedPlaceholder;
 
     return (
         <div className="flex flex-col gap-2">
@@ -161,9 +240,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
                 <textarea
                     ref={textareaRef}
                     value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    onChange={(e) => {
+                        setText(e.target.value);
+                        if (!userHasInteracted) {
+                            setUserHasInteracted(true);
+                        }
+                    }}
                     onKeyDown={handleKeyDown}
-                    placeholder={isRecording ? t('chat_listening') : t('chat_placeholder')}
+                    placeholder={placeholderText}
                     rows={1}
                     className="flex-grow bg-transparent focus:outline-none resize-none max-h-[200px] text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
                     dir="auto"
