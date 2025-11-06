@@ -186,8 +186,8 @@ export const RestorerView: React.FC<RestorerViewProps> = ({ t, language }) => {
                         value={additionalInstructions}
                         onChange={(e) => setAdditionalInstructions(e.target.value)}
                         placeholder={t('restorer_instructions_placeholder')}
-                        dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                        dir="auto"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden text-start"
                     />
                 </div>
 

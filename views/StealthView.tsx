@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { PromptResultDisplay } from '../components/PromptResultDisplay';
 import { humanizeText } from '../services/geminiService';
@@ -171,7 +170,7 @@ export const StealthView: React.FC<StealthViewProps> = ({ t, language }) => {
                         placeholder={t('stealth_input_placeholder')}
                         dir="auto"
                         disabled={!!uploadedFile}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none overflow-hidden disabled:bg-gray-100 dark:disabled:bg-gray-700/50"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none overflow-hidden disabled:bg-gray-100 dark:disabled:bg-gray-700/50 text-start"
                     />
                     {uploadedFile && (
                         <div className="mt-2 flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-lg animate-fade-in">

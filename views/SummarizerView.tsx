@@ -143,7 +143,7 @@ export const SummarizerView: React.FC<SummarizerViewProps> = ({ t, language }) =
                         placeholder={t('summarizer_input_placeholder')}
                         dir="auto"
                         disabled={!!uploadedFile}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none overflow-hidden disabled:bg-gray-100 dark:disabled:bg-gray-700/50"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none overflow-hidden disabled:bg-gray-100 dark:disabled:bg-gray-700/50 text-start"
                     />
                     {uploadedFile && (
                         <div className="mt-2 flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-lg animate-fade-in">
@@ -195,8 +195,8 @@ export const SummarizerView: React.FC<SummarizerViewProps> = ({ t, language }) =
                                         value={focusKeywords}
                                         onChange={(e) => setFocusKeywords(e.target.value)}
                                         placeholder={t('focus_keywords_placeholder')}
-                                        dir={language === 'ar' ? 'rtl' : 'ltr'}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        dir="auto"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white text-start"
                                      />
                                 </div>
                             </div>

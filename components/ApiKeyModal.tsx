@@ -122,8 +122,8 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, t, la
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder={t('api_key_input_placeholder')}
-                    dir={language === 'ar' ? 'rtl' : 'ltr'}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ltr:pr-10 rtl:pl-10"
+                    dir="auto"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ltr:pr-10 rtl:pl-10 text-start"
                 />
                 <button
                     onClick={() => setIsPassword(!isPassword)}

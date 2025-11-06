@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
@@ -142,8 +140,8 @@ export const MergerView: React.FC<MergerViewProps> = ({ t, language }) => {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder={t('merger_prompt_placeholder')}
-                        dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                        dir="auto"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden text-start"
                     />
                 </div>
 

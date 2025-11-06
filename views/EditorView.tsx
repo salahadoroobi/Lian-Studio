@@ -168,8 +168,8 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={t('edit_instructions_placeholder')}
-            dir={language === 'ar' ? 'rtl' : 'ltr'}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+            dir="auto"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden text-start"
           />
         </div>
 
@@ -187,9 +187,9 @@ export const EditorView: React.FC<EditorViewProps> = ({ t, language }) => {
                             value={colorPrompts[color] || ''}
                             onChange={(e) => setColorPrompts(p => ({...p, [color]: e.target.value}))}
                             placeholder={t('color_prompt_placeholder')}
-                            dir={language === 'ar' ? 'rtl' : 'ltr'}
+                            dir="auto"
                             aria-label={`Instructions for color ${color}`}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-start"
                         />
                     </div>
                 ))}

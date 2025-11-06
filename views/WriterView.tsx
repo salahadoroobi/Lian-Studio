@@ -179,8 +179,8 @@ export const WriterView: React.FC<WriterViewProps> = ({ t, language }) => {
                         value={idea}
                         onChange={(e) => setIdea(e.target.value)}
                         placeholder={t('writer_idea_placeholder')}
-                        dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden"
+                        dir="auto"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden text-start"
                     />
                 </div>
                 

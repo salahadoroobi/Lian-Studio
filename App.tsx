@@ -166,7 +166,7 @@ const App: React.FC = () => {
                 t={t}
                 setIsApiKeyModalOpen={setIsApiKeyModalOpen}
             />
-            <main className={`flex-grow transition-opacity duration-300 ease-in-out ${mainContentClasses}`}>
+            <main className={`flex-grow flex flex-col transition-opacity duration-300 ease-in-out ${mainContentClasses}`}>
                 {renderView()}
             </main>
             <Footer t={t} onHeartClick={() => setIsDeveloperModalOpen(true)} setIsLiveSupportModalOpen={setIsLiveSupportModalOpen} />

@@ -14,15 +14,18 @@ interface ChatViewProps {
 }
 
 interface Message {
+    id: string;
     role: 'user' | 'model';
     text: string;
     images?: string[]; // data URLs
+    isLoading?: boolean;
 }
 
 export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language, setView }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
     
     const chatRef = useRef<Chat | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,7 +45,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
             // Using a model that supports multi-turn chat and images
             chatRef.current = ai.chats.create({ model: 'gemini-2.5-flash' });
 
-            const userMessage: Message = { role: 'user', text: firstMessage.text, images: [] };
+            const userMessage: Message = { id: `user-${Date.now()}`, role: 'user', text: firstMessage.text, images: [] };
             if (firstMessage.images) {
                 userMessage.images = firstMessage.images.map(file => URL.createObjectURL(file));
             }
@@ -59,7 +62,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
             // Fix: Call `sendMessage` with a `{ message: parts }` object, as it expects a `message` property, not `parts`.
             const result = await chatRef.current.sendMessage({ message: parts });
             
-            const modelMessage: Message = { role: 'model', text: result.text };
+            const modelMessage: Message = { id: `model-${Date.now()}`, role: 'model', text: result.text };
             setMessages(prev => [...prev, modelMessage]);
 
         } catch (e: any) {
@@ -88,7 +91,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
         setIsLoading(true);
         setError(null);
         
-        const userMessage: Message = { role: 'user', text: message.text, images: [] };
+        const userMessage: Message = { id: `user-${Date.now()}`, role: 'user', text: message.text, images: [] };
         if (message.images) {
             userMessage.images = message.images.map(file => URL.createObjectURL(file));
         }
@@ -106,7 +109,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
 
             // Fix: Call `sendMessage` with a `{ message: parts }` object, as it expects a `message` property, not `parts`.
             const result = await chatRef.current.sendMessage({ message: parts });
-            const modelMessage: Message = { role: 'model', text: result.text };
+            const modelMessage: Message = { id: `model-${Date.now()}`, role: 'model', text: result.text };
             setMessages(prev => [...prev, modelMessage]);
 
         } catch (e: any) {
@@ -116,22 +119,115 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
         }
     };
 
+    const handleUpdateMessage = async (messageId: string, newText: string) => {
+        const originalMessages = messages; // Keep a reference to revert on error
+        const messageIndex = originalMessages.findIndex(m => m.id === messageId);
+        if (messageIndex === -1 || originalMessages[messageIndex].role !== 'user') {
+            return;
+        }
+    
+        const modelResponseIndex = messageIndex + 1;
+    
+        // Scenario 1: Editing the last message, or a message not followed by a model response.
+        // In this case, we truncate the history and resend.
+        if (modelResponseIndex >= originalMessages.length || originalMessages[modelResponseIndex].role !== 'model') {
+            setIsLoading(true);
+            setError(null);
+            setEditingMessageId(null);
+            
+            const historySlice = originalMessages.slice(0, messageIndex);
+            setMessages(historySlice); // Visually remove the message to be edited and anything after.
+    
+            try {
+                const ai = getAi();
+                const historyForApi = historySlice.map(msg => ({ role: msg.role, parts: [{ text: msg.text }] }));
+                chatRef.current = ai.chats.create({ model: 'gemini-2.5-flash', history: historyForApi });
+                // handleSend will add the new user message and get the new model response.
+                await handleSend({ text: newText }); 
+            } catch (e: any) {
+                setError(e.message || 'An unexpected error occurred.');
+                setMessages(originalMessages); // Revert on error
+                setIsLoading(false);
+            }
+            return;
+        }
+    
+        // Scenario 2: Editing a message in the middle of the conversation.
+        // We will replace the message and its direct response, leaving subsequent messages.
+        setEditingMessageId(null);
+    
+        // Immediately update UI to show the edited text and a loading state for the response
+        setMessages(currentMessages =>
+            currentMessages.map((msg, index) => {
+                if (index === messageIndex) {
+                    return { ...msg, text: newText };
+                }
+                if (index === modelResponseIndex) {
+                    return { ...msg, text: '', isLoading: true };
+                }
+                return msg;
+            })
+        );
+    
+        try {
+            const ai = getAi();
+            // Create history from messages *before* the one being edited
+            const historyForApi = originalMessages.slice(0, messageIndex).map(msg => ({
+                role: msg.role,
+                parts: [{ text: msg.text }]
+            }));
+    
+            const tempChat = ai.chats.create({ model: 'gemini-2.5-flash', history: historyForApi });
+            const result = await tempChat.sendMessage({ message: [{ text: newText }] });
+    
+            // Update the model response with the new text and remove the loading state
+            setMessages(currentMessages =>
+                currentMessages.map((msg, index) => {
+                    if (index === modelResponseIndex) {
+                        return { ...msg, text: result.text, isLoading: false };
+                    }
+                    return msg;
+                })
+            );
+        } catch (e: any) {
+            setError(e.message || 'An unexpected error occurred.');
+            // On error, revert the changes back to the original state before the edit attempt
+            setMessages(originalMessages);
+        }
+    };
+
     return (
-        <div className="flex flex-col h-full max-h-[calc(100vh-140px)] w-full max-w-4xl mx-auto p-4">
-            <div className="flex-grow overflow-y-auto pr-4 space-y-6">
-                {messages.map((msg, index) => (
-                    <ChatBubble key={index} role={msg.role} text={msg.text} images={msg.images} language={language} />
-                ))}
-                 {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
-                    <ChatBubble role="model" text="" isLoading={true} language={language} />
-                 )}
-                 {error && (
-                    <div className="text-center text-red-500 p-4 bg-red-500/10 rounded-lg">
-                        <p className="font-bold">{t('error_title')}</p>
-                        <p className="text-sm">{error}</p>
-                    </div>
-                 )}
-                <div ref={messagesEndRef} />
+        <div className="flex flex-col flex-grow w-full max-w-4xl mx-auto p-4">
+            <div className="flex-grow overflow-y-auto pr-4">
+                <div className="flex flex-col justify-end min-h-full space-y-6">
+                    {messages.map((msg) => {
+                        return (
+                            <ChatBubble
+                                key={msg.id}
+                                id={msg.id}
+                                role={msg.role}
+                                text={msg.text}
+                                images={msg.images}
+                                language={language}
+                                t={t}
+                                isLoading={msg.isLoading}
+                                isEditing={editingMessageId === msg.id}
+                                onSetEditing={setEditingMessageId}
+                                onUpdateMessage={handleUpdateMessage}
+                            />
+                        );
+                    })}
+                     {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
+                        <ChatBubble id="loading-bubble" role="model" text="" isLoading={true} language={language} t={t} />
+                     )}
+                     {error && (
+                        <div className="text-center text-red-500 p-4 bg-red-500/10 rounded-lg">
+                            <p className="font-bold">{t('error_title')}</p>
+                            <p className="text-sm">{error}</p>
+                        </div>
+                     )}
+                    <div ref={messagesEndRef} />
+                </div>
             </div>
             <div className="mt-4">
                 <ChatInput onSend={handleSend} isLoading={isLoading} t={t} language={language} />

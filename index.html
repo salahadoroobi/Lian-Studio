@@ -9,6 +9,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      html[dir="rtl"] input::placeholder,
+      html[dir="rtl"] textarea::placeholder {
+        text-align: right;
+      }
+      html[dir="ltr"] input::placeholder,
+      html[dir="ltr"] textarea::placeholder {
+        text-align: left;
+      }
+    </style>
     <script>
       tailwind.config = {
         darkMode: 'class', // Enable dark mode using a class

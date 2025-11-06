@@ -249,8 +249,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
                     onKeyDown={handleKeyDown}
                     placeholder={placeholderText}
                     rows={1}
-                    className="flex-grow bg-transparent focus:outline-none resize-none max-h-[200px] text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
                     dir="auto"
+                    className="flex-grow bg-transparent focus:outline-none resize-none max-h-[200px] text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 text-start"
                 />
                 <button
                     onClick={handleSend}
