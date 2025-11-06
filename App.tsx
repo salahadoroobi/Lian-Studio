@@ -20,8 +20,10 @@ import { SummarizerView } from './views/SummarizerView';
 import { TextExtractorView } from './views/TextExtractorView';
 import { LiveSupportModal } from './components/LiveSupportModal';
 import { InspirationView } from './views/InspirationView';
+import { ChatView } from './views/ChatView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor' | 'inspiration';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor' | 'inspiration' | 'chat';
+export type InitialChatMessage = { text: string, images?: File[] };
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -38,6 +40,7 @@ const App: React.FC = () => {
     const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
     const [isLiveSupportModalOpen, setIsLiveSupportModalOpen] = useState(false);
     const [initialGeneratorPrompt, setInitialGeneratorPrompt] = useState('');
+    const [initialChatMessage, setInitialChatMessage] = useState<InitialChatMessage | null>(null);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -79,12 +82,22 @@ const App: React.FC = () => {
     
     // Add a transition effect for view change
     const [isViewTransitioning, setIsViewTransitioning] = useState(false);
-    const changeView = (newView: View, options?: { initialPrompt?: string }) => {
-        if (newView !== view || (newView === 'generator' && options?.initialPrompt)) {
+    const changeView = (newView: View, options?: { initialPrompt?: string; initialMessage?: InitialChatMessage }) => {
+        const hasNewState = 
+            (newView === 'generator' && options?.initialPrompt && options.initialPrompt !== initialGeneratorPrompt) ||
+            (newView === 'chat' && options?.initialMessage);
+
+        if (newView !== view || hasNewState) {
             if (newView === 'generator' && options?.initialPrompt) {
                 setInitialGeneratorPrompt(options.initialPrompt);
             } else {
                 setInitialGeneratorPrompt('');
+            }
+
+            if (newView === 'chat' && options?.initialMessage) {
+                setInitialChatMessage(options.initialMessage);
+            } else {
+                setInitialChatMessage(null);
             }
 
             setIsViewTransitioning(true);
@@ -99,6 +112,8 @@ const App: React.FC = () => {
 
     const renderView = () => {
         switch (view) {
+            case 'chat':
+                return <ChatView t={t} language={language} initialMessage={initialChatMessage} setView={changeView} />;
             case 'inspiration':
                 return <InspirationView setView={changeView} t={t} language={language} />;
             case 'editor':

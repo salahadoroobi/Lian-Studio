@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import type { View } from '../App';
+import type { View, InitialChatMessage } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
 import { WandIcon } from '../components/icons/WandIcon';
 import { DocumentTextIcon } from '../components/icons/DocumentTextIcon';
@@ -26,9 +26,10 @@ import { SummarizerIcon } from '../components/icons/SummarizerIcon';
 import { TextExtractorIcon } from '../components/icons/TextExtractorIcon';
 import { StudioIcon } from '../components/icons/StudioIcon';
 import { InspirationIcon } from '../components/icons/InspirationIcon';
+import { ChatInput } from '../components/ChatInput';
 
 interface LandingPageProps {
-  setView: (view: View, options?: { initialPrompt?: string }) => void;
+  setView: (view: View, options?: { initialPrompt?: string; initialMessage?: InitialChatMessage }) => void;
   t: TFunction;
   language: Language;
 }
@@ -168,6 +169,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
       { titleKey: 'landing_feature_9_title', descKey: 'landing_feature_9_desc', icon: <AudioIcon className="w-12 h-12 text-brand-accent"/> },
   ];
 
+  const handleInitialSend = (message: { text: string, images?: File[] }) => {
+    setView('chat', { initialMessage: message });
+  };
+
   const renderInfoContent = () => {
     switch(activeInfoTab) {
         case 'about':
@@ -265,6 +270,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
 
   const renderContent = () => {
     switch (activeContentType) {
+        case 'studio':
+            return (
+                <div className="max-w-4xl mx-auto py-10 md:py-20 animate-fade-in">
+                    <div className="text-center mb-8">
+                        <h3 className="text-3xl font-bold text-brand-primary dark:text-white mb-4">{t('studio_chat_title')}</h3>
+                        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{t('studio_chat_subtitle')}</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4">
+                        <ChatInput onSend={handleInitialSend} t={t} language={language} isLoading={false} />
+                    </div>
+                </div>
+            );
         case 'images':
             return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 md:mb-32 animate-fade-in">
@@ -288,7 +305,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
                     <Card icon={<TextExtractorIcon />} title={t('text_extractor_card_title')} description={t('text_extractor_card_desc')} buttonText={t('start_text_extracting')} onClick={() => setView('text_extractor')} isBeta={true} />
                 </div>
             );
-        case 'studio':
         case 'videos':
         case 'audio':
         default:

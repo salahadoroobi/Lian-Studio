@@ -2,7 +2,7 @@ import { GoogleGenAI, Modality } from '@google/genai';
 import type { ReferenceImage } from '../types';
 
 // Helper to convert File to base64
-const fileToGenerativePart = async (file: File) => {
+export const fileToGenerativePart = async (file: File) => {
   const base64EncodedDataPromise = new Promise<string>((resolve) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -33,7 +33,7 @@ const dataURLtoFile = (dataurl: string, filename: string): File => {
     return new File([u8arr], filename, { type: mime });
 };
 
-const getAi = () => {
+export const getAi = () => {
     const userApiKey = localStorage.getItem('gemini_api_key');
     const apiKey = userApiKey || process.env.API_KEY;
      if (!apiKey) {
