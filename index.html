@@ -60,6 +60,14 @@
                 '25%': { transform: 'translateX(-3px)' },
                 '50%': { transform: 'translateX(3px)' },
                 '75%': { transform: 'translateX(-2px)' },
+              },
+              slideUpOut: {
+                'from': { transform: 'translateY(0)', opacity: '1' },
+                'to': { transform: 'translateY(-100%)', opacity: '0' },
+              },
+              slideUpIn: {
+                'from': { transform: 'translateY(100%)', opacity: '0' },
+                'to': { transform: 'translateY(0)', opacity: '1' },
               }
             },
             animation: {
@@ -77,6 +85,8 @@
               'slide-in-left': 'slideInFromLeft 0.4s ease-out forwards',
               'slide-in-right': 'slideInFromRight 0.4s ease-out forwards',
               'jiggle': 'jiggle 0.4s ease-in-out forwards 0.1s',
+              'slide-up-out': 'slideUpOut 0.4s ease-in forwards',
+              'slide-up-in': 'slideUpIn 0.4s ease-out forwards',
             }
           }
         }

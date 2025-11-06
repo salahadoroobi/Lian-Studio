@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { View } from '../App';
 import { SparklesIcon } from '../components/icons/SparklesIcon';
 import { WandIcon } from '../components/icons/WandIcon';
@@ -56,6 +56,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
   const [activeContentType, setActiveContentType] = useState<ContentType>('studio');
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>('about');
   const [activeFeatureTab, setActiveFeatureTab] = useState<ContentType>('studio');
+
+  const animatedWords = useMemo(() => [
+    t('content_type_images'),
+    t('content_type_videos'),
+    t('content_type_audio'),
+    t('content_type_text'),
+  ], [t]);
+
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
+
+  useEffect(() => {
+    // Reset index on language change to start animation from the beginning
+    setCurrentWordIndex(0);
+    setIsExiting(false);
+    
+    const interval = setInterval(() => {
+        setIsExiting(true);
+        setTimeout(() => {
+            setCurrentWordIndex(prevIndex => (prevIndex + 1) % animatedWords.length);
+            setIsExiting(false);
+        }, 400); // This must match the animation duration in index.html
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [animatedWords]);
   
   const contentTypes: ContentType[] = ['studio', 'inspiration', 'images', 'videos', 'audio', 'text'];
   const infoTabs: InfoTab[] = ['about', 'why', 'mission', 'features'];
@@ -278,8 +304,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="text-center">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-brand-primary dark:text-white mb-4">{t('landing_title')}</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t('landing_subtitle')}</p>
+        <h2 className="text-4xl md:text-5xl font-extrabold text-brand-primary dark:text-white mb-8">{t('landing_title')}</h2>
+        <div className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto flex items-baseline justify-center flex-wrap gap-x-1.5">
+          <span>{t('landing_subtitle_part1')}</span>
+          <div className="relative inline-grid h-8 place-items-center font-bold text-brand-primary dark:text-brand-accent">
+            {/* This invisible span will set the grid cell's width */}
+            <span className="invisible col-start-1 row-start-1 px-1">
+              {animatedWords[currentWordIndex]}
+            </span>
+            {/* This span is the visible, animated one */}
+            <span
+              key={currentWordIndex}
+              className={`col-start-1 row-start-1 px-1 ${isExiting ? 'animate-slide-up-out' : 'animate-slide-up-in'}`}
+            >
+              {animatedWords[currentWordIndex]}
+            </span>
+          </div>
+          <span>{t('landing_subtitle_part2')}</span>
+        </div>
       </div>
       
       {/* Content Type Selector */}
