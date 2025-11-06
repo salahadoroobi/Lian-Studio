@@ -751,9 +751,26 @@ export type TFunction = (key: keyof typeof translations.en) => string;
 type Direction = 'ltr' | 'rtl';
 
 export const useLocalization = () => {
-  const [language, setLanguage] = useState<Language>('ar');
+  const [language, setLanguage] = useState<Language>(() => {
+    // 1. Check for a saved preference in localStorage
+    const storedLang = localStorage.getItem('language');
+    if (storedLang === 'en' || storedLang === 'ar') {
+        return storedLang as Language;
+    }
+
+    // 2. If no stored preference, detect browser language
+    const browserLang = navigator.language.split('-')[0]; // 'ar-SA' -> 'ar'
+    if (browserLang === 'ar') {
+        return 'ar';
+    }
+
+    // 3. Default to English for all other languages
+    return 'en';
+  });
 
   const setLang = useCallback((lang: Language) => {
+    // When language is manually set, save it to localStorage
+    localStorage.setItem('language', lang);
     setLanguage(lang);
   }, []);
 
