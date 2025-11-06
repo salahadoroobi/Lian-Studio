@@ -17,7 +17,7 @@ interface Message {
     id: string;
     role: 'user' | 'model';
     text: string;
-    images?: string[]; // data URLs
+    files?: {name: string, type: 'image' | 'other', url: string}[];
     isLoading?: boolean;
 }
 
@@ -45,21 +45,39 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
             // Using a model that supports multi-turn chat and images
             chatRef.current = ai.chats.create({ model: 'gemini-2.5-flash' });
 
-            const userMessage: Message = { id: `user-${Date.now()}`, role: 'user', text: firstMessage.text, images: [] };
-            if (firstMessage.images) {
-                userMessage.images = firstMessage.images.map(file => URL.createObjectURL(file));
+            const userMessage: Message = { id: `user-${Date.now()}`, role: 'user', text: firstMessage.text, files: [] };
+            if (firstMessage.files) {
+                userMessage.files = firstMessage.files.map(file => ({
+                    name: file.name,
+                    type: file.type.startsWith('image/') ? 'image' : 'other',
+                    url: file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
+                }));
             }
             setMessages([userMessage]);
 
-            // Fix: Explicitly type `parts` as `any[]` to allow both text and image parts, fixing the type error on `parts.push`.
-            const parts: any[] = [{ text: firstMessage.text }];
-            if (firstMessage.images) {
-                for (const image of firstMessage.images) {
-                    parts.push(await fileToGenerativePart(image));
+            let fullPromptText = firstMessage.text;
+            const mediaParts = [];
+
+            if (firstMessage.files) {
+                for (const file of firstMessage.files) {
+                    const isTextBased = file.type.startsWith('text/') || 
+                                      file.type.includes('json') || 
+                                      file.type.includes('javascript') ||
+                                      // This regex covers all the text types from ChatInput
+                                      /\.(txt|md|py|js|jsx|ts|tsx|html|css|java|c|cpp|h|cs|sql|sh|json|xml)$/i.test(file.name);
+
+                    if (isTextBased) {
+                        const fileContent = await file.text();
+                        fullPromptText += `\n\n--- Attached File: ${file.name} ---\n${fileContent}\n--- End of File ---`;
+                    } else {
+                        // For non-text files, use fileToGenerativePart
+                        mediaParts.push(await fileToGenerativePart(file));
+                    }
                 }
             }
             
-            // Fix: Call `sendMessage` with a `{ message: parts }` object, as it expects a `message` property, not `parts`.
+            const parts = [{ text: fullPromptText }, ...mediaParts];
+            
             const result = await chatRef.current.sendMessage({ message: parts });
             
             const modelMessage: Message = { id: `model-${Date.now()}`, role: 'model', text: result.text };
@@ -82,7 +100,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
     }, [initialMessage]);
 
 
-    const handleSend = async (message: { text: string, images?: File[] }) => {
+    const handleSend = async (message: { text: string, files?: File[] }) => {
         if (!chatRef.current) {
             setError("Chat is not initialized.");
             return;
@@ -91,23 +109,39 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
         setIsLoading(true);
         setError(null);
         
-        const userMessage: Message = { id: `user-${Date.now()}`, role: 'user', text: message.text, images: [] };
-        if (message.images) {
-            userMessage.images = message.images.map(file => URL.createObjectURL(file));
+        const userMessage: Message = { id: `user-${Date.now()}`, role: 'user', text: message.text, files: [] };
+        if (message.files) {
+            userMessage.files = message.files.map(file => ({
+                name: file.name,
+                type: file.type.startsWith('image/') ? 'image' : 'other',
+                url: file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
+            }));
         }
         
         setMessages(prev => [...prev, userMessage]);
 
         try {
-            // Fix: Explicitly type `parts` as `any[]` to allow both text and image parts, fixing the type error on `parts.push`.
-            const parts: any[] = [{ text: message.text }];
-            if (message.images) {
-                for (const image of message.images) {
-                    parts.push(await fileToGenerativePart(image));
+            let fullPromptText = message.text;
+            const mediaParts = [];
+
+            if (message.files) {
+                for (const file of message.files) {
+                     const isTextBased = file.type.startsWith('text/') || 
+                                      file.type.includes('json') || 
+                                      file.type.includes('javascript') ||
+                                      /\.(txt|md|py|js|jsx|ts|tsx|html|css|java|c|cpp|h|cs|sql|sh|json|xml)$/i.test(file.name);
+
+                    if (isTextBased) {
+                        const fileContent = await file.text();
+                        fullPromptText += `\n\n--- Attached File: ${file.name} ---\n${fileContent}\n--- End of File ---`;
+                    } else {
+                        mediaParts.push(await fileToGenerativePart(file));
+                    }
                 }
             }
 
-            // Fix: Call `sendMessage` with a `{ message: parts }` object, as it expects a `message` property, not `parts`.
+            const parts = [{ text: fullPromptText }, ...mediaParts];
+
             const result = await chatRef.current.sendMessage({ message: parts });
             const modelMessage: Message = { id: `model-${Date.now()}`, role: 'model', text: result.text };
             setMessages(prev => [...prev, modelMessage]);
@@ -207,7 +241,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ initialMessage, t, language,
                                 id={msg.id}
                                 role={msg.role}
                                 text={msg.text}
-                                images={msg.images}
+                                files={msg.files}
                                 language={language}
                                 t={t}
                                 isLoading={msg.isLoading}

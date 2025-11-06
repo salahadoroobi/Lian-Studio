@@ -23,7 +23,7 @@ import { InspirationView } from './views/InspirationView';
 import { ChatView } from './views/ChatView';
 
 export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor' | 'inspiration' | 'chat';
-export type InitialChatMessage = { text: string, images?: File[] };
+export type InitialChatMessage = { text: string, files?: File[] };
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {

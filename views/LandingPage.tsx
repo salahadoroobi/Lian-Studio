@@ -68,6 +68,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
 
+  const chatAnimatedVerbs = useMemo(() => [
+    t('studio_chat_verb1'),
+    t('studio_chat_verb2'),
+    t('studio_chat_verb3'),
+  ], [t]);
+
+  const [currentChatVerbIndex, setCurrentChatVerbIndex] = useState(0);
+  const [isChatVerbExiting, setIsChatVerbExiting] = useState(false);
+
+  useEffect(() => {
+    // Reset index on language change to start animation from the beginning
+    setCurrentChatVerbIndex(0);
+    setIsChatVerbExiting(false);
+    
+    const interval = setInterval(() => {
+        setIsChatVerbExiting(true);
+        setTimeout(() => {
+            setCurrentChatVerbIndex(prevIndex => (prevIndex + 1) % chatAnimatedVerbs.length);
+            setIsChatVerbExiting(false);
+        }, 400); // This must match the animation duration in index.html
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [chatAnimatedVerbs]);
+
   useEffect(() => {
     // Reset index on language change to start animation from the beginning
     setCurrentWordIndex(0);
@@ -169,7 +194,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
       { titleKey: 'landing_feature_9_title', descKey: 'landing_feature_9_desc', icon: <AudioIcon className="w-12 h-12 text-brand-accent"/> },
   ];
 
-  const handleInitialSend = (message: { text: string, images?: File[] }) => {
+  const handleInitialSend = (message: { text: string, files?: File[] }) => {
     setView('chat', { initialMessage: message });
   };
 
@@ -275,7 +300,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
                 <div className="max-w-4xl mx-auto py-10 md:py-20 animate-fade-in">
                     <div className="text-center mb-8">
                         <h3 className="text-3xl font-bold text-brand-primary dark:text-white mb-4">{t('studio_chat_title')}</h3>
-                        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{t('studio_chat_subtitle')}</p>
+                        <div className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto flex items-baseline justify-center flex-wrap gap-x-1.5">
+                            <span>{t('studio_chat_subtitle_part1')}</span>
+                            <div className="relative inline-grid h-8 place-items-center font-bold text-brand-primary dark:text-brand-accent">
+                                {/* This invisible span will set the grid cell's width */}
+                                <span className="invisible col-start-1 row-start-1 px-1">
+                                    {chatAnimatedVerbs[currentChatVerbIndex]}
+                                </span>
+                                {/* This span is the visible, animated one */}
+                                <span
+                                    key={currentChatVerbIndex}
+                                    className={`col-start-1 row-start-1 px-1 ${isChatVerbExiting ? 'animate-slide-up-out' : 'animate-slide-up-in'}`}
+                                >
+                                    {chatAnimatedVerbs[currentChatVerbIndex]}
+                                </span>
+                            </div>
+                            <span>{t('studio_chat_subtitle_part2')}</span>
+                        </div>
                     </div>
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4">
                         <ChatInput onSend={handleInitialSend} t={t} language={language} isLoading={false} />

@@ -7,12 +7,13 @@ import { ClipboardCheckIcon } from './icons/ClipboardCheckIcon';
 import { DownloadIcon } from './icons/DownloadIcon';
 import type { TFunction } from '../hooks/useLocalization';
 import { PencilIcon } from './icons/PencilIcon';
+import { DocumentTextIcon } from './icons/DocumentTextIcon';
 
 interface ChatBubbleProps {
     id: string;
     role: 'user' | 'model';
     text: string;
-    images?: string[];
+    files?: {name: string, type: 'image' | 'other', url: string}[];
     isLoading?: boolean;
     language: 'en' | 'ar';
     t: TFunction;
@@ -21,7 +22,7 @@ interface ChatBubbleProps {
     onUpdateMessage?: (id: string, newText: string) => void;
 }
 
-export const ChatBubble: React.FC<ChatBubbleProps> = ({ id, role, text, images, isLoading, language, t, isEditing, onSetEditing, onUpdateMessage }) => {
+export const ChatBubble: React.FC<ChatBubbleProps> = ({ id, role, text, files, isLoading, language, t, isEditing, onSetEditing, onUpdateMessage }) => {
     const isUser = role === 'user';
     const [copied, setCopied] = useState(false);
     const [editedText, setEditedText] = useState(text);
@@ -125,7 +126,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ id, role, text, images, 
                     <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
             )}
-             {isUser && (
+             {isUser && text && (
                  <div className="flex-shrink-0 self-center flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button
                         onClick={() => onSetEditing && onSetEditing(id)}
@@ -135,14 +136,31 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ id, role, text, images, 
                     >
                        <PencilIcon className="w-5 h-5" />
                     </button>
+                    <button
+                        onClick={handleDownload}
+                        title={t('download_prompt_label')}
+                        aria-label={t('download_prompt_label')}
+                        className={`p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${actionIconColor}`}
+                    >
+                        <DownloadIcon />
+                    </button>
                 </div>
              )}
             <div className="flex flex-col max-w-xl">
                 <div className={`p-4 rounded-2xl ${bubbleClasses}`}>
-                    {images && images.length > 0 && (
+                    {files && files.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2">
-                            {images.map((src, index) => (
-                                <img key={index} src={src} className="w-24 h-24 object-cover rounded-md" alt="uploaded content" />
+                            {files.map((file, index) => (
+                                <div key={index} className="w-24 h-24">
+                                {file.type === 'image' ? (
+                                    <img src={file.url} className="w-full h-full object-cover rounded-md" alt={file.name} title={file.name} />
+                                ) : (
+                                    <div className="w-full h-full bg-gray-300 dark:bg-gray-800 rounded-md flex flex-col items-center justify-center p-1 text-center" title={file.name}>
+                                        <DocumentTextIcon className="w-8 h-8 text-gray-600 dark:text-gray-400" />
+                                        <span className="text-xs text-gray-700 dark:text-gray-300 truncate w-full mt-1">{file.name}</span>
+                                    </div>
+                                )}
+                                </div>
                             ))}
                         </div>
                     )}
