@@ -19,8 +19,9 @@ import { StealthView } from './views/StealthView';
 import { SummarizerView } from './views/SummarizerView';
 import { TextExtractorView } from './views/TextExtractorView';
 import { LiveSupportModal } from './components/LiveSupportModal';
+import { InspirationView } from './views/InspirationView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor' | 'inspiration';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
@@ -31,7 +32,6 @@ const App: React.FC = () => {
     const [isDeveloperModalOpen, setIsDeveloperModalOpen] = useState(false);
     const [isLiveSupportModalOpen, setIsLiveSupportModalOpen] = useState(false);
     const [initialGeneratorPrompt, setInitialGeneratorPrompt] = useState('');
-    const [visibleCards, setVisibleCards] = useState(15);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -74,6 +74,8 @@ const App: React.FC = () => {
 
     const renderView = () => {
         switch (view) {
+            case 'inspiration':
+                return <InspirationView setView={changeView} t={t} language={language} />;
             case 'editor':
                 return <EditorView t={t} language={language} />;
             case 'generator':
@@ -105,9 +107,7 @@ const App: React.FC = () => {
                 return <LandingPage 
                     setView={changeView} 
                     t={t} 
-                    language={language} 
-                    visibleCards={visibleCards}
-                    setVisibleCards={setVisibleCards}
+                    language={language}
                 />;
         }
     };
