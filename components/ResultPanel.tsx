@@ -9,7 +9,7 @@ interface ResultPanelProps {
   isLoading: boolean;
   error: string | null;
   t: TFunction;
-  view: 'generator' | 'enhancer' | 'merger' | 'editor' | 'restorer';
+  view: 'generator' | 'enhancer' | 'merger' | 'editor' | 'restorer' | 'camera';
 }
 
 export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoading, error, t, view }) => {
@@ -41,6 +41,9 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
       } else if (view === 'restorer') {
           titleKey = 'restoring_title';
           descKey = 'restoring_desc';
+      } else if (view === 'camera') {
+          titleKey = 're_rendering_title';
+          descKey = 're_rendering_desc';
       }
 
       return (
@@ -93,6 +96,9 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ generatedImage, isLoad
     const getInitialDescKey = (): Parameters<TFunction>[0] => {
         if (view === 'restorer') {
             return 'initial_desc_restorer';
+        }
+        if (view === 'camera') {
+            return 'initial_desc_camera';
         }
         return 'initial_desc';
     };

@@ -27,6 +27,7 @@ import { TextExtractorIcon } from '../components/icons/TextExtractorIcon';
 import { StudioIcon } from '../components/icons/StudioIcon';
 import { InspirationIcon } from '../components/icons/InspirationIcon';
 import { ChatInput } from '../components/ChatInput';
+import { CameraIcon } from '../components/icons/CameraIcon';
 
 interface LandingPageProps {
   setView: (view: View, options?: { initialPrompt?: string; initialMessage?: InitialChatMessage }) => void;
@@ -325,8 +326,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ setView, t, language }
             );
         case 'images':
             return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 md:mb-32 animate-fade-in">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20 md:mb-32 animate-fade-in">
                     <Card icon={<PaintBrushIcon />} title={t('editor_card_title')} description={t('editor_card_desc')} buttonText={t('start_editing')} onClick={() => setView('editor')} isBeta={true} />
+                    <Card icon={<CameraIcon />} title={t('camera_card_title')} description={t('camera_card_desc')} buttonText={t('start_camera')} onClick={() => setView('camera')} isBeta={true} />
                     <Card icon={<SparklesIcon />} title={t('generator_card_title')} description={t('generator_card_desc')} buttonText={t('start_generating')} onClick={() => setView('generator')} />
                     <Card icon={<WandIcon />} title={t('enhancer_card_title')} description={t('enhancer_card_desc')} buttonText={t('start_enhancing')} onClick={() => setView('enhancer')} />
                     <Card icon={<CombineIcon />} title={t('merger_card_title')} description={t('merger_card_desc')} buttonText={t('start_merging')} onClick={() => setView('merger')} isBeta={true} />

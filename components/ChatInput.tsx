@@ -147,7 +147,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, t, lang
         if (e.target.files) {
             const newFiles = Array.from(e.target.files);
             setFiles(prev => [...prev, ...newFiles]);
-            const newPreviews = newFiles.map(file => ({
+// Fix: Explicitly type 'file' as File to resolve type inference issues where it was being treated as 'unknown'.
+            const newPreviews = newFiles.map((file: File) => ({
                 name: file.name,
                 // Fix: Cast the result of the ternary operator to the correct literal type to prevent type widening to 'string'.
                 type: (file.type.startsWith('image/') ? 'image' : 'other') as 'image' | 'other',

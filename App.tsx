@@ -21,8 +21,9 @@ import { TextExtractorView } from './views/TextExtractorView';
 import { LiveSupportModal } from './components/LiveSupportModal';
 import { InspirationView } from './views/InspirationView';
 import { ChatView } from './views/ChatView';
+import { CameraView } from './views/CameraView';
 
-export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor' | 'inspiration' | 'chat';
+export type View = 'landing' | 'editor' | 'generator' | 'enhancer' | 'prompt_extractor' | 'merger' | 'corrector' | 'restorer' | 'writer' | 'translator' | 'proofreader' | 'stealth' | 'summarizer' | 'text_extractor' | 'inspiration' | 'chat' | 'camera';
 export type InitialChatMessage = { text: string, files?: File[] };
 type Theme = 'light' | 'dark';
 
@@ -118,6 +119,8 @@ const App: React.FC = () => {
                 return <InspirationView setView={changeView} t={t} language={language} />;
             case 'editor':
                 return <EditorView t={t} language={language} />;
+            case 'camera':
+                return <CameraView t={t} language={language} />;
             case 'generator':
                 return <GeneratorView t={t} language={language} initialPrompt={initialGeneratorPrompt} />;
             case 'enhancer':

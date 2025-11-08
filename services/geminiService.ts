@@ -279,6 +279,72 @@ Your restoration process based on the user's request:
     throw new Error('Image restoration failed. No image data received.');
 };
 
+export const changeImageAngle = async (
+    baseImage: ReferenceImage,
+    settings: {
+        yaw: number; // -50 to 50
+        pitch: number; // -50 to 50
+        dolly: number; // -50 to 50
+        wideAngle: boolean;
+    }
+): Promise<string> => {
+    const ai = getAi();
+    
+    const imagePart = await fileToGenerativePart(baseImage.file);
+    
+    let promptInstructions = `You are an expert virtual photographer. Your task is to re-render the provided image from a new camera perspective.
+CRITICAL INSTRUCTIONS:
+- Faithfully preserve the subject, content, style, and overall atmosphere of the original image.
+- DO NOT add, remove, or change any objects or elements.
+- DO NOT change the lighting unless it's a natural consequence of the new camera angle.
+- Your only task is to change the camera's position and lens properties as requested.
+
+Apply the following transformations:\n`;
+    
+    const transformations: string[] = [];
+    
+    if (settings.yaw !== 0) {
+        transformations.push(`- Rotate the camera yaw by approximately ${Math.abs(Math.round(settings.yaw / 50 * 30))} degrees to the ${settings.yaw > 0 ? 'right' : 'left'}.`);
+    }
+
+    if (settings.pitch !== 0) {
+        transformations.push(`- Change the camera pitch to a ${settings.pitch > 0 ? 'high angle (bird\'s eye view)' : 'low angle (worm\'s eye view)'}. The magnitude of the angle change should be proportional to a value of ${Math.abs(settings.pitch)} out of 50.`);
+    }
+
+    if (settings.dolly !== 0) {
+        transformations.push(`- Dolly the camera ${settings.dolly > 0 ? 'forward to zoom in' : 'backward to zoom out'}. The magnitude of the dolly should be proportional to a value of ${Math.abs(settings.dolly)} out of 50.`);
+    }
+
+    if (settings.wideAngle) {
+        transformations.push(`- Apply a wide-angle lens effect to the image, increasing the field of view and introducing slight peripheral distortion.`);
+    }
+
+    if (transformations.length === 0) {
+        promptInstructions += "- Re-render the image from the exact same perspective with high fidelity.";
+    } else {
+        promptInstructions += transformations.join('\n');
+    }
+    
+    const textPart = { text: promptInstructions };
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: { parts: [imagePart, textPart] },
+        config: {
+            responseModalities: [Modality.IMAGE],
+        },
+    });
+    
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            const base64ImageBytes: string = part.inlineData.data;
+            return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
+        }
+    }
+    
+    throw new Error('Image re-rendering failed. No image data received.');
+};
+
 
 export const extractPromptFromImage = async (
     image: ReferenceImage,
