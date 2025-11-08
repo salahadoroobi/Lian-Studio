@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { ImageUploader } from '../components/ImageUploader';
 import { ResultPanel } from '../components/ResultPanel';
 import { changeImageAngle } from '../services/geminiService';
@@ -50,18 +50,31 @@ export const CameraView: React.FC<CameraViewProps> = ({ t, language }) => {
     const [pitch, setPitch] = useState(0); // Vertical angle
     const [dolly, setDolly] = useState(0); // Zoom in/out
     const [wideAngle, setWideAngle] = useState(false);
+    
+    const [additionalInstructions, setAdditionalInstructions] = useState('');
+    const [isAdvancedOptionsOpen, setIsAdvancedOptionsOpen] = useState(false);
 
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    
+    const instructionsTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useLayoutEffect(() => {
+        const textarea = instructionsTextareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    }, [additionalInstructions]);
 
     const handleRerender = async () => {
         if (baseImage.length === 0) {
             setError('Please upload an image to adjust.');
             return;
         }
-        if (yaw === 0 && pitch === 0 && dolly === 0 && !wideAngle) {
-            setError('Please adjust at least one camera control.');
+        if (yaw === 0 && pitch === 0 && dolly === 0 && !wideAngle && !additionalInstructions.trim()) {
+            setError('Please adjust at least one camera control or provide instructions.');
             return;
         }
 
@@ -69,7 +82,7 @@ export const CameraView: React.FC<CameraViewProps> = ({ t, language }) => {
         setError(null);
         setGeneratedImage(null);
         try {
-            const result = await changeImageAngle(baseImage[0], { yaw, pitch, dolly, wideAngle });
+            const result = await changeImageAngle(baseImage[0], { yaw, pitch, dolly, wideAngle }, additionalInstructions);
             setGeneratedImage(result);
         } catch (e: any) {
             setError(e.message || 'An unexpected error occurred.');
@@ -83,9 +96,10 @@ export const CameraView: React.FC<CameraViewProps> = ({ t, language }) => {
         setPitch(0);
         setDolly(0);
         setWideAngle(false);
+        setAdditionalInstructions('');
     };
     
-    const canRerender = !isLoading && baseImage.length > 0 && (yaw !== 0 || pitch !== 0 || dolly !== 0 || wideAngle);
+    const canRerender = !isLoading && baseImage.length > 0 && (yaw !== 0 || pitch !== 0 || dolly !== 0 || wideAngle || additionalInstructions.trim().length > 0);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 md:p-8">
@@ -148,6 +162,53 @@ export const CameraView: React.FC<CameraViewProps> = ({ t, language }) => {
                             />
                             <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-accent/30 dark:peer-focus:ring-brand-accent/80 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-accent"></div>
                         </label>
+                    </div>
+                </div>
+
+                {/* Integrated Advanced Options Section */}
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg transition-all duration-300">
+                    <div
+                        className="flex items-center justify-between p-4 cursor-pointer"
+                        onClick={() => setIsAdvancedOptionsOpen(prev => !prev)}
+                        role="button"
+                        aria-expanded={isAdvancedOptionsOpen}
+                        aria-controls="advanced-camera-options-content"
+                    >
+                        <label className="block text-lg font-semibold text-brand-primary dark:text-gray-300 pointer-events-none">
+                            {t('camera_advanced_options_toggle')}
+                        </label>
+                        <label htmlFor="advanced-options-toggle-camera" className="inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            <input
+                                id="advanced-options-toggle-camera"
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={isAdvancedOptionsOpen}
+                                onChange={(e) => setIsAdvancedOptionsOpen(e.target.checked)}
+                            />
+                            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-accent/30 dark:peer-focus:ring-brand-accent/80 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-accent"></div>
+                        </label>
+                    </div>
+                    
+                    <div
+                        id="advanced-camera-options-content"
+                        className="grid transition-all duration-500 ease-in-out"
+                        style={{ gridTemplateRows: isAdvancedOptionsOpen ? '1fr' : '0fr' }}
+                    >
+                        <div className="overflow-hidden">
+                            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                                <label htmlFor="additional-instructions" className="block text-lg font-semibold text-brand-primary dark:text-gray-300 mb-2">{t('edit_instructions_label')}</label>
+                                <textarea
+                                    ref={instructionsTextareaRef}
+                                    id="additional-instructions"
+                                    rows={2}
+                                    value={additionalInstructions}
+                                    onChange={(e) => setAdditionalInstructions(e.target.value)}
+                                    placeholder={t('camera_edit_instructions_placeholder')}
+                                    dir="auto"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white resize-none overflow-hidden text-start"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 

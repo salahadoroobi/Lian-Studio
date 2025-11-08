@@ -286,43 +286,61 @@ export const changeImageAngle = async (
         pitch: number; // -90 to 90
         dolly: number; // -90 to 90
         wideAngle: boolean;
-    }
+    },
+    additionalInstructions: string
 ): Promise<string> => {
     const ai = getAi();
     
     const imagePart = await fileToGenerativePart(baseImage.file);
     
-    let promptInstructions = `You are an expert virtual photographer. Your task is to re-render the provided image from a new camera perspective.
+    let promptInstructions = `You are an expert virtual photographer. Your task is to re-render the provided image from a new camera perspective based on the user's instructions.
 CRITICAL INSTRUCTIONS:
 - Faithfully preserve the subject, content, style, and overall atmosphere of the original image.
-- DO NOT add, remove, or change any objects or elements.
+- **DO NOT alter facial features, expressions, body posture, or the identity of people.**
+- **DO NOT change the direction subjects are facing.**
+- **DO NOT add, remove, or change any objects or elements.**
 - DO NOT change the lighting unless it's a natural consequence of the new camera angle.
-- Your only task is to change the camera's position and lens properties as requested.
+- Your ONLY task is to change the camera's position and lens properties as requested.
 
-Apply the following camera adjustments simultaneously:\n`;
+Apply the following adjustments:\n`;
     
     const transformations: string[] = [];
     
     if (settings.yaw !== 0) {
-        transformations.push(`- **Horizontal Rotation (Yaw):** Rotate the camera horizontally by approximately ${Math.abs(Math.round(settings.yaw / 90 * 45))} degrees to the ${settings.yaw > 0 ? 'right' : 'left'}.`);
+        transformations.push(`rotate the camera horizontally by approximately ${Math.abs(Math.round(settings.yaw / 90 * 45))} degrees to the ${settings.yaw > 0 ? 'right' : 'left'}`);
     }
 
     if (settings.pitch !== 0) {
-        transformations.push(`- **Vertical Angle (Pitch):** Adjust the camera to a ${settings.pitch > 0 ? 'high angle (bird\'s eye view)' : 'low angle (worm\'s eye view)'}. The magnitude of the angle change should be proportional to a value of ${Math.abs(settings.pitch)} out of 90.`);
+        transformations.push(`adjust the camera to a ${settings.pitch > 0 ? "high angle (bird's eye view)" : "low angle (worm's eye view)"} with a magnitude proportional to ${Math.abs(settings.pitch)} out of 90`);
     }
 
     if (settings.dolly !== 0) {
-        transformations.push(`- **Dolly (Zoom):** Move the camera ${settings.dolly > 0 ? 'forward (dolly in)' : 'backward (dolly out)'}. The magnitude of the movement should be proportional to a value of ${Math.abs(settings.dolly)} out of 90.`);
+        transformations.push(`move the camera ${settings.dolly > 0 ? 'forward (dolly in)' : 'backward (dolly out)'} with a magnitude proportional to ${Math.abs(settings.dolly)} out of 90`);
     }
 
     if (settings.wideAngle) {
-        transformations.push(`- **Lens Effect:** Apply a wide-angle lens effect, increasing the field of view.`);
+        transformations.push(`apply a wide-angle lens effect to increase the field of view`);
     }
 
-    if (transformations.length === 0) {
-        promptInstructions = "Re-render the image from the exact same perspective with high fidelity.";
+    let combinedInstruction = '';
+    if (transformations.length > 0) {
+        if (transformations.length === 1) {
+            combinedInstruction = `- Simultaneously, ${transformations[0]}.`;
+        } else {
+            const last = transformations.pop();
+            combinedInstruction = `- Simultaneously, ${transformations.join(', ')}, and ${last}.`;
+        }
+    }
+
+    if (additionalInstructions.trim()) {
+        combinedInstruction += `\n- Additionally, follow these instructions: "${additionalInstructions.trim()}"`;
+    }
+
+    if (!combinedInstruction) {
+        // This case is unlikely if the button is properly disabled, but serves as a fallback.
+        promptInstructions += "- Re-render the image from the exact same perspective with high fidelity, applying no changes.";
     } else {
-        promptInstructions += transformations.join('\n');
+        promptInstructions += combinedInstruction;
     }
     
     const textPart = { text: promptInstructions };
