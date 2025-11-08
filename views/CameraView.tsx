@@ -6,6 +6,7 @@ import type { ReferenceImage } from '../types';
 import type { TFunction, Language } from '../hooks/useLocalization';
 import { ActionButton } from '../components/ActionButton';
 import { ShimmerWrapper } from '../components/ShimmerWrapper';
+import { ResetIcon } from '../components/icons/ResetIcon';
 
 interface CameraViewProps {
   t: TFunction;
@@ -16,28 +17,27 @@ const ControlSlider: React.FC<{
     label: string;
     value: number;
     onChange: (value: number) => void;
-    minLabel: string;
-    maxLabel: string;
     t: TFunction;
-}> = ({ label, value, onChange, minLabel, maxLabel, t }) => (
+}> = ({ label, value, onChange, t }) => (
     <div className="w-full">
-        <label className="block text-md font-semibold text-brand-primary dark:text-gray-300 mb-2">{label}</label>
+        <div className="flex items-center gap-2 mb-2">
+            <label className="block text-md font-semibold text-brand-primary dark:text-gray-300">{label}</label>
+            <button onClick={() => onChange(0)} title={t('reset_view')} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-accent transition-colors">
+                <ResetIcon className="w-4 h-4" />
+            </button>
+        </div>
         <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-500 w-16 text-center">{minLabel}</span>
             <input
                 type="range"
-                min="-50"
-                max="50"
+                min="-90"
+                max="90"
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-brand-accent [&::-moz-range-thumb]:bg-brand-accent"
             />
-            <span className="text-xs text-gray-500 w-16 text-center">{maxLabel}</span>
-        </div>
-        <div className="text-center mt-1">
-            <button onClick={() => onChange(0)} className="text-xs text-brand-accent hover:underline">
-                Reset
-            </button>
+            <span className="font-semibold text-brand-primary dark:text-gray-300 w-16 text-center tabular-nums">
+                {value > 0 ? '+' : ''}{value}°
+            </span>
         </div>
     </div>
 );
@@ -78,6 +78,13 @@ export const CameraView: React.FC<CameraViewProps> = ({ t, language }) => {
         }
     };
     
+    const handleResetAll = () => {
+        setYaw(0);
+        setPitch(0);
+        setDolly(0);
+        setWideAngle(false);
+    };
+    
     const canRerender = !isLoading && baseImage.length > 0 && (yaw !== 0 || pitch !== 0 || dolly !== 0 || wideAngle);
 
     return (
@@ -92,39 +99,38 @@ export const CameraView: React.FC<CameraViewProps> = ({ t, language }) => {
                 </div>
                 
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col gap-4">
-                    <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold text-brand-primary dark:text-gray-300">
-                            {t('camera_options_label')}
-                        </h3>
-                         <ShimmerWrapper className="rounded-full">
-                            <span className="inline-flex items-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full">
-                                {t('beta_tag')}
-                            </span>
-                        </ShimmerWrapper>
+                    <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-semibold text-brand-primary dark:text-gray-300">
+                                {t('camera_options_label')}
+                            </h3>
+                             <ShimmerWrapper className="rounded-full">
+                                <span className="inline-flex items-center bg-brand-accent text-brand-bg text-xs font-semibold px-2.5 py-1 rounded-full">
+                                    {t('beta_tag')}
+                                </span>
+                            </ShimmerWrapper>
+                        </div>
+                        <button onClick={handleResetAll} title={t('reset_view')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-brand-accent transition-colors">
+                            <ResetIcon className="w-5 h-5" />
+                        </button>
                     </div>
 
                     <ControlSlider
                         label={t('camera_yaw_label')}
                         value={yaw}
                         onChange={setYaw}
-                        minLabel={t('camera_yaw_left')}
-                        maxLabel={t('camera_yaw_right')}
                         t={t}
                     />
                     <ControlSlider
                         label={t('camera_pitch_label')}
                         value={pitch}
                         onChange={setPitch}
-                        minLabel={t('camera_pitch_low')}
-                        maxLabel={t('camera_pitch_high')}
                         t={t}
                     />
                     <ControlSlider
                         label={t('camera_dolly_label')}
                         value={dolly}
                         onChange={setDolly}
-                        minLabel={t('camera_dolly_out')}
-                        maxLabel={t('camera_dolly_in')}
                         t={t}
                     />
                     

@@ -282,9 +282,9 @@ Your restoration process based on the user's request:
 export const changeImageAngle = async (
     baseImage: ReferenceImage,
     settings: {
-        yaw: number; // -50 to 50
-        pitch: number; // -50 to 50
-        dolly: number; // -50 to 50
+        yaw: number; // -90 to 90
+        pitch: number; // -90 to 90
+        dolly: number; // -90 to 90
         wideAngle: boolean;
     }
 ): Promise<string> => {
@@ -299,28 +299,28 @@ CRITICAL INSTRUCTIONS:
 - DO NOT change the lighting unless it's a natural consequence of the new camera angle.
 - Your only task is to change the camera's position and lens properties as requested.
 
-Apply the following transformations:\n`;
+Apply the following camera adjustments simultaneously:\n`;
     
     const transformations: string[] = [];
     
     if (settings.yaw !== 0) {
-        transformations.push(`- Rotate the camera yaw by approximately ${Math.abs(Math.round(settings.yaw / 50 * 30))} degrees to the ${settings.yaw > 0 ? 'right' : 'left'}.`);
+        transformations.push(`- **Horizontal Rotation (Yaw):** Rotate the camera horizontally by approximately ${Math.abs(Math.round(settings.yaw / 90 * 45))} degrees to the ${settings.yaw > 0 ? 'right' : 'left'}.`);
     }
 
     if (settings.pitch !== 0) {
-        transformations.push(`- Change the camera pitch to a ${settings.pitch > 0 ? 'high angle (bird\'s eye view)' : 'low angle (worm\'s eye view)'}. The magnitude of the angle change should be proportional to a value of ${Math.abs(settings.pitch)} out of 50.`);
+        transformations.push(`- **Vertical Angle (Pitch):** Adjust the camera to a ${settings.pitch > 0 ? 'high angle (bird\'s eye view)' : 'low angle (worm\'s eye view)'}. The magnitude of the angle change should be proportional to a value of ${Math.abs(settings.pitch)} out of 90.`);
     }
 
     if (settings.dolly !== 0) {
-        transformations.push(`- Dolly the camera ${settings.dolly > 0 ? 'forward to zoom in' : 'backward to zoom out'}. The magnitude of the dolly should be proportional to a value of ${Math.abs(settings.dolly)} out of 50.`);
+        transformations.push(`- **Dolly (Zoom):** Move the camera ${settings.dolly > 0 ? 'forward (dolly in)' : 'backward (dolly out)'}. The magnitude of the movement should be proportional to a value of ${Math.abs(settings.dolly)} out of 90.`);
     }
 
     if (settings.wideAngle) {
-        transformations.push(`- Apply a wide-angle lens effect to the image, increasing the field of view and introducing slight peripheral distortion.`);
+        transformations.push(`- **Lens Effect:** Apply a wide-angle lens effect, increasing the field of view.`);
     }
 
     if (transformations.length === 0) {
-        promptInstructions += "- Re-render the image from the exact same perspective with high fidelity.";
+        promptInstructions = "Re-render the image from the exact same perspective with high fidelity.";
     } else {
         promptInstructions += transformations.join('\n');
     }
