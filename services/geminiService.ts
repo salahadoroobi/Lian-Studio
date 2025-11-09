@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality } from '@google/genai';
 import type { ReferenceImage } from '../types';
 
@@ -293,14 +294,15 @@ export const changeImageAngle = async (
     
     const imagePart = await fileToGenerativePart(baseImage.file);
     
-    let promptInstructions = `You are an expert virtual photographer. Your task is to re-render the provided image from a new camera perspective based on the user's instructions.
-CRITICAL INSTRUCTIONS:
-- Faithfully preserve the subject, content, style, and overall atmosphere of the original image.
-- **DO NOT alter facial features, expressions, body posture, or the identity of people.**
-- **DO NOT change the direction subjects are facing.**
-- **DO NOT add, remove, or change any objects or elements.**
-- DO NOT change the lighting unless it's a natural consequence of the new camera angle.
-- Your ONLY task is to change the camera's position and lens properties as requested.
+    let promptInstructions = `You are an expert virtual photographer with a strict directive to only adjust the camera's perspective. Your task is to re-render the provided image from a new viewpoint without altering its content in any other way.
+
+**ABSOLUTE CORE DIRECTIVES (NON-NEGOTIABLE):**
+1.  **PRESERVE ALL ORIGINAL ELEMENTS:** Every object, person, and background element from the original image **MUST** remain in the final output. Nothing should be added, removed, or changed.
+2.  **MAINTAIN POSITIONS AND PLACEMENT:** The relative position of all elements to each other **MUST** be preserved. Do not move objects or subjects within the scene.
+3.  **NO CONTENT ALTERATION:** You **MUST NOT** alter facial features, expressions, body posture, clothing, colors, or the identity of people. The subjects must look identical to the original.
+4.  **NO STYLE OR ATMOSPHERE CHANGE:** The artistic style, lighting (unless a direct result of the new angle), mood, and overall atmosphere of the original image **MUST** be faithfully replicated.
+
+Your ONLY task is to change the camera's position (yaw, pitch, dolly) and lens properties (wide-angle) as requested below. Think of it as taking a new photo of the exact same static scene from a different spot.
 
 Apply the following adjustments:\n`;
     
